@@ -1,0 +1,914 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1A0608">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Yeehaw">
+<title>Yeehaw</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rye&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --bg:#1A0608; --surface:#2A0E0F; --surface2:#220A0B; --line:#46201C;
+  --text:#FFF6EC; --soft:#F5DFCF; --muted:#CDA593;
+  --accent:#FF3347; --gold:#FFD23F; --teal:#FFD23F; --ink:#1A0608;
+  --grad:linear-gradient(120deg,#FFD23F 0%,#FF7A1A 50%,#E8172E 100%);
+  --ring:repeating-conic-gradient(from 0deg,#FFD23F 0deg 12deg,#E8172E 12deg 24deg);
+  --glow:0 8px 26px rgba(255,122,26,.38);
+  --stitch:1.5px dashed rgba(255,210,63,.45);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:'Work Sans',system-ui,sans-serif;font-size:15px}
+body{background:radial-gradient(120% 60% at 100% 0%,rgba(255,122,26,.16),transparent 60%),radial-gradient(100% 50% at 0% 100%,rgba(255,210,63,.12),transparent 60%),var(--bg);background-attachment:fixed}
+button,input,textarea,select{font-family:inherit;font-size:inherit;color:inherit}
+button{cursor:pointer;transition:transform .12s ease}
+button:active{transform:scale(.94)}
+a{color:var(--accent)}
+img,video{display:block;max-width:100%}
+#app{max-width:520px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
+.logo{font-family:Rye,serif;font-size:30px;letter-spacing:.5px;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 12px rgba(255,122,26,.45))}
+.topbar{position:sticky;top:0;z-index:5;background:rgba(26,6,8,.78);border-bottom:var(--stitch);backdrop-filter:blur(18px) saturate(1.6);-webkit-backdrop-filter:blur(18px) saturate(1.6);display:flex;align-items:center;justify-content:space-between;padding:calc(10px + env(safe-area-inset-top)) 16px 8px}
+.iconbtn{width:44px;height:44px;border-radius:22px;border:1px solid var(--line);background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;padding:0}
+.iconbtn.plain{border:none;background:none}
+main{flex:1;padding-bottom:calc(104px + env(safe-area-inset-bottom))}
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:6;padding:0 14px calc(12px + env(safe-area-inset-bottom));pointer-events:none}
+.nav-in{pointer-events:auto;max-width:492px;margin:0 auto;display:flex;justify-content:space-around;align-items:center;padding:6px 8px;border-radius:28px;background:rgba(42,14,15,.86);backdrop-filter:blur(20px) saturate(1.8);-webkit-backdrop-filter:blur(20px) saturate(1.8);border:1px solid rgba(255,255,255,.08);box-shadow:0 10px 34px rgba(0,0,0,.55)}
+.nav button{border:none;background:none;width:58px;height:54px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;font-weight:600;color:var(--muted)}
+.nav button.on{color:#fff}
+.nav button.on svg{stroke:url(#g);filter:drop-shadow(0 0 8px rgba(255,122,26,.7))}
+.nav button.on::after{content:"";width:5px;height:5px;border-radius:50%;background:var(--gold);box-shadow:0 0 8px var(--gold)}
+.nav .plus{width:60px;height:46px;border-radius:16px;background:var(--grad);color:var(--ink);box-shadow:var(--glow);outline:var(--stitch);outline-color:rgba(26,6,8,.45);outline-offset:-5px}
+.stories{display:flex;gap:14px;overflow-x:auto;padding:10px 16px 16px;scrollbar-width:none}
+.stories::-webkit-scrollbar,.chips::-webkit-scrollbar{display:none}
+.story{border:none;background:none;padding:0;display:flex;flex-direction:column;align-items:center;gap:6px;width:72px;flex-shrink:0}
+.story span{font-size:12px;font-weight:500;color:var(--soft);max-width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ring{position:relative;width:70px;height:70px;border-radius:50%;padding:3px;background:var(--line)}
+.ring.new{background:none}
+.ring.new::before{content:"";position:absolute;inset:0;border-radius:50%;background:var(--ring);animation:spin 4s linear infinite;box-shadow:0 0 16px rgba(255,122,26,.45)}
+.ring>div{position:relative;width:100%;height:100%;border-radius:50%;border:3px solid var(--bg);overflow:hidden}
+.avatar{border-radius:50%;background:var(--grad);color:var(--ink);font-weight:700;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:0 16px 16px;scrollbar-width:none}
+.chip{flex-shrink:0;height:38px;padding:0 18px;border-radius:19px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--soft);font-weight:600;font-size:14px}
+.chip.on{background:var(--grad);border-color:transparent;color:var(--ink);box-shadow:0 4px 16px rgba(255,122,26,.35)}
+.post{margin:0 10px 22px;border-radius:24px;background:var(--surface);border:1px solid rgba(255,255,255,.06);overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,.35)}
+.post-head{display:flex;align-items:center;gap:10px;padding:12px 12px 10px;border-bottom:var(--stitch);margin:0 8px 0}
+.post-head .who{flex:1;min-width:0;border:none;background:none;padding:0;text-align:left;display:flex;flex-direction:column}
+.post-head b{font-size:15px}
+.post-head small{color:var(--muted);font-size:13px}
+.tag{font-size:12px;font-weight:700;color:var(--ink);background:var(--grad);padding:5px 11px;border-radius:12px}
+.media{position:relative;background:#000;width:100%;aspect-ratio:4/5;overflow:hidden;user-select:none;-webkit-user-select:none}
+.media img,.media video{width:100%;height:100%;object-fit:cover}
+.burst{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;opacity:0}
+.burst.go{animation:burst .9s ease-out}
+.burst b{font-family:Rye,serif;font-size:42px;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 3px 14px rgba(0,0,0,.7))}
+@keyframes burst{0%{opacity:0;transform:scale(.4) rotate(-8deg)}20%{opacity:1;transform:scale(1.2) rotate(4deg)}40%{transform:scale(1) rotate(0)}80%{opacity:1}100%{opacity:0;transform:scale(1.05) translateY(-18px)}}
+.actions{display:flex;align-items:center;padding:6px 6px 0}
+.actions .count{margin-left:auto;padding-right:10px;font-weight:700;font-size:14px}
+.liked{color:var(--accent)}
+.liked svg{fill:var(--accent);filter:drop-shadow(0 0 8px rgba(232,23,46,.8))}
+.pop{animation:pop .4s cubic-bezier(.3,1.6,.5,1)}
+@keyframes pop{50%{transform:scale(1.4)}}
+.caption{margin:2px 16px 0;font-size:14px;line-height:1.45;color:var(--soft);white-space:pre-wrap;word-wrap:break-word}
+.caption b{color:var(--text)}
+.meta{margin:6px 16px 14px;color:var(--muted);font-size:13px}
+.linkbtn{border:none;background:none;padding:0;color:var(--muted);font-size:13px}
+.shop{margin:12px 12px 4px;padding:12px;border-radius:18px;background:linear-gradient(135deg,rgba(255,122,26,.12),rgba(255,210,63,.12));border:var(--stitch)}
+.shop h4{margin:0 0 10px;font-size:14px;display:flex;justify-content:space-between;align-items:center}
+.shop h4 small{font-weight:400;color:var(--muted);font-size:11px}
+.shop-items{display:flex;gap:8px;overflow-x:auto}
+.shop-item{flex-shrink:0;min-width:110px;padding:12px;border-radius:14px;background:rgba(20,5,6,.6);border:1px solid rgba(255,255,255,.08);text-decoration:none;color:var(--text);display:flex;flex-direction:column;gap:4px}
+.shop-item span{color:var(--gold);font-size:13px;font-weight:700}
+.empty{text-align:center;padding:60px 30px;color:var(--muted);line-height:1.5}
+.empty .logo{display:block;margin-bottom:10px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;padding:0 4px}
+.tile{position:relative;aspect-ratio:3/4;background:var(--surface);border:none;padding:0;overflow:hidden;border-radius:10px}
+.tile img,.tile video{width:100%;height:100%;object-fit:cover}
+.tile .play{position:absolute;top:6px;right:6px;color:#fff;filter:drop-shadow(0 1px 3px rgba(0,0,0,.7))}
+.page{padding-left:16px;padding-right:16px}
+.page form{padding-bottom:24px}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.field label{font-size:13px;font-weight:600;color:var(--soft)}
+.input{width:100%;min-height:50px;padding:12px 16px;border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s}
+.input:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(255,122,26,.25)}
+textarea.input{min-height:90px;resize:vertical}
+.btn{width:100%;height:52px;border-radius:26px;border:none;background:var(--grad);color:var(--ink);font-weight:700;font-size:16px;box-shadow:var(--glow)}
+.btn:disabled{opacity:.55}
+.btn.ghost{background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--text);box-shadow:none}
+.btn.small{width:auto;height:42px;padding:0 20px;font-size:14px}
+.err{color:#FF8FA8;font-size:14px;margin:0 0 12px;min-height:1px}
+.ok{color:#7DF0B0;font-size:14px;margin:0 0 12px}
+.picker{width:100%;aspect-ratio:4/5;border-radius:22px;border:2px dashed rgba(255,210,63,.55);background:linear-gradient(135deg,rgba(255,122,26,.08),rgba(255,210,63,.1));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--muted);overflow:hidden;padding:0;margin-bottom:14px}
+.picker img,.picker video{width:100%;height:100%;object-fit:cover}
+.auth{flex:1;display:flex;flex-direction:column;justify-content:center;padding:40px 22px calc(30px + env(safe-area-inset-bottom));position:relative;isolation:isolate}
+.auth::before{content:"";position:fixed;inset:-20%;z-index:-1;background:radial-gradient(40% 30% at 20% 20%,rgba(255,122,26,.35),transparent 70%),radial-gradient(40% 30% at 80% 30%,rgba(255,210,63,.3),transparent 70%),radial-gradient(45% 35% at 50% 85%,rgba(232,23,46,.22),transparent 70%);filter:blur(30px);animation:float 12s ease-in-out infinite alternate}
+@keyframes float{to{transform:translate(4%,-3%) rotate(8deg)}}
+.auth .logo{font-size:60px;text-align:center}
+.auth form{padding:20px 18px;border-radius:24px;background:rgba(42,14,15,.6);border:var(--stitch);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.auth p.lead{text-align:center;color:var(--soft);margin:6px 0 30px}
+.switch{text-align:center;margin-top:18px;color:var(--muted);font-size:14px}
+.switch button{border:none;background:none;color:var(--gold);font-weight:700;padding:8px}
+.prof-head{display:flex;align-items:center;gap:18px;padding:6px 16px 14px}
+.prof-head .ring{background:var(--ring)}
+.stats{flex:1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));text-align:center;gap:8px}
+.stats>div{padding:10px 4px;border-radius:16px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06)}
+.stats b{display:block;font-size:20px;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.stats span{font-size:12px;color:var(--muted)}
+.prof-info{padding:0 16px 14px}
+.prof-info b{font-size:18px}
+.prof-info div{color:var(--muted);font-size:14px;margin-top:2px}
+.prof-btns{display:flex;gap:8px;padding:0 16px 16px}
+.prof-btns .btn{height:42px;font-size:14px}
+.sheet-bg{position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center}
+.sheet{width:100%;max-width:520px;max-height:85vh;max-height:85dvh;background:var(--surface2);border-radius:26px 26px 0 0;border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;animation:up .25s cubic-bezier(.2,1,.3,1)}
+.sheet .post{margin:0 0 10px;box-shadow:none}
+@keyframes up{from{transform:translateY(60px);opacity:.3}}
+.sheet-head{display:flex;align-items:center;justify-content:space-between;padding:10px 10px 6px 18px;border-bottom:1px solid var(--line)}
+.sheet-head b{font-size:16px}
+.sheet-body{overflow-y:auto;padding:12px 16px;flex:1}
+.sheet-foot{display:flex;gap:8px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}
+.cmt{display:flex;gap:10px;margin-bottom:14px}
+.cmt p{margin:0;font-size:14px;line-height:1.4;white-space:pre-wrap;word-wrap:break-word;color:var(--soft)}
+.cmt p b{color:var(--text)}
+.cmt small{color:var(--muted);font-size:12px}
+.toast{position:fixed;left:50%;bottom:calc(100px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--grad);color:var(--ink);padding:11px 20px;border-radius:22px;font-weight:700;font-size:14px;z-index:30;max-width:90vw;text-align:center;box-shadow:var(--glow);animation:up .25s ease-out}
+.spinner{width:30px;height:30px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--teal);border-right-color:var(--gold);animation:spin .8s linear infinite;margin:40px auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+.row{display:flex;gap:8px}
+.row .input{flex:1;min-width:0}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* ---- Sundowns ---- */
+.sd-add{position:absolute;right:-2px;bottom:-2px;width:24px;height:24px;border-radius:50%;background:var(--grad);color:var(--ink);border:3px solid var(--bg);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;line-height:1}
+.ring.seen{background:#5A3A33}
+.ring.blank{background:none;border:2px dashed rgba(255,210,63,.55);padding:1px}
+.story .sd-add{max-width:none;overflow:visible;color:var(--ink)}
+.kinds svg{width:20px;height:20px}
+.sd-viewer{position:fixed;inset:0;z-index:40;background:#000;display:flex;flex-direction:column;animation:up .2s ease-out}
+.sd-in{position:relative;flex:1;max-width:520px;width:100%;margin:0 auto;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.sd-in img,.sd-in video{width:100%;height:100%;object-fit:contain}
+.sd-top{position:absolute;left:0;right:0;top:0;z-index:3;padding:calc(10px + env(safe-area-inset-top)) 10px 18px;background:linear-gradient(rgba(0,0,0,.65),transparent)}
+.sd-bars{display:flex;gap:4px;margin-bottom:10px}
+.sd-bar{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.3);overflow:hidden}
+.sd-bar i{display:block;height:100%;width:0;background:var(--grad)}
+.sd-head{display:flex;align-items:center;gap:10px}
+.sd-head b{font-size:15px}
+.sd-head small{color:rgba(255,255,255,.75);font-size:13px}
+.sd-head .sp{flex:1}
+.sd-zone{position:absolute;top:80px;bottom:90px;z-index:2;border:none;background:none;padding:0}
+.sd-zone.prev{left:0;width:33%}
+.sd-zone.next{right:0;width:67%}
+.sd-cap{position:absolute;left:0;right:0;bottom:0;z-index:3;padding:24px 18px calc(22px + env(safe-area-inset-bottom));background:linear-gradient(transparent,rgba(0,0,0,.7));font-size:15px;line-height:1.4;text-align:center;white-space:pre-wrap;word-wrap:break-word}
+.sd-label{display:inline-flex;align-items:center;gap:6px;font-family:Rye,serif;font-size:13px;color:var(--gold)}
+/* ---- Rides ---- */
+.rides{position:fixed;top:0;bottom:0;left:0;right:0;max-width:520px;margin:0 auto;overflow-y:auto;scroll-snap-type:y mandatory;background:#000;scrollbar-width:none;z-index:1}
+.rides::-webkit-scrollbar{display:none}
+.rides-top{position:fixed;top:0;left:0;right:0;max-width:520px;margin:0 auto;z-index:4;display:flex;align-items:center;justify-content:space-between;padding:calc(10px + env(safe-area-inset-top)) 16px 10px;background:linear-gradient(rgba(0,0,0,.55),transparent);pointer-events:none}
+.rides-top>*{pointer-events:auto}
+.ride{position:relative;height:100vh;height:100dvh;scroll-snap-align:start;scroll-snap-stop:always;overflow:hidden;background:#000}
+.ride video{width:100%;height:100%;object-fit:cover}
+.ride .burst{z-index:2}
+.ride-info{position:absolute;left:0;right:76px;bottom:calc(96px + env(safe-area-inset-bottom));z-index:3;padding:0 14px;text-shadow:0 1px 6px rgba(0,0,0,.7)}
+.ride-info .who{display:flex;align-items:center;gap:10px;border:none;background:none;padding:0;margin-bottom:8px;text-align:left}
+.ride-info .who b{font-size:16px}
+.ride-info p{margin:0 0 8px;font-size:14px;line-height:1.4;white-space:pre-wrap;word-wrap:break-word}
+.ride::after{content:"";position:absolute;left:0;right:0;bottom:0;height:45%;background:linear-gradient(transparent,rgba(0,0,0,.65));pointer-events:none;z-index:1}
+.ride-side{position:absolute;right:6px;bottom:calc(100px + env(safe-area-inset-bottom));z-index:3;display:flex;flex-direction:column;align-items:center;gap:6px}
+.ride-side .iconbtn{width:52px;height:52px;border-radius:26px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.15);color:#fff}
+.ride-side span{font-size:12px;font-weight:700;text-shadow:0 1px 4px rgba(0,0,0,.8);margin-bottom:6px}
+.ride-paused{position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.ride-paused span{width:76px;height:76px;border-radius:50%;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;color:#fff}
+.kinds{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:4px;border-radius:20px;background:rgba(255,255,255,.05);border:1px solid var(--line);margin-bottom:14px}
+.kinds button{height:44px;border:none;border-radius:16px;background:none;color:var(--soft);font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;gap:6px}
+.kinds button.on{background:var(--grad);color:var(--ink);box-shadow:var(--glow)}
+.hint{font-size:13px;color:var(--muted);margin:-6px 0 14px;line-height:1.4}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFD23F"/><stop offset=".5" stop-color="#FF7A1A"/><stop offset="1" stop-color="#E8172E"/></linearGradient></defs></svg>
+<div id="app"></div>
+<script>
+// ===== CONFIGURACIÓN (la llena Claude con tus datos de Supabase) =====
+const SUPABASE_URL = 'https://olflxehmwfxvsnzoqzrm.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_-GRf3to9PdSARsBT_PXAnw_K2Kqgwtp';
+// =====================================================================
+
+const CATEGORIES = ['Bailes', 'Outfits', 'Caballos', 'Jaripeo', 'Ganado', 'Comida'];
+const MAX_VIDEO_MB = 50;
+
+const ICONS = {
+  home: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>',
+  search: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>',
+  plus: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  user: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>',
+  heart: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>',
+  comment: '<svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8A8.5 8.5 0 0 1 12.5 3 8.4 8.4 0 0 1 21 11.5z"/></svg>',
+  share: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>',
+  refresh: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.6-6.4L21 8"/><path d="M21 3v5h-5"/></svg>',
+  close: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>',
+  back: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>',
+  play: '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>',
+  camera: '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>',
+  hat: '<svg width="70" height="46" viewBox="0 0 70 46" fill="url(#g)" stroke="#0A0A0F" stroke-width="2"><path d="M22 10c3-6 8-8 13-5 5-3 10-1 13 5l3 20H19z"/><path d="M2 30c6 8 20 12 33 12s27-4 33-12c-8 3-20 5-33 5S10 33 2 30z"/></svg>',
+  horseshoe: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 21v-9a6 6 0 0 1 12 0v9"/><path d="M4.5 21h3M16.5 21h3"/><circle cx="7.2" cy="9" r=".6" fill="currentColor"/><circle cx="16.8" cy="9" r=".6" fill="currentColor"/><circle cx="6.4" cy="14" r=".6" fill="currentColor"/><circle cx="17.6" cy="14" r=".6" fill="currentColor"/></svg>',
+  sundown: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 17a5 5 0 0 0-10 0"/><path d="M2 17h20M6 21h12"/><path d="M12 6v3M4.9 9.9l1.5 1.5M19.1 9.9l-1.5 1.5"/></svg>',
+  sound: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg>',
+  mute: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="m22 9-6 6M16 9l6 6"/></svg>',
+  playbig: '<svg width="34" height="34" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>',
+  trash: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>'
+};
+
+// ---------- utilidades ----------
+function h(tag, attrs, ...kids) {
+  const el = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (v == null || v === false) continue;
+    if (k === 'class') el.className = v;
+    else if (k === 'style') el.style.cssText = v;
+    else if (k === 'icon') el.innerHTML = ICONS[v]; // solo íconos propios, nunca texto de usuarios
+    else if (k.startsWith('on')) el.addEventListener(k.slice(2).toLowerCase(), v);
+    else if (k in el && typeof v !== 'string') el[k] = v;
+    else el.setAttribute(k, v === true ? '' : v);
+  }
+  for (const kid of kids.flat()) {
+    if (kid == null || kid === false) continue;
+    el.append(kid instanceof Node ? kid : document.createTextNode(String(kid)));
+  }
+  return el;
+}
+const $app = document.getElementById('app');
+function toast(msg) {
+  const t = h('div', { class: 'toast', role: 'status' }, msg);
+  document.body.append(t);
+  setTimeout(() => t.remove(), 2600);
+}
+function timeAgo(iso) {
+  const s = (Date.now() - new Date(iso).getTime()) / 1000;
+  if (s < 60) return 'hace un momento';
+  const m = Math.floor(s / 60); if (m < 60) return `hace ${m} min`;
+  const hr = Math.floor(m / 60); if (hr < 24) return `hace ${hr} h`;
+  const d = Math.floor(hr / 24); if (d < 7) return `hace ${d} ${d === 1 ? 'día' : 'días'}`;
+  return new Date(iso).toLocaleDateString('es-MX', { day: 'numeric', month: 'short' });
+}
+function initials(p) {
+  const n = (p && (p.full_name || p.username)) || '?';
+  return n.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase();
+}
+function avatar(p, size) {
+  const a = h('div', { class: 'avatar', style: `width:${size}px;height:${size}px;font-size:${Math.round(size * 0.38)}px` });
+  if (p && p.avatar_url) a.append(h('img', { src: p.avatar_url, alt: '' }));
+  else a.textContent = initials(p);
+  return a;
+}
+function safeUrl(u) { return /^https?:\/\//i.test(u || '') ? u : null; }
+function friendlyError(e) {
+  const m = (e && e.message) || String(e);
+  if (/Invalid login/i.test(m)) return 'Correo o contraseña incorrectos.';
+  if (/already registered/i.test(m)) return 'Ese correo ya tiene cuenta. Inicia sesión.';
+  if (/Password should be/i.test(m)) return 'La contraseña debe tener al menos 6 caracteres.';
+  if (/Email not confirmed/i.test(m)) return 'Falta confirmar tu correo. Revisa tu bandeja de entrada.';
+  if (/Failed to fetch|NetworkError/i.test(m)) return 'Sin conexión. Revisa tu internet.';
+  if (/kind/i.test(m) && /column|columna/i.test(m)) return 'Falta actualizar la base de datos en Supabase (el paso del SQL de Rides y Sundowns).';
+  return m;
+}
+async function compressImage(file, max = 1440) {
+  if (!file.type.startsWith('image/') || file.type === 'image/gif') return file;
+  try {
+    const bmp = await createImageBitmap(file);
+    const s = Math.min(1, max / Math.max(bmp.width, bmp.height));
+    const c = document.createElement('canvas');
+    c.width = Math.round(bmp.width * s); c.height = Math.round(bmp.height * s);
+    c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+    const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.82));
+    return blob || file;
+  } catch (_) { return file; }
+}
+
+// ---------- estado ----------
+if (SUPABASE_URL.startsWith('PEGA') || !window.supabase) {
+  $app.append(h('div', { class: 'empty' }, h('span', { class: 'logo' }, 'Yeehaw'),
+    window.supabase ? 'Falta poner los datos de Supabase en el archivo.' : 'No se pudo cargar. Revisa tu conexión y recarga.'));
+  throw new Error('config');
+}
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const state = { session: null, me: null, view: 'feed', category: 'Todo', profileId: null, authMode: 'login', uploadKind: 'post', ridesMuted: true };
+const DAY = 864e5;
+const SEEN_KEY = 'yeehaw_seen_sundowns';
+let seenSundowns = new Set();
+try { seenSundowns = new Set(JSON.parse(localStorage.getItem(SEEN_KEY) || '[]')); } catch (_) {}
+function markSeen(id) {
+  seenSundowns.add(id);
+  try { localStorage.setItem(SEEN_KEY, JSON.stringify([...seenSundowns].slice(-500))); } catch (_) {}
+}
+
+// ---------- datos ----------
+const POST_SELECT = 'id,user_id,media_url,media_type,caption,category,shop_links,created_at,profiles(id,username,full_name,avatar_url,rancho),likes(user_id),comments(count)';
+async function loadMe() {
+  const { data } = await sb.from('profiles').select('*').eq('id', state.session.user.id).maybeSingle();
+  state.me = data;
+}
+let HAS_KIND = true;
+async function fetchPosts({ category, userId, kinds = ['post', 'ride'], since } = {}) {
+  const build = (withKind) => {
+    let q = sb.from('posts').select(POST_SELECT + (withKind ? ',kind' : '')).order('created_at', { ascending: false }).limit(60);
+    if (category && category !== 'Todo') q = q.eq('category', category);
+    if (userId) q = q.eq('user_id', userId);
+    if (since) q = q.gte('created_at', since);
+    if (withKind) q = q.in('kind', kinds);
+    return q;
+  };
+  if (HAS_KIND) {
+    const { data, error } = await build(true);
+    if (!error) return data || [];
+    if (!/kind/i.test(error.message || '')) throw error;
+    HAS_KIND = false; // la base de datos aún no tiene Rides ni Sundowns
+  }
+  if (!kinds.includes('post')) return [];
+  const { data, error } = await build(false);
+  if (error) throw error;
+  return data || [];
+}
+async function fetchSundownGroups(userId) {
+  const items = await fetchPosts({ kinds: ['sundown'], since: new Date(Date.now() - DAY).toISOString(), userId }).catch(() => []);
+  const map = new Map();
+  items.slice().reverse().forEach(it => {
+    if (!map.has(it.user_id)) map.set(it.user_id, { user: it.profiles || { id: it.user_id }, items: [] });
+    map.get(it.user_id).items.push(it);
+  });
+  return [...map.values()].map(g => ({ ...g, unseen: g.items.some(i => !seenSundowns.has(i.id)) }));
+}
+
+// ---------- navegación ----------
+function go(view, extra) {
+  state.view = view;
+  if (extra && 'profileId' in extra) state.profileId = extra.profileId;
+  window.scrollTo(0, 0);
+  render();
+}
+function navBar() {
+  const b = (v, icon, label, isOn) => h('button', { class: isOn ? 'on' : '', 'aria-label': label, onclick: () => go(v, v === 'profile' ? { profileId: state.me.id } : undefined) },
+    h('span', { icon }), label);
+  const ownProfile = state.view === 'profile' && state.profileId === state.me.id;
+  return h('nav', { class: 'nav' }, h('div', { class: 'nav-in' },
+    b('feed', 'home', 'Inicio', state.view === 'feed'),
+    b('rides', 'horseshoe', 'Rides', state.view === 'rides'),
+    h('button', { class: 'plus', 'aria-label': 'Subir', onclick: () => { state.uploadKind = state.view === 'rides' ? 'ride' : 'post'; go('upload'); }, icon: 'plus' }),
+    b('explore', 'search', 'Explorar', state.view === 'explore'),
+    b('profile', 'user', 'Perfil', ownProfile)
+  ));
+}
+
+// ---------- pantallas ----------
+function render() {
+  $app.replaceChildren();
+  if (!state.session) return renderAuth();
+  if (!state.me) { $app.append(h('div', { class: 'spinner' })); return; }
+  const views = { feed: renderFeed, rides: renderRides, explore: renderExplore, upload: renderUpload, profile: renderProfile };
+  (views[state.view] || renderFeed)();
+  $app.append(navBar());
+}
+
+function renderAuth() {
+  const isLogin = state.authMode === 'login';
+  const err = h('p', { class: 'err', role: 'alert' });
+  const f = (label, attrs) => { const id = 'f_' + attrs.name; return h('div', { class: 'field' }, h('label', { for: id }, label), h('input', { class: 'input', id, ...attrs })); };
+  const form = h('form', {
+    onsubmit: async (e) => {
+      e.preventDefault();
+      const fd = new FormData(form); const btn = form.querySelector('button[type=submit]');
+      btn.disabled = true; err.textContent = '';
+      try {
+        if (isLogin) {
+          const { error } = await sb.auth.signInWithPassword({ email: fd.get('email').trim(), password: fd.get('password') });
+          if (error) throw error;
+        } else {
+          const { data, error } = await sb.auth.signUp({ email: fd.get('email').trim(), password: fd.get('password'),
+            options: { data: { full_name: fd.get('full_name').trim(), username: fd.get('username').trim() } } });
+          if (error) throw error;
+          if (!data.session) { err.className = 'ok'; err.textContent = 'Cuenta creada. Revisa tu correo para confirmarla y luego inicia sesión.'; }
+        }
+      } catch (ex) { err.className = 'err'; err.textContent = friendlyError(ex); }
+      btn.disabled = false;
+    }
+  },
+    !isLogin && f('Tu nombre', { name: 'full_name', required: true, autocomplete: 'name', maxlength: '60' }),
+    !isLogin && f('Nombre de usuario', { name: 'username', required: true, autocapitalize: 'off', placeholder: 'ej. el_compa_chuy', maxlength: '30' }),
+    f('Correo', { name: 'email', type: 'email', required: true, autocomplete: 'email', autocapitalize: 'off' }),
+    f('Contraseña', { name: 'password', type: 'password', required: true, minlength: '6', autocomplete: isLogin ? 'current-password' : 'new-password' }),
+    err,
+    h('button', { class: 'btn', type: 'submit' }, isLogin ? 'Entrar' : 'Crear cuenta')
+  );
+  $app.append(h('div', { class: 'auth' },
+    h('div', { class: 'logo' }, 'Yeehaw'),
+    h('p', { class: 'lead' }, 'La vida de rancho, en un solo lugar'),
+    form,
+    h('div', { class: 'switch' }, isLogin ? '¿No tienes cuenta?' : '¿Ya tienes cuenta?',
+      h('button', { type: 'button', onclick: () => { state.authMode = isLogin ? 'signup' : 'login'; render(); } }, isLogin ? 'Regístrate' : 'Inicia sesión'))
+  ));
+}
+
+async function renderFeed() {
+  const main = h('main');
+  $app.append(h('header', { class: 'topbar' }, h('div', { class: 'logo' }, 'Yeehaw'),
+    h('button', { class: 'iconbtn', 'aria-label': 'Actualizar', icon: 'refresh', onclick: () => render() })), main);
+
+  const stories = h('div', { class: 'stories' });
+  const chips = h('div', { class: 'chips' }, ['Todo', ...CATEGORIES].map(c =>
+    h('button', { class: 'chip' + (state.category === c ? ' on' : ''), onclick: () => { state.category = c; render(); } }, c)));
+  const list = h('div', {}, h('div', { class: 'spinner' }));
+  main.append(stories, chips, list);
+
+  // Sundowns: lo que subieron en las últimas 24 horas
+  const paintSundowns = async () => {
+    const groups = await fetchSundownGroups();
+    const mine = groups.find(g => g.user.id === state.me.id);
+    const others = groups.filter(g => g.user.id !== state.me.id).sort((a, b) => b.unseen - a.unseen);
+    const newSundown = () => { state.uploadKind = 'sundown'; go('upload'); };
+    const myBubble = h('button', { class: 'story', 'aria-label': mine ? 'Ver tu sundown' : 'Subir tu sundown', onclick: () => mine ? openSundowns([mine, ...others], 0, paintSundowns) : newSundown() },
+      h('div', { class: 'ring' + (mine ? (mine.unseen ? ' new' : ' seen') : ' blank') }, h('div', {}, avatar(state.me, 56)),
+        h('span', { class: 'sd-add', role: 'button', 'aria-label': 'Nuevo sundown', onclick: (e) => { e.stopPropagation(); newSundown(); } }, '+')),
+      h('span', {}, 'Tu sundown'));
+    stories.replaceChildren(myBubble, ...others.map((g, i) => h('button', { class: 'story', onclick: () => openSundowns(others, i, paintSundowns) },
+      h('div', { class: 'ring ' + (g.unseen ? 'new' : 'seen') }, h('div', {}, avatar(g.user, 56))),
+      h('span', {}, g.user.username || ''))));
+  };
+  paintSundowns();
+
+  try {
+    const posts = await fetchPosts({ category: state.category });
+    list.replaceChildren();
+    if (!posts.length) {
+      list.append(h('div', { class: 'empty' }, state.category === 'Todo'
+        ? 'Todavía no hay nada por aquí. ¡Sube la primera foto del rancho con el botón +!'
+        : `Nadie ha subido nada de ${state.category} todavía. ¡Estrénala tú!`,
+        h('div', { style: 'margin-top:18px' }, h('button', { class: 'btn small', onclick: () => go('upload') }, 'Subir algo'))));
+    }
+    posts.forEach(p => list.append(postCard(p)));
+  } catch (e) { list.replaceChildren(h('div', { class: 'empty' }, friendlyError(e))); }
+}
+
+function likeControls(p, short) {
+  const myId = state.me.id;
+  let liked = (p.likes || []).some(l => l.user_id === myId);
+  let likeCount = (p.likes || []).length;
+  const countEl = h('span', { class: short ? '' : 'count' });
+  const likeBtn = h('button', { class: 'iconbtn' + (short ? '' : ' plain'), 'aria-label': 'Dar yeehaw', icon: 'heart' });
+  const paint = () => {
+    likeBtn.classList.toggle('liked', liked);
+    likeBtn.setAttribute('aria-pressed', String(liked));
+    countEl.textContent = short ? likeCount.toLocaleString('es-MX') : `${likeCount.toLocaleString('es-MX')} ${likeCount === 1 ? 'yeehaw' : 'yeehaws'}`;
+  };
+  let busy = false;
+  const setLike = async (want) => {
+    if (busy || want === liked) return;
+    busy = true; liked = want; likeCount += want ? 1 : -1; paint();
+    likeBtn.classList.remove('pop'); void likeBtn.offsetWidth; likeBtn.classList.add('pop');
+    const res = want ? await sb.from('likes').insert({ post_id: p.id, user_id: myId })
+                     : await sb.from('likes').delete().eq('post_id', p.id).eq('user_id', myId);
+    if (res.error) { liked = !want; likeCount += want ? -1 : 1; paint(); toast('No se pudo guardar, intenta de nuevo'); }
+    busy = false;
+  };
+  likeBtn.addEventListener('click', () => setLike(!liked));
+  paint();
+  return { likeBtn, countEl, setLike };
+}
+function burstEl() { return h('div', { class: 'burst', 'aria-hidden': 'true' }, h('span', { icon: 'hat' }), h('b', {}, 'YEEHAW!')); }
+function fireBurst(b) { b.classList.remove('go'); void b.offsetWidth; b.classList.add('go'); }
+async function sharePost(p) {
+  const data = { title: 'Yeehaw', text: (p.caption || 'Mira esto en Yeehaw') + '\n', url: location.href };
+  try { if (navigator.share) await navigator.share(data); else { await navigator.clipboard.writeText(location.href); toast('Enlace copiado'); } } catch (_) {}
+}
+async function deletePost(p) {
+  if (!confirm('¿Borrar esta publicación?')) return false;
+  const { error } = await sb.from('posts').delete().eq('id', p.id);
+  if (error) { toast('No se pudo borrar'); return false; }
+  const path = p.media_url.split('/media/')[1];
+  if (path) sb.storage.from('media').remove([decodeURIComponent(path)]);
+  toast('Borrado');
+  return true;
+}
+
+function postCard(p) {
+  const prof = p.profiles || {};
+  const myId = state.me.id;
+  const commentCount = (p.comments && p.comments[0] && p.comments[0].count) || 0;
+  const { likeBtn, countEl, setLike } = likeControls(p, false);
+  const burst = burstEl();
+  const mediaEl = p.media_type === 'video'
+    ? h('video', { src: p.media_url, controls: true, playsInline: true, preload: 'metadata' })
+    : h('img', { src: p.media_url, alt: p.caption ? p.caption.slice(0, 120) : 'Foto de ' + (prof.username || '') , loading: 'lazy' });
+  const media = h('div', { class: 'media' }, mediaEl, burst);
+  if (p.media_type !== 'video') {
+    let last = 0;
+    media.addEventListener('click', () => {
+      const now = Date.now();
+      if (now - last < 320) { fireBurst(burst); setLike(true); last = 0; }
+      else last = now;
+    });
+  }
+
+  const links = (Array.isArray(p.shop_links) ? p.shop_links : []).filter(l => l && safeUrl(l.url));
+  const card = h('article', { class: 'post' },
+    h('div', { class: 'post-head' },
+      avatar(prof, 40),
+      h('button', { class: 'who', onclick: () => go('profile', { profileId: p.user_id }) },
+        h('b', {}, prof.username || 'usuario'), h('small', {}, p.kind === 'ride' ? 'Ride · ' + timeAgo(p.created_at) : (prof.rancho || timeAgo(p.created_at)))),
+      p.category && h('span', { class: 'tag' }, p.category),
+      p.user_id === myId && h('button', { class: 'iconbtn plain', 'aria-label': 'Borrar publicación', icon: 'trash', onclick: async () => { if (await deletePost(p)) card.remove(); } })
+    ),
+    media,
+    links.length > 0 && h('div', { class: 'shop' },
+      h('h4', {}, 'Comprar el look', h('small', {}, 'Enlaces de tiendas')),
+      h('div', { class: 'shop-items' }, links.map(l => h('a', { class: 'shop-item', href: safeUrl(l.url), target: '_blank', rel: 'noopener noreferrer' },
+        h('b', {}, l.name || 'Ver producto'), h('span', {}, 'Ver en tienda'))))),
+    h('div', { class: 'actions' },
+      likeBtn,
+      h('button', { class: 'iconbtn plain', 'aria-label': 'Comentarios', icon: 'comment', onclick: () => openComments(p) }),
+      h('button', { class: 'iconbtn plain', 'aria-label': 'Compartir', icon: 'share', onclick: () => sharePost(p) }),
+      countEl),
+    p.caption && h('p', { class: 'caption' }, h('b', {}, prof.username || ''), ' ', p.caption),
+    h('div', { class: 'meta' },
+      h('button', { class: 'linkbtn', onclick: () => openComments(p) }, commentCount ? `Ver ${commentCount === 1 ? 'el comentario' : `los ${commentCount} comentarios`}` : 'Comentar'),
+      ' · ', timeAgo(p.created_at))
+  );
+  return card;
+}
+
+function openSheet(title, body, foot) {
+  const close = () => bg.remove();
+  const bg = h('div', { class: 'sheet-bg', onclick: (e) => { if (e.target === bg) close(); } },
+    h('div', { class: 'sheet', role: 'dialog', 'aria-label': title },
+      h('div', { class: 'sheet-head' }, h('b', {}, title), h('button', { class: 'iconbtn plain', 'aria-label': 'Cerrar', icon: 'close', onclick: close })),
+      body, foot || null));
+  document.body.append(bg);
+  return close;
+}
+
+async function openComments(p) {
+  const body = h('div', { class: 'sheet-body' }, h('div', { class: 'spinner' }));
+  const input = h('input', { class: 'input', placeholder: 'Escribe un comentario…', maxlength: '500', 'aria-label': 'Comentario' });
+  const send = h('button', { class: 'btn small', type: 'submit' }, 'Enviar');
+  const foot = h('form', { class: 'sheet-foot', onsubmit: async (e) => {
+    e.preventDefault();
+    const text = input.value.trim(); if (!text) return;
+    send.disabled = true;
+    const { error } = await sb.from('comments').insert({ post_id: p.id, user_id: state.me.id, body: text });
+    send.disabled = false;
+    if (error) return toast('No se pudo enviar');
+    input.value = ''; load();
+  } }, input, send);
+  openSheet('Comentarios', body, foot);
+  async function load() {
+    const { data, error } = await sb.from('comments').select('id,body,created_at,user_id,profiles(username,full_name,avatar_url)').eq('post_id', p.id).order('created_at');
+    if (error) return body.replaceChildren(h('p', { class: 'err' }, friendlyError(error)));
+    body.replaceChildren();
+    if (!data.length) body.append(h('p', { class: 'empty', style: 'padding:30px 10px' }, 'Sé el primero en comentar.'));
+    data.forEach(c => body.append(h('div', { class: 'cmt' }, avatar(c.profiles, 34),
+      h('div', {}, h('p', {}, h('b', {}, (c.profiles && c.profiles.username) || ''), ' ', c.body), h('small', {}, timeAgo(c.created_at))))));
+    body.scrollTop = body.scrollHeight;
+  }
+  load();
+}
+
+function gridOf(posts, onEmpty) {
+  if (!posts.length) return h('div', { class: 'empty' }, onEmpty);
+  return h('div', { class: 'grid' }, posts.map(p => h('button', { class: 'tile', 'aria-label': p.caption || 'Ver publicación', onclick: () => {
+    const body = h('div', { class: 'sheet-body', style: 'padding:12px 0' }, postCard(p));
+    openSheet(p.profiles ? p.profiles.username : 'Publicación', body);
+  } },
+    p.media_type === 'video' ? [h('video', { src: p.media_url + '#t=0.5', muted: true, playsInline: true, preload: 'metadata' }), h('span', { class: 'play', icon: 'play' })]
+                             : h('img', { src: p.media_url, alt: '', loading: 'lazy' }))));
+}
+
+
+// ---------- Sundowns (desaparecen en 24 horas) ----------
+function openSundowns(groups, gi, onClose) {
+  if (!groups.length) return;
+  let ii = 0, timer = null, video = null;
+  const bars = h('div', { class: 'sd-bars' });
+  const head = h('div', { class: 'sd-head' });
+  const stage = h('div', { style: 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center' });
+  const cap = h('div', { class: 'sd-cap' });
+  const inner = h('div', { class: 'sd-in' }, stage,
+    h('div', { class: 'sd-top' }, bars, head),
+    h('button', { class: 'sd-zone prev', 'aria-label': 'Anterior', onclick: () => prev() }),
+    h('button', { class: 'sd-zone next', 'aria-label': 'Siguiente', onclick: () => next() }),
+    cap);
+  const viewer = h('div', { class: 'sd-viewer', role: 'dialog', 'aria-label': 'Sundowns' }, inner);
+  const stop = () => { clearTimeout(timer); if (video) { video.pause(); video = null; } };
+  const close = () => { stop(); viewer.remove(); document.removeEventListener('keydown', onKey); if (onClose) onClose(); };
+  const onKey = (e) => { if (e.key === 'Escape') close(); if (e.key === 'ArrowRight') next(); if (e.key === 'ArrowLeft') prev(); };
+  document.addEventListener('keydown', onKey);
+  function show() {
+    stop();
+    const g = groups[gi]; const it = g.items[ii];
+    markSeen(it.id);
+    bars.replaceChildren(...g.items.map((_, k) => h('div', { class: 'sd-bar' }, h('i', { style: `width:${k < ii ? 100 : 0}%` }))));
+    const fill = bars.children[ii].firstChild;
+    head.replaceChildren(...[avatar(g.user, 36),
+      h('div', {}, h('b', {}, g.user.username || ''), h('br'), h('small', {}, timeAgo(it.created_at))),
+      h('div', { class: 'sp' }),
+      it.user_id === state.me.id && h('button', { class: 'iconbtn plain', style: 'color:#fff', 'aria-label': 'Borrar sundown', icon: 'trash', onclick: async () => {
+        stop();
+        if (await deletePost(it)) { g.items.splice(ii, 1); if (!g.items.length) { groups.splice(gi, 1); if (!groups.length) return close(); gi = Math.min(gi, groups.length - 1); ii = 0; } else ii = Math.min(ii, g.items.length - 1); }
+        show();
+      } }),
+      h('button', { class: 'iconbtn plain', style: 'color:#fff', 'aria-label': 'Cerrar', icon: 'close', onclick: close })].filter(Boolean));
+    cap.textContent = it.caption || '';
+    cap.style.display = it.caption ? 'block' : 'none';
+    if (it.media_type === 'video') {
+      video = h('video', { src: it.media_url, playsInline: true, autoplay: true });
+      video.addEventListener('timeupdate', () => { if (video && video.duration) fill.style.width = (video.currentTime / video.duration * 100) + '%'; });
+      video.addEventListener('ended', () => next());
+      video.addEventListener('error', () => { timer = setTimeout(next, 3000); });
+      video.play().catch(() => { if (video) { video.muted = true; video.play().catch(() => {}); } });
+      stage.replaceChildren(video);
+      timer = setTimeout(next, 60000);
+    } else {
+      stage.replaceChildren(h('img', { src: it.media_url, alt: it.caption || 'Sundown de ' + (g.user.username || '') }));
+      requestAnimationFrame(() => requestAnimationFrame(() => { fill.style.transition = 'width 5s linear'; fill.style.width = '100%'; }));
+      timer = setTimeout(next, 5000);
+    }
+  }
+  function next() { const g = groups[gi]; if (ii < g.items.length - 1) ii++; else if (gi < groups.length - 1) { gi++; ii = 0; } else return close(); show(); }
+  function prev() { if (ii > 0) ii--; else if (gi > 0) { gi--; ii = groups[gi].items.length - 1; } show(); }
+  document.body.append(viewer);
+  show();
+}
+
+// ---------- Rides (videos verticales en pantalla completa) ----------
+async function renderRides() {
+  const wrap = h('div', { class: 'rides' }, h('div', { class: 'spinner', style: 'margin-top:45vh' }));
+  $app.append(h('div', { class: 'rides-top' }, h('div', { class: 'logo', style: 'font-size:26px' }, 'Rides'),
+    h('button', { class: 'iconbtn', style: 'color:#fff;background:rgba(0,0,0,.35)', 'aria-label': 'Subir un ride', icon: 'plus', onclick: () => { state.uploadKind = 'ride'; go('upload'); } })), wrap);
+  let rides = [];
+  try { rides = await fetchPosts({ kinds: ['ride'] }); } catch (e) { return wrap.replaceChildren(h('div', { class: 'empty', style: 'margin-top:35vh' }, friendlyError(e))); }
+  if (!HAS_KIND) return wrap.replaceChildren(h('div', { class: 'empty', style: 'margin-top:30vh' }, 'Los Rides todavía no están activados en la base de datos. Corre el SQL de actualización en Supabase.'));
+  if (!rides.length) return wrap.replaceChildren(h('div', { class: 'empty', style: 'margin-top:30vh' },
+    h('span', { class: 'logo', style: 'font-size:34px' }, 'Rides'), 'Videos cortos y verticales del rancho. ¡Sube el primero!',
+    h('div', { style: 'margin-top:18px' }, h('button', { class: 'btn small', onclick: () => { state.uploadKind = 'ride'; go('upload'); } }, 'Subir mi ride'))));
+  const cards = rides.map(rideCard);
+  wrap.replaceChildren(...cards.map(c => c.el));
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(en => {
+      const c = cards.find(x => x.el === en.target); if (!c) return;
+      if (en.isIntersecting && en.intersectionRatio > 0.6) c.play(); else c.pause();
+    });
+  }, { root: wrap, threshold: [0, 0.6, 1] });
+  cards.forEach(c => io.observe(c.el));
+}
+
+function rideCard(p) {
+  const prof = p.profiles || {};
+  const commentCount = (p.comments && p.comments[0] && p.comments[0].count) || 0;
+  const { likeBtn, countEl, setLike } = likeControls(p, true);
+  const video = h('video', { src: p.media_url, loop: true, playsInline: true, muted: state.ridesMuted, preload: 'metadata' });
+  video.muted = state.ridesMuted;
+  const burst = burstEl();
+  const paused = h('div', { class: 'ride-paused', style: 'display:none' }, h('span', { icon: 'playbig' }));
+  const muteBtn = h('button', { class: 'iconbtn', 'aria-label': 'Sonido', icon: state.ridesMuted ? 'mute' : 'sound' });
+  muteBtn.addEventListener('click', () => {
+    state.ridesMuted = !state.ridesMuted;
+    document.querySelectorAll('.ride video').forEach(v => { v.muted = state.ridesMuted; });
+    document.querySelectorAll('.ride .mutebtn').forEach(b => { b.innerHTML = ICONS[state.ridesMuted ? 'mute' : 'sound']; });
+  });
+  muteBtn.classList.add('mutebtn');
+  let wantPlay = false;
+  const play = () => { wantPlay = true; video.muted = state.ridesMuted; video.play().then(() => { paused.style.display = 'none'; }).catch(() => { video.muted = true; video.play().catch(() => { paused.style.display = 'flex'; }); }); };
+  const pause = () => { wantPlay = false; video.pause(); };
+  let last = 0, tapTimer = null;
+  const tapLayer = h('button', { 'aria-label': 'Pausar o reproducir. Doble toque para dar yeehaw', style: 'position:absolute;inset:0;z-index:1;border:none;background:none;padding:0' });
+  tapLayer.addEventListener('click', () => {
+    const now = Date.now();
+    if (now - last < 300) { clearTimeout(tapTimer); fireBurst(burst); setLike(true); last = 0; return; }
+    last = now;
+    tapTimer = setTimeout(() => {
+      if (video.paused) { video.play().catch(() => {}); paused.style.display = 'none'; }
+      else { video.pause(); paused.style.display = 'flex'; }
+    }, 300);
+  });
+  const el = h('section', { class: 'ride', 'aria-label': 'Ride de ' + (prof.username || '') },
+    video, tapLayer, burst, paused,
+    h('div', { class: 'ride-info' },
+      h('button', { class: 'who', onclick: () => go('profile', { profileId: p.user_id }) }, avatar(prof, 40), h('b', {}, prof.username || 'usuario')),
+      p.caption && h('p', {}, p.caption),
+      h('div', { style: 'display:flex;gap:8px;align-items:center' }, p.category && h('span', { class: 'tag' }, p.category), h('small', { style: 'color:rgba(255,255,255,.8)' }, timeAgo(p.created_at)))),
+    h('div', { class: 'ride-side' },
+      likeBtn, countEl,
+      h('button', { class: 'iconbtn', 'aria-label': 'Comentarios', icon: 'comment', onclick: () => openComments(p) }), h('span', {}, String(commentCount)),
+      h('button', { class: 'iconbtn', 'aria-label': 'Compartir', icon: 'share', onclick: () => sharePost(p) }), h('span', {}, ' '),
+      muteBtn,
+      p.user_id === state.me.id && h('button', { class: 'iconbtn', 'aria-label': 'Borrar ride', icon: 'trash', style: 'margin-top:6px', onclick: async () => { pause(); if (await deletePost(p)) el.remove(); } })));
+  return { el, play, pause };
+}
+
+async function renderExplore() {
+  const main = h('main');
+  $app.append(h('header', { class: 'topbar' }, h('div', { class: 'logo', style: 'font-size:24px' }, 'Explorar')), main);
+  const search = h('input', { class: 'input', type: 'search', placeholder: 'Buscar personas o ranchos…', 'aria-label': 'Buscar' });
+  const people = h('div', { style: 'padding:0 16px' });
+  const chips = h('div', { class: 'chips', style: 'padding-top:12px' }, ['Todo', ...CATEGORIES].map(c =>
+    h('button', { class: 'chip' + (state.category === c ? ' on' : ''), onclick: () => { state.category = c; render(); } }, c)));
+  const grid = h('div', {}, h('div', { class: 'spinner' }));
+  main.append(h('div', { style: 'padding:0 16px' }, search), people, chips, grid);
+
+  let timer;
+  search.addEventListener('input', () => {
+    clearTimeout(timer);
+    timer = setTimeout(async () => {
+      const q = search.value.trim().replace(/[%,()]/g, '');
+      if (!q) return people.replaceChildren();
+      const { data } = await sb.from('profiles').select('id,username,full_name,avatar_url,rancho')
+        .or(`username.ilike.%${q}%,full_name.ilike.%${q}%,rancho.ilike.%${q}%`).limit(10);
+      people.replaceChildren(...(data || []).map(p => h('button', { class: 'post-head', style: 'width:100%;border:none;background:none;padding:10px 0;text-align:left', onclick: () => go('profile', { profileId: p.id }) },
+        avatar(p, 44), h('div', { class: 'who' }, h('b', {}, p.username), h('small', {}, [p.full_name, p.rancho].filter(Boolean).join(' · '))))));
+      if (data && !data.length) people.append(h('p', { style: 'color:var(--muted)' }, 'No encontramos a nadie con ese nombre.'));
+    }, 300);
+  });
+
+  try { grid.replaceChildren(gridOf(await fetchPosts({ category: state.category }), 'Aún no hay publicaciones aquí.')); }
+  catch (e) { grid.replaceChildren(h('div', { class: 'empty' }, friendlyError(e))); }
+}
+
+function renderUpload() {
+  let file = null; let category = 'Bailes';
+  let kind = state.uploadKind || 'post';
+  const main = h('main', { class: 'page' });
+  $app.append(h('header', { class: 'topbar' }, h('div', { class: 'logo', style: 'font-size:24px' }, 'Subir')), main);
+
+  const KINDS = [['post', 'Publicación', 'camera'], ['ride', 'Ride', 'horseshoe'], ['sundown', 'Sundown', 'sundown']];
+  const HINTS = {
+    post: 'Foto o video que se queda en el inicio y en tu perfil.',
+    ride: 'Video corto y vertical, en pantalla completa. Ideal para bailes, montas y caballos.',
+    sundown: 'Foto o video que desaparece en 24 horas, cuando se pone el sol.'
+  };
+  const kindBar = h('div', { class: 'kinds', role: 'tablist' });
+  const hint = h('p', { class: 'hint' });
+  const fileInput = h('input', { type: 'file', accept: 'image/*,video/*', class: 'sr', id: 'pick' });
+  const pickerEmpty = () => [h('span', { icon: kind === 'ride' ? 'horseshoe' : kind === 'sundown' ? 'sundown' : 'camera' }),
+    h('b', { style: 'color:var(--text)' }, kind === 'ride' ? 'Toca para elegir un video' : 'Toca para elegir foto o video'),
+    h('span', {}, 'De tu galería o la cámara')];
+  const picker = h('label', { class: 'picker', for: 'pick' }, ...pickerEmpty());
+  fileInput.addEventListener('change', () => {
+    const f = fileInput.files[0]; if (!f) return;
+    if (f.type.startsWith('video/') && f.size > MAX_VIDEO_MB * 1048576) { file = null; return toast(`El video pesa mucho (máx. ${MAX_VIDEO_MB} MB). Prueba uno más corto.`); }
+    if (kind === 'ride' && !f.type.startsWith('video/')) { file = null; return toast('Los rides son videos. Elige un video.'); }
+    file = f;
+    const url = URL.createObjectURL(f);
+    picker.replaceChildren(f.type.startsWith('video/') ? h('video', { src: url, muted: true, playsInline: true, autoplay: true, loop: true }) : h('img', { src: url, alt: 'Vista previa' }));
+  });
+
+  const shopBox = h('div', { class: 'shop', style: 'margin:0 0 14px;display:none' },
+    h('h4', {}, 'Comprar el look', h('small', {}, 'Opcional')),
+    ...[0, 1, 2].map(i => h('div', { class: 'row', style: 'margin-bottom:8px' },
+      h('input', { class: 'input', name: 'shop_name_' + i, placeholder: ['Botas', 'Sombrero', 'Cinto'][i], maxlength: '40', 'aria-label': 'Prenda ' + (i + 1) }),
+      h('input', { class: 'input', name: 'shop_url_' + i, type: 'url', placeholder: 'https://enlace-tienda…', 'aria-label': 'Enlace de la prenda ' + (i + 1) }))));
+  const catChips = h('div', { class: 'chips', style: 'padding:0 0 14px;flex-wrap:wrap' });
+  const paintCats = () => {
+    catChips.replaceChildren(...CATEGORIES.map(c => h('button', { type: 'button', class: 'chip' + (c === category ? ' on' : ''), onclick: () => { category = c; paintCats(); } }, c)));
+    shopBox.style.display = kind !== 'sundown' && category === 'Outfits' ? 'block' : 'none';
+  };
+  paintCats();
+
+  const caption = h('textarea', { class: 'input', name: 'caption', id: 'cap', maxlength: '1000', placeholder: '¿Qué está pasando en el rancho?' });
+  const catField = h('div', {}, h('div', { class: 'field' }, h('label', {}, 'Sección')), catChips);
+  const paintKind = () => {
+    kindBar.replaceChildren(...KINDS.map(([k, label, icon]) => h('button', { type: 'button', role: 'tab', 'aria-selected': String(k === kind), class: k === kind ? 'on' : '', onclick: () => {
+      kind = k; state.uploadKind = k;
+      if (k === 'ride' && file && !file.type.startsWith('video/')) { file = null; fileInput.value = ''; picker.replaceChildren(...pickerEmpty()); }
+      paintKind();
+    } }, h('span', { icon }), label)));
+    hint.textContent = HINTS[kind];
+    fileInput.accept = kind === 'ride' ? 'video/*' : 'image/*,video/*';
+    if (!file) picker.replaceChildren(...pickerEmpty());
+    picker.style.aspectRatio = kind === 'post' ? '4/5' : '9/16';
+    picker.style.maxHeight = kind === 'post' ? '' : '62vh';
+    catField.style.display = kind === 'sundown' ? 'none' : 'block';
+    shopBox.style.display = kind !== 'sundown' && category === 'Outfits' ? 'block' : 'none';
+    caption.placeholder = kind === 'sundown' ? 'Escribe algo (opcional)' : kind === 'ride' ? 'Describe tu ride…' : '¿Qué está pasando en el rancho?';
+    btn.textContent = kind === 'ride' ? 'Publicar ride' : kind === 'sundown' ? 'Publicar sundown' : 'Publicar';
+  };
+  const err = h('p', { class: 'err', role: 'alert' });
+  const btn = h('button', { class: 'btn', type: 'submit' }, 'Publicar');
+  const form = h('form', { onsubmit: async (e) => {
+    e.preventDefault(); err.textContent = '';
+    if (!file) return (err.textContent = 'Primero elige una foto o video.');
+    btn.disabled = true; btn.textContent = 'Subiendo…';
+    try {
+      const isVideo = file.type.startsWith('video/');
+      const blob = isVideo ? file : await compressImage(file);
+      const ext = isVideo ? ((file.name.split('.').pop() || 'mp4').toLowerCase().replace(/[^a-z0-9]/g, '') || 'mp4') : (blob.type === 'image/gif' ? 'gif' : (blob.type === 'image/png' ? 'png' : 'jpg'));
+      const path = `${state.me.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+      const up = await sb.storage.from('media').upload(path, blob, { contentType: blob.type || file.type, cacheControl: '31536000' });
+      if (up.error) throw up.error;
+      const { data: pub } = sb.storage.from('media').getPublicUrl(path);
+      const fd = new FormData(form);
+      const shop_links = kind !== 'sundown' && category === 'Outfits' ? [0, 1, 2].map(i => ({ name: String(fd.get('shop_name_' + i) || '').trim(), url: String(fd.get('shop_url_' + i) || '').trim() })).filter(l => safeUrl(l.url)) : [];
+      const row = { user_id: state.me.id, media_url: pub.publicUrl, media_type: isVideo ? 'video' : 'image', caption: caption.value.trim() || null, category: kind === 'sundown' ? null : category, shop_links };
+      if (kind !== 'post') row.kind = kind;
+      const ins = await sb.from('posts').insert(row);
+      if (ins.error) { sb.storage.from('media').remove([path]); throw ins.error; }
+      toast(kind === 'sundown' ? 'Sundown publicado. Se va con el sol en 24 h' : kind === 'ride' ? '¡Ride publicado! Yeehaw' : '¡Publicado! Yeehaw');
+      state.category = 'Todo'; state.uploadKind = 'post'; go(kind === 'ride' ? 'rides' : 'feed');
+    } catch (ex) { err.textContent = friendlyError(ex); btn.disabled = false; paintKind(); }
+  } },
+    kindBar, hint, fileInput, picker,
+    catField,
+    shopBox,
+    h('div', { class: 'field' }, h('label', { for: 'cap' }, 'Descripción'), caption),
+    err, btn);
+  paintKind();
+  main.append(form);
+}
+
+async function renderProfile() {
+  const id = state.profileId || state.me.id;
+  const isMe = id === state.me.id;
+  const main = h('main');
+  const top = h('header', { class: 'topbar' },
+    !isMe ? h('button', { class: 'iconbtn plain', 'aria-label': 'Regresar', icon: 'back', onclick: () => go('feed') }) : h('div', { class: 'logo', style: 'font-size:24px' }, 'Perfil'),
+    h('div'));
+  $app.append(top, main);
+  main.append(h('div', { class: 'spinner' }));
+
+  const [{ data: prof }, posts, sdGroups] = await Promise.all([
+    sb.from('profiles').select('*').eq('id', id).maybeSingle(),
+    fetchPosts({ userId: id }).catch(() => []),
+    fetchSundownGroups(id)
+  ]);
+  const sd = sdGroups[0];
+  if (!prof) return main.replaceChildren(h('div', { class: 'empty' }, 'No encontramos este perfil.'));
+  const totalLikes = posts.reduce((s, p) => s + (p.likes || []).length, 0);
+  if (!isMe) top.children[1].replaceWith(h('b', { style: 'font-size:17px' }, prof.username), h('div', { style: 'width:44px' }));
+
+  main.replaceChildren(
+    h('div', { class: 'prof-head' }, h('button', { style: 'border:none;background:none;padding:0', 'aria-label': sd ? 'Ver sundown' : 'Foto de perfil', onclick: () => { if (sd) openSundowns([sd], 0, () => render()); } },
+        h('div', { class: 'ring' + (sd ? (sd.unseen ? ' new' : ' seen') : ''), style: 'width:92px;height:92px' }, h('div', {}, avatar(prof, 80)))),
+      h('div', { class: 'stats' },
+        h('div', {}, h('b', {}, posts.length), h('span', {}, posts.length === 1 ? 'Publicación' : 'Publicaciones')),
+        h('div', {}, h('b', {}, totalLikes.toLocaleString('es-MX')), h('span', {}, 'Yeehaws')))),
+    h('div', { class: 'prof-info' }, h('b', {}, prof.full_name || prof.username), h('div', {}, '@' + prof.username + (prof.rancho ? ' · ' + prof.rancho : ''))),
+    isMe && h('div', { class: 'prof-btns' },
+      h('button', { class: 'btn ghost', onclick: () => editProfile(prof) }, 'Editar perfil'),
+      h('button', { class: 'btn ghost', onclick: async () => { await sb.auth.signOut(); } }, 'Cerrar sesión')),
+    gridOf(posts, isMe ? 'Aún no subes nada. Toca el botón + para tu primera publicación.' : 'Todavía no ha subido nada.')
+  );
+}
+
+function editProfile(prof) {
+  let newAvatar = null;
+  const prev = h('div', {}, avatar(prof, 84));
+  const fileIn = h('input', { type: 'file', accept: 'image/*', class: 'sr', id: 'av' });
+  fileIn.addEventListener('change', () => {
+    newAvatar = fileIn.files[0]; if (!newAvatar) return;
+    const a = h('div', { class: 'avatar', style: 'width:84px;height:84px' }, h('img', { src: URL.createObjectURL(newAvatar), alt: '' }));
+    prev.replaceChildren(a);
+  });
+  const name = h('input', { class: 'input', id: 'pn', value: prof.full_name || '', maxlength: '60' });
+  const rancho = h('input', { class: 'input', id: 'pr', value: prof.rancho || '', maxlength: '60', placeholder: 'ej. Rancho Los Álamos, Jalisco' });
+  const err = h('p', { class: 'err', role: 'alert' });
+  const save = h('button', { class: 'btn', type: 'submit' }, 'Guardar');
+  let close;
+  const body = h('form', { class: 'sheet-body', onsubmit: async (e) => {
+    e.preventDefault(); save.disabled = true; err.textContent = '';
+    try {
+      const patch = { full_name: name.value.trim() || null, rancho: rancho.value.trim() || null };
+      if (newAvatar) {
+        const blob = await compressImage(newAvatar, 480);
+        const path = `${state.me.id}/avatar-${Date.now()}.jpg`;
+        const up = await sb.storage.from('media').upload(path, blob, { contentType: 'image/jpeg' });
+        if (up.error) throw up.error;
+        patch.avatar_url = sb.storage.from('media').getPublicUrl(path).data.publicUrl;
+      }
+      const { error } = await sb.from('profiles').update(patch).eq('id', state.me.id);
+      if (error) throw error;
+      await loadMe(); close(); toast('Perfil actualizado'); render();
+    } catch (ex) { err.textContent = friendlyError(ex); save.disabled = false; }
+  } },
+    h('div', { style: 'display:flex;align-items:center;gap:16px;margin-bottom:18px' }, prev,
+      fileIn, h('label', { for: 'av', class: 'btn ghost small', style: 'display:inline-flex;align-items:center;cursor:pointer' }, 'Cambiar foto')),
+    h('div', { class: 'field' }, h('label', { for: 'pn' }, 'Nombre'), name),
+    h('div', { class: 'field' }, h('label', { for: 'pr' }, 'Rancho o lugar'), rancho),
+    err, save);
+  close = openSheet('Editar perfil', body);
+}
+
+// ---------- arranque ----------
+let started = false;
+sb.auth.onAuthStateChange((_event, session) => {
+  const changed = !started || (session && session.user.id) !== (state.session && state.session.user.id);
+  started = true;
+  state.session = session;
+  if (!changed) return;
+  state.me = null; state.view = 'feed'; render();
+  if (session) setTimeout(async () => { await loadMe(); render(); }, 0);
+});
+</script>
+</body>
+</html>
