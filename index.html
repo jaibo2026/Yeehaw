@@ -266,6 +266,33 @@ textarea.input{min-height:90px;resize:vertical}
 @keyframes rear{0%{transform:rotate(0) scale(1)}30%{transform:rotate(-16deg) translateY(-3px) scale(1.18)}55%{transform:rotate(6deg) scale(1.05)}75%{transform:rotate(-4deg)}100%{transform:rotate(0) scale(1)}}
 .burst-horse .horse{width:150px;height:150px;filter:drop-shadow(0 4px 14px rgba(0,0,0,.55))}
 .wc-ico .horse{width:24px;height:24px;filter:none}
+/* ---------- Mensajes ---------- */
+.dm-btn{position:relative;color:var(--text)}
+.dm-badge{position:absolute;top:-3px;right:-3px;min-width:19px;height:19px;padding:0 5px;border-radius:10px;background:#E8172E;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #fff}
+.inbox-row{width:100%;display:flex;align-items:center;gap:12px;padding:12px 16px;border:none;background:none;text-align:left}
+.inbox-row:active{background:var(--surface)}
+.inbox-row .who{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.inbox-row .who b{font-size:15px}
+.inbox-row .who span{color:var(--muted);font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.inbox-row.unread .who span{color:var(--text);font-weight:600}
+.inbox-row small{color:var(--muted);font-size:12px;flex-shrink:0}
+.inbox-dot{width:10px;height:10px;border-radius:50%;background:var(--grad);box-shadow:0 0 8px rgba(255,122,26,.6);flex-shrink:0}
+.dm-empty{text-align:center;padding:50px 30px;color:var(--muted);line-height:1.5}
+.dm-empty b{display:block;color:var(--text);font-size:17px;margin:10px 0 4px}
+.chat-head{gap:6px;justify-content:flex-start}
+.chat-head .who{display:flex;align-items:center;gap:10px;border:none;background:none;padding:0;font-weight:700;font-size:16px;min-width:0}
+.chat{flex:1;display:flex;flex-direction:column;gap:4px;padding:14px 12px calc(86px + env(safe-area-inset-bottom))}
+.msg{max-width:78%;padding:9px 14px;border-radius:20px;font-size:15px;line-height:1.38;white-space:pre-wrap;word-wrap:break-word}
+.msg.them{align-self:flex-start;background:var(--surface);border:1px solid var(--line);border-bottom-left-radius:6px}
+.msg.me{align-self:flex-end;background:var(--grad);color:var(--ink);border-bottom-right-radius:6px}
+.msg.pending{opacity:.6}
+.msg-time{align-self:center;color:var(--muted);font-size:12px;margin:10px 0 4px}
+.msg-seen{align-self:flex-end;color:var(--muted);font-size:12px;margin:2px 4px 0}
+.composer{position:fixed;left:0;right:0;bottom:0;z-index:6;background:rgba(255,255,255,.96);border-top:var(--stitch);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.composer form{max-width:520px;margin:0 auto;display:flex;gap:8px;align-items:flex-end;padding:10px 12px calc(10px + env(safe-area-inset-bottom))}
+.composer textarea{flex:1;min-height:46px;max-height:130px;resize:none;border-radius:23px;padding:12px 16px;line-height:1.3}
+.composer .send{width:46px;height:46px;border-radius:23px;border:none;background:var(--grad);color:var(--ink);display:flex;align-items:center;justify-content:center;box-shadow:var(--glow);flex-shrink:0}
+.composer .send:disabled{opacity:.5}
 @media (prefers-reduced-motion:reduce){*:not(.horse){animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -305,6 +332,9 @@ const ICONS = {
   flag: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22V4c5-3 9 3 16 0v10c-7 3-11-3-16 0"/></svg>',
   block: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="m5.7 5.7 12.6 12.6"/></svg>',
   horse: '<i class="horse" aria-hidden="true"></i>',
+  shots: '<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.82 15.16 L11.18 13.40 L10.05 9.00 L4.58 11.21 Z" fill="url(#g)" opacity="0.95" stroke="none"/><path d="M7.63 16.89 L11.80 15.20 L9.06 5.09 L2.57 7.71 Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M6.93 15.55 L11.38 13.75" fill="none" stroke="currentColor" stroke-width="1.26" stroke-linecap="round"/><path d="M12.82 13.40 L17.18 15.16 L19.42 11.21 L13.95 9.00 Z" fill="url(#g)" opacity="0.95" stroke="none"/><path d="M12.20 15.20 L16.37 16.89 L21.43 7.71 L14.94 5.09 Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12.62 13.75 L17.07 15.55" fill="none" stroke="currentColor" stroke-width="1.26" stroke-linecap="round"/><path d="M12 16.4 C13.4 16.4 13.6 18.6 13.3 20.8 C13.1 22.2 12.6 23 12 23 C11.4 23 10.9 22.2 10.7 20.8 C10.4 18.6 10.6 16.4 12 16.4 Z" fill="currentColor" opacity="0.4"/></svg>',
+  shotsbig: '<svg width="96" height="96" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.82 15.16 L11.18 13.40 L10.05 9.00 L4.58 11.21 Z" fill="url(#g)" opacity="1" stroke="none"/><path d="M7.63 16.89 L11.80 15.20 L9.06 5.09 L2.57 7.71 Z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M6.93 15.55 L11.38 13.75" fill="none" stroke="currentColor" stroke-width="0.9099999999999999" stroke-linecap="round"/><path d="M12.82 13.40 L17.18 15.16 L19.42 11.21 L13.95 9.00 Z" fill="url(#g)" opacity="1" stroke="none"/><path d="M12.20 15.20 L16.37 16.89 L21.43 7.71 L14.94 5.09 Z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M12.62 13.75 L17.07 15.55" fill="none" stroke="currentColor" stroke-width="0.9099999999999999" stroke-linecap="round"/><path d="M12 16.4 C13.4 16.4 13.6 18.6 13.3 20.8 C13.1 22.2 12.6 23 12 23 C11.4 23 10.9 22.2 10.7 20.8 C10.4 18.6 10.6 16.4 12 16.4 Z" fill="currentColor" opacity="0.3"/></svg>',
+  send: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>',
   pause: '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>',
   resume: '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>',
   trash: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>'
@@ -493,13 +523,14 @@ function navBar() {
 
 // ---------- pantallas ----------
 function render() {
+  if (state.cleanup) { try { state.cleanup(); } catch (_) {} state.cleanup = null; }
   $app.replaceChildren();
   if (!state.session) return renderAuth();
   if (!state.me) { $app.append(h('div', { class: 'spinner' })); return; }
   if (state.view === 'welcome') return renderWelcome();
-  const views = { feed: renderFeed, rides: renderRides, explore: renderExplore, upload: renderUpload, profile: renderProfile, animal: renderAnimal };
+  const views = { feed: renderFeed, rides: renderRides, explore: renderExplore, upload: renderUpload, profile: renderProfile, animal: renderAnimal, inbox: renderInbox, chat: renderChat };
   (views[state.view] || renderFeed)();
-  $app.append(navBar());
+  if (state.view !== 'chat') $app.append(navBar());
 }
 
 function renderAuth() {
@@ -545,7 +576,7 @@ function renderAuth() {
 
 async function renderFeed() {
   const main = h('main');
-  $app.append(h('header', { class: 'topbar' }, h('div', { class: 'logo' }, 'Yeehaw')), main);
+  $app.append(h('header', { class: 'topbar' }, h('div', { class: 'logo' }, 'Yeehaw'), dmButton()), main);
 
   const stories = h('div', { class: 'stories' });
   const chips = h('div', { class: 'chips' }, ['Todo', ...CATEGORIES].map(c =>
@@ -1256,7 +1287,7 @@ async function renderProfile() {
     isMe && h('div', { class: 'prof-btns' },
       h('button', { class: 'btn ghost', onclick: () => editProfile(prof) }, 'Editar perfil'),
       h('button', { class: 'btn ghost', onclick: async () => { await sb.auth.signOut(); } }, 'Cerrar sesión')),
-    !isMe && h('div', { class: 'prof-btns' }, (state.blocked && state.blocked.has(id))
+    !isMe && h('div', { class: 'prof-btns' }, !(state.blocked && state.blocked.has(id)) && HAS_DM && h('button', { class: 'btn small', style: 'flex:1', onclick: () => openChatWith(prof) }, 'Mensaje'), (state.blocked && state.blocked.has(id))
       ? h('button', { class: 'btn ghost', onclick: () => unblockUser(id, prof.username) }, 'Desbloquear')
       : h('button', { class: 'btn ghost', onclick: async () => { if (await blockUser(id, prof.username)) go('feed'); } }, 'Bloquear')),
     showAnimals && h('section', { class: 'herd' },
@@ -1419,11 +1450,159 @@ function editProfile(prof) {
   close = openSheet('Editar perfil', body);
 }
 
+// ---------- Mensajes ----------
+let HAS_DM = true;
+const PROF_MINI = 'id,username,full_name,avatar_url';
+function dmButton() {
+  const badge = h('span', { class: 'dm-badge', hidden: true });
+  const btn = h('button', { class: 'iconbtn dm-btn', 'aria-label': 'Mensajes', onclick: () => go('inbox') }, h('span', { icon: 'shots', style: 'display:flex' }), badge);
+  refreshUnread(badge);
+  return HAS_DM ? btn : h('div');
+}
+async function refreshUnread(badge) {
+  if (!HAS_DM || !state.me) return;
+  const { count, error } = await sb.from('messages').select('id', { count: 'exact', head: true }).is('read_at', null).neq('sender_id', state.me.id);
+  if (error) { if (/messages|relation|schema/i.test(error.message || '')) HAS_DM = false; return; }
+  const n = count || 0;
+  if (badge) { badge.hidden = !n; badge.textContent = n > 9 ? '9+' : String(n); }
+}
+async function openChatWith(prof) {
+  const { data, error } = await sb.rpc('open_conversation', { other: prof.id });
+  if (error) return toast(/function|open_conversation/i.test(error.message || '') ? 'Falta activar los mensajes en Supabase' : 'No se pudo abrir el chat');
+  state.chat = { id: data, other: prof };
+  go('chat');
+}
+function shortTime(iso) {
+  const d = new Date(iso), now = new Date();
+  if (d.toDateString() === now.toDateString()) return d.toLocaleTimeString('es-MX', { hour: 'numeric', minute: '2-digit' });
+  return timeAgo(iso).replace('hace ', '');
+}
+async function renderInbox() {
+  const main = h('main');
+  $app.append(h('header', { class: 'topbar' },
+    h('button', { class: 'iconbtn plain', 'aria-label': 'Regresar', icon: 'back', onclick: () => go('feed') }),
+    h('b', { style: 'font-size:18px' }, 'Mensajes'), h('div', { style: 'width:44px' })), main);
+  const search = h('input', { class: 'input', type: 'search', placeholder: 'Buscar a alguien para escribirle…', 'aria-label': 'Buscar persona' });
+  const found = h('div');
+  const list = h('div', {}, h('div', { class: 'spinner' }));
+  main.append(h('div', { style: 'padding:12px 16px 4px' }, search), found, list);
+
+  let timer;
+  search.addEventListener('input', () => {
+    clearTimeout(timer);
+    timer = setTimeout(async () => {
+      const q = search.value.trim().replace(/[%,()]/g, '');
+      if (!q) return found.replaceChildren();
+      const { data } = await sb.from('profiles').select(PROF_MINI + ',rancho').or(`username.ilike.%${q}%,full_name.ilike.%${q}%`).neq('id', state.me.id).limit(8);
+      const b = state.blocked || new Set();
+      found.replaceChildren(...(data || []).filter(p => !b.has(p.id)).map(p => h('button', { class: 'inbox-row', onclick: () => openChatWith(p) },
+        avatar(p, 48), h('div', { class: 'who' }, h('b', {}, p.username), h('span', {}, [p.full_name, p.rancho].filter(Boolean).join(' · ') || 'Escribirle')))));
+      if (data && !data.length) found.append(h('p', { style: 'color:var(--muted);padding:0 16px' }, 'No encontramos a nadie con ese nombre.'));
+    }, 300);
+  });
+
+  const { data: convs, error } = await sb.from('conversations')
+    .select(`id,user_a,user_b,last_message_at,a:profiles!user_a(${PROF_MINI}),b:profiles!user_b(${PROF_MINI})`)
+    .order('last_message_at', { ascending: false }).limit(60);
+  if (error) {
+    HAS_DM = !/conversations|relation|schema/i.test(error.message || '') ? HAS_DM : false;
+    return list.replaceChildren(h('div', { class: 'empty' }, HAS_DM ? friendlyError(error) : 'Los mensajes todavía no están activados.'));
+  }
+  const ids = (convs || []).map(c => c.id);
+  let msgs = [];
+  if (ids.length) {
+    const r = await sb.from('messages').select('id,conversation_id,sender_id,body,created_at,read_at').in('conversation_id', ids).order('created_at', { ascending: false }).limit(400);
+    msgs = r.data || [];
+  }
+  const last = new Map(), unread = new Map();
+  for (const m of msgs) {
+    if (!last.has(m.conversation_id)) last.set(m.conversation_id, m);
+    if (!m.read_at && m.sender_id !== state.me.id) unread.set(m.conversation_id, (unread.get(m.conversation_id) || 0) + 1);
+  }
+  const blocked = state.blocked || new Set();
+  const rows = (convs || []).filter(c => last.has(c.id)).map(c => {
+    const other = c.user_a === state.me.id ? c.b : c.a;
+    return { c, other, m: last.get(c.id), n: unread.get(c.id) || 0 };
+  }).filter(r => r.other && !blocked.has(r.other.id));
+  if (!rows.length) return list.replaceChildren(h('div', { class: 'dm-empty' }, h('div', { icon: 'shotsbig' }),
+    h('b', {}, '¡Salud! Aquí van tus mensajes'), 'Busca a alguien arriba o entra a su perfil y toca "Mensaje".'));
+  list.replaceChildren(...rows.map(({ c, other, m, n }) => h('button', { class: 'inbox-row' + (n ? ' unread' : ''), onclick: () => { state.chat = { id: c.id, other }; go('chat'); } },
+    avatar(other, 52),
+    h('div', { class: 'who' }, h('b', {}, other.username), h('span', {}, (m.sender_id === state.me.id ? 'Tú: ' : '') + m.body)),
+    h('small', {}, shortTime(m.created_at)), n ? h('span', { class: 'inbox-dot', 'aria-label': n + ' sin leer' }) : null)));
+}
+async function renderChat() {
+  const chat = state.chat;
+  if (!chat) return go('inbox');
+  const other = chat.other || {};
+  $app.append(h('header', { class: 'topbar chat-head' },
+    h('button', { class: 'iconbtn plain', 'aria-label': 'Regresar', icon: 'back', onclick: () => go('inbox') }),
+    h('button', { class: 'who', onclick: () => go('profile', { profileId: other.id }) }, avatar(other, 36), h('span', {}, other.username || ''))));
+  const box = h('main', { class: 'chat' }, h('div', { class: 'spinner' }));
+  const input = h('textarea', { class: 'input', rows: 1, maxlength: '2000', placeholder: 'Escribe un mensaje…', 'aria-label': 'Mensaje' });
+  const send = h('button', { class: 'send', type: 'submit', 'aria-label': 'Enviar', icon: 'send', disabled: true });
+  const form = h('form', { onsubmit: (e) => { e.preventDefault(); submit(); } }, input, send);
+  $app.append(box, h('div', { class: 'composer' }, form));
+  const blockedNow = state.blocked && state.blocked.has(other.id);
+  if (blockedNow) { input.disabled = true; input.placeholder = 'Bloqueaste a esta persona'; }
+
+  const grow = () => { input.style.height = 'auto'; input.style.height = Math.min(130, input.scrollHeight) + 'px'; send.disabled = !input.value.trim() || blockedNow; };
+  input.addEventListener('input', grow);
+  input.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && !('ontouchstart' in window)) { e.preventDefault(); submit(); } });
+
+  let msgs = [], alive = true;
+  const seen = new Set();
+  function paint() {
+    const kids = []; let prev = null;
+    for (const m of msgs) {
+      if (!prev || new Date(m.created_at) - new Date(prev.created_at) > 15 * 60e3) kids.push(h('div', { class: 'msg-time' }, shortTime(m.created_at)));
+      kids.push(h('div', { class: 'msg ' + (m.sender_id === state.me.id ? 'me' : 'them') + (m.pending ? ' pending' : '') }, m.body));
+      prev = m;
+    }
+    const lastMine = [...msgs].reverse().find(m => m.sender_id === state.me.id && !m.pending);
+    if (lastMine && msgs[msgs.length - 1] === lastMine && lastMine.read_at) kids.push(h('div', { class: 'msg-seen' }, 'Visto'));
+    if (!msgs.length) kids.push(h('div', { class: 'dm-empty' }, h('div', { icon: 'shotsbig' }), h('b', {}, '¡Salud!'), `Mándale el primer mensaje a @${other.username || ''}.`));
+    box.replaceChildren(...kids);
+    window.scrollTo(0, document.body.scrollHeight);
+  }
+  async function load() {
+    const { data, error } = await sb.from('messages').select('id,sender_id,body,created_at,read_at').eq('conversation_id', chat.id).order('created_at', { ascending: true }).limit(300);
+    if (!alive) return;
+    if (error) return box.replaceChildren(h('div', { class: 'empty' }, friendlyError(error)));
+    const pend = msgs.filter(m => m.pending);
+    msgs = (data || []).concat(pend);
+    msgs.forEach(m => seen.add(m.id));
+    paint();
+    if (msgs.some(m => m.sender_id !== state.me.id && !m.read_at)) sb.rpc('mark_read', { conv: chat.id }).then(() => {}, () => {});
+  }
+  async function submit() {
+    const text = input.value.trim();
+    if (!text || blockedNow) return;
+    input.value = ''; grow();
+    const tmp = { id: 'tmp' + Date.now(), sender_id: state.me.id, body: text, created_at: new Date().toISOString(), pending: true };
+    msgs.push(tmp); paint();
+    const { data, error } = await sb.from('messages').insert({ conversation_id: chat.id, sender_id: state.me.id, body: text }).select('id,sender_id,body,created_at,read_at').single();
+    msgs = msgs.filter(m => m !== tmp);
+    if (error) { input.value = text; grow(); paint(); return toast(/row-level|policy/i.test(error.message || '') ? 'No puedes mandarle mensajes a esta persona' : 'No se pudo enviar'); }
+    if (data && !seen.has(data.id)) { seen.add(data.id); msgs.push(data); }
+    paint();
+  }
+  let channel = null;
+  try {
+    if (sb.channel) channel = sb.channel('dm-' + chat.id).on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: 'conversation_id=eq.' + chat.id }, () => load()).subscribe();
+  } catch (_) { channel = null; }
+  const poll = setInterval(() => { if (!document.hidden) load(); }, channel ? 15000 : 4000);
+  state.cleanup = () => { alive = false; clearInterval(poll); if (channel) try { sb.removeChannel(channel); } catch (_) {} };
+  await load();
+  input.focus({ preventScroll: true });
+}
+
 // ---------- arranque ----------
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 let started = false;
 // Botón "atrás" del teléfono: cierra lo que esté abierto, regresa al inicio, y en el inicio actualiza.
 function armBack() { try { history.pushState({ yh: 1 }, ''); } catch (_) {} }
+setInterval(() => { const b = document.querySelector('.dm-badge'); if (b && !document.hidden) refreshUnread(b); }, 30000);
 armBack();
 window.addEventListener('popstate', () => {
   armBack();
@@ -1432,6 +1611,7 @@ window.addEventListener('popstate', () => {
   const sheets = document.querySelectorAll('.sheet-bg');
   if (sheets.length) { const c = sheets[sheets.length - 1].querySelector('.sheet-head [aria-label="Cerrar"]'); return c ? c.click() : sheets[sheets.length - 1].remove(); }
   if (!state.session || !state.me || state.view === 'welcome') return;
+  if (state.view === 'chat') return go('inbox');
   if (state.view !== 'feed') return go('feed');
   window.scrollTo({ top: 0, behavior: 'smooth' });
   render();
