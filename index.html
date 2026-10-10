@@ -150,7 +150,10 @@ textarea.input{min-height:90px;resize:vertical}
 .sd-add{position:absolute;right:-2px;bottom:-2px;width:24px;height:24px;border-radius:50%;background:var(--grad);color:var(--ink);border:3px solid var(--bg);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;line-height:1}
 .ring.seen{background:#E6D2C7}
 .ring.blank{background:none;border:2px dashed rgba(255,210,63,.55);padding:1px}
-.story .sd-add{max-width:none;overflow:visible;color:var(--ink)}
+.story .sd-add{max-width:none;overflow:visible;color:var(--ink);width:28px;height:28px;font-size:18px;z-index:2}
+.sd-new>div{display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#FFFDF8,#F3E6CC)}
+.story .sd-plus{font-size:34px;font-weight:300;color:#6A3415;line-height:1;max-width:none!important;overflow:visible!important}
+.sd-new{border-color:#CFAE73!important}
 .kinds svg{width:20px;height:20px}
 .sd-viewer{color:#fff;position:fixed;inset:0;z-index:40;background:#000;display:flex;flex-direction:column;animation:up .2s ease-out}
 .sd-in{position:relative;flex:1;max-width:520px;width:100%;margin:0 auto;display:flex;align-items:center;justify-content:center;overflow:hidden}
@@ -300,6 +303,26 @@ textarea.input{min-height:90px;resize:vertical}
 .song-chip .song-t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .song-chip.dark{background:rgba(20,8,2,.55);border-color:rgba(247,226,186,.45);color:#FBF0D8;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);text-shadow:none}
 .song-prev{margin-top:4px}
+.song-picked{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.song-list{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.song-row{display:flex;align-items:center;gap:10px;padding:6px;border-radius:14px;background:#FFFDF8;border:1px solid #E2CFAF;cursor:pointer}
+.song-row:active{background:#F3E6CC}
+.song-row img{width:46px;height:46px;border-radius:8px;object-fit:cover;flex-shrink:0;background:#E2CFAF}
+.song-row .who{flex:1;min-width:0;display:flex;flex-direction:column}
+.song-row .who b,.song-row .who small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.song-row .who small{color:var(--muted)}
+.song-play{width:38px;height:38px;border-radius:19px;border:1px solid #CFAE73;background:linear-gradient(135deg,#FBF0D8,#EBD3A6);color:#3B2314;font-size:14px;flex-shrink:0}
+.song-play.playing{background:#6A3415;color:#FBF0D8}
+.song-chip .song-eq{display:none;align-items:flex-end;gap:2px;height:14px}
+.song-chip .song-eq i{display:block;width:3px;height:40%;background:currentColor;border-radius:2px}
+.song-chip.playing .song-eq{display:inline-flex}
+.song-chip .song-pl{font-size:11px;opacity:.8}
+.song-chip.playing .song-pl{display:none}
+.song-chip.playing .song-eq i{animation:eq .9s ease-in-out infinite}
+.song-chip.playing .song-eq i:nth-child(2){animation-delay:.2s}.song-chip.playing .song-eq i:nth-child(3){animation-delay:.4s}
+@keyframes eq{0%,100%{height:30%}50%{height:100%}}
+.song-chip:not(.playing) img{animation-play-state:paused}
+.song-chip .song-sp.am{background:linear-gradient(135deg,#FA5C6E,#D21E3C)}
 .song-body{padding:12px 12px 20px}
 .song-frame{width:100%;aspect-ratio:16/9;border:0;border-radius:14px;background:#000;display:block}
 .song-frame.sp{aspect-ratio:auto;height:152px;background:transparent}
@@ -539,6 +562,7 @@ function parseSong(raw) {
   if (host === 'youtu.be') id = u.pathname.slice(1).split('/')[0];
   else if (host === 'youtube.com' || host === 'music.youtube.com') id = u.pathname.startsWith('/shorts/') ? u.pathname.split('/')[2] : u.searchParams.get('v');
   if (id && /^[A-Za-z0-9_-]{6,20}$/.test(id)) return { type: 'yt', id, url: 'https://www.youtube.com/watch?v=' + id };
+  if (host === 'music.apple.com') return { type: 'am', id: u.searchParams.get('i') || u.pathname, url: u.href };
   if (host === 'open.spotify.com') { const m = u.pathname.match(/\/track\/([A-Za-z0-9]{10,30})/); if (m) return { type: 'sp', id: m[1], url: 'https://open.spotify.com/track/' + m[1] }; }
   return null;
 }
@@ -551,7 +575,30 @@ async function songTitle(url) {
     return (j.title + who).slice(0, 120);
   } catch (_) { return null; }
 }
+// Reproductor único para los avances de 30 s (Apple Music)
+const SONG = { audio: null, chip: null };
+function stopSong() {
+  if (SONG.audio) { try { SONG.audio.pause(); } catch (_) {} }
+  if (SONG.chip) SONG.chip.classList.remove('playing');
+  SONG.audio = null; SONG.chip = null;
+}
+function playSong(preview, chip) {
+  if (SONG.chip === chip && SONG.audio && !SONG.audio.paused) { stopSong(); return false; }
+  stopSong();
+  const a = new Audio(preview); a.loop = true; a.volume = 1;
+  SONG.audio = a; SONG.chip = chip; if (chip) chip.classList.add('playing');
+  a.play().catch(() => { if (chip) chip.classList.remove('playing'); });
+  return true;
+}
 function songChip(url, title, opts = {}) {
+  if (opts.preview) {
+    const chip = h('button', { class: 'song-chip' + (opts.dark ? ' dark' : ''), type: 'button', 'aria-label': 'Escuchar: ' + (title || 'canción'), onclick: (e) => { e.stopPropagation(); if (playSong(opts.preview, chip) && opts.before) opts.before(); } },
+      opts.art ? h('img', { src: opts.art, alt: '' }) : h('span', { class: 'song-sp am', 'aria-hidden': 'true' }, '♫'),
+      h('span', { class: 'song-pl', 'aria-hidden': 'true' }, '▶'),
+      h('span', { class: 'song-eq', 'aria-hidden': 'true' }, h('i'), h('i'), h('i')),
+      h('span', { class: 'song-t' }, title || 'Canción'));
+    return chip;
+  }
   const sg = parseSong(url); if (!sg) return null;
   const thumb = sg.type === 'yt' ? h('img', { src: `https://i.ytimg.com/vi/${sg.id}/default.jpg`, alt: '' }) : h('span', { class: 'song-sp', 'aria-hidden': 'true' }, '♫');
   return h('button', { class: 'song-chip' + (opts.dark ? ' dark' : ''), type: 'button', 'aria-label': 'Escuchar canción: ' + (title || 'canción'), onclick: (e) => { e.stopPropagation(); if (opts.before) opts.before(); openSong(url, title, opts.after); } },
@@ -571,7 +618,7 @@ let HAS_ANIMALS = true;
 const ANIMAL_EMBED = ',animal_id,animals!animal_id(id,name,species,photo_url)';
 async function fetchPosts({ category, userId, kinds = ['post', 'ride'], since, animalId } = {}) {
   const build = () => {
-    let q = sb.from('posts').select(POST_SELECT + (HAS_KIND ? ',kind' : '') + (HAS_SONG ? ',song_url,song_title' : '') + (HAS_ANIMALS ? ANIMAL_EMBED : '')).order('created_at', { ascending: false }).limit(60);
+    let q = sb.from('posts').select(POST_SELECT + (HAS_KIND ? ',kind' : '') + (HAS_SONG ? ',song_url,song_title,song_preview,song_art' : '') + (HAS_ANIMALS ? ANIMAL_EMBED : '')).order('created_at', { ascending: false }).limit(60);
     if (category && category !== 'Todo') q = q.eq('category', category);
     if (userId) q = q.eq('user_id', userId);
     if (since) q = q.gte('created_at', since);
@@ -653,6 +700,7 @@ function navBar() {
 
 // ---------- pantallas ----------
 function render() {
+  stopSong();
   if (state.cleanup) { try { state.cleanup(); } catch (_) {} state.cleanup = null; }
   $app.replaceChildren();
   if (!state.session && state.view === 'auth') return renderAuth();
@@ -726,7 +774,9 @@ async function renderFeed() {
       h('div', { class: 'ring' + (mine ? (mine.unseen ? ' new' : ' seen') : ' blank') }, h('div', {}, avatar(state.me, 56)),
         h('span', { class: 'sd-add', role: 'button', 'aria-label': 'Nuevo sundown', onclick: (e) => { e.stopPropagation(); newSundown(); } }, '+')),
       h('span', {}, 'Tu sundown'));
-    stories.replaceChildren(...(isGuest() ? [] : [myBubble]), ...others.map((g, i) => h('button', { class: 'story', onclick: () => openSundowns(others, i, paintSundowns) },
+    const addBubble = h('button', { class: 'story', 'aria-label': 'Agregar otro sundown', onclick: newSundown },
+      h('div', { class: 'ring blank sd-new' }, h('div', {}, h('span', { class: 'sd-plus' }, '+'))), h('span', {}, 'Agregar'));
+    stories.replaceChildren(...(isGuest() ? [] : mine ? [addBubble, myBubble] : [myBubble]), ...others.map((g, i) => h('button', { class: 'story', onclick: () => openSundowns(others, i, paintSundowns) },
       h('div', { class: 'ring ' + (g.unseen ? 'new' : 'seen') }, h('div', {}, avatar(g.user, 56))),
       h('span', {}, g.user.username || ''))));
   };
@@ -830,7 +880,7 @@ function postCard(p) {
       countEl),
     p.animals && h('div', { style: 'padding:2px 12px 4px' }, animalTag(p.animals)),
     p.caption && h('p', { class: 'caption' }, h('b', {}, prof.username || ''), ' ', p.caption),
-    p.song_url && h('div', { style: 'margin:8px 16px 0' }, songChip(p.song_url, p.song_title)),
+    p.song_url && h('div', { style: 'margin:8px 16px 0' }, songChip(p.song_url, p.song_title, { preview: p.song_preview, art: p.song_art })),
     h('div', { class: 'meta' },
       h('button', { class: 'linkbtn', onclick: () => openComments(p) }, commentCount ? `Ver ${commentCount === 1 ? 'el comentario' : `los ${commentCount} comentarios`}` : 'Comentar'),
       ' · ', timeAgo(p.created_at))
@@ -1132,6 +1182,7 @@ function openSundowns(groups, gi, onClose) {
     if (why === 'button') userPaused = p;
     paused = p || userPaused;
     if (video) { if (paused) video.pause(); else video.play().catch(() => {}); }
+    if (SONG.audio) { if (paused) SONG.audio.pause(); else SONG.audio.play().catch(() => {}); }
     lastT = performance.now();
     paintPause();
   }
@@ -1144,7 +1195,7 @@ function openSundowns(groups, gi, onClose) {
     raf = requestAnimationFrame(tick);
   }
   const stop = () => { cancelAnimationFrame(raf); clearTimeout(safety); if (video) { video.pause(); video = null; } };
-  const close = () => { stop(); viewer.remove(); document.removeEventListener('keydown', onKey); if (onClose) onClose(); };
+  const close = () => { stop(); stopSong(); viewer.remove(); document.removeEventListener('keydown', onKey); if (onClose) onClose(); };
   const onKey = (e) => { if (e.key === 'Escape') close(); if (e.key === 'ArrowRight') next(); if (e.key === 'ArrowLeft') prev(); if (e.key === ' ') { e.preventDefault(); setPaused(!userPaused, 'button'); } };
   document.addEventListener('keydown', onKey);
   function show() {
@@ -1159,6 +1210,7 @@ function openSundowns(groups, gi, onClose) {
       h('div', {}, h('b', {}, g.user.username || ''), h('br'), h('small', {}, timeAgo(it.created_at))),
       h('div', { class: 'sp' }),
       pauseBtn,
+      it.user_id === state.me.id && h('button', { class: 'iconbtn plain', style: 'color:#fff', 'aria-label': 'Agregar otro sundown', icon: 'plus', onclick: () => { close(); state.uploadKind = 'sundown'; go('upload'); } }),
       it.user_id === state.me.id && h('button', { class: 'iconbtn plain', style: 'color:#fff', 'aria-label': 'Borrar sundown', icon: 'trash', onclick: async () => {
         setPaused(true, 'button');
         if (await deletePost(it)) { g.items.splice(ii, 1); if (!g.items.length) { groups.splice(gi, 1); if (!groups.length) return close(); gi = Math.min(gi, groups.length - 1); ii = 0; } else ii = Math.min(ii, g.items.length - 1); show(); }
@@ -1166,8 +1218,9 @@ function openSundowns(groups, gi, onClose) {
       it.user_id !== state.me.id && h('button', { class: 'iconbtn plain', style: 'color:#fff', 'aria-label': 'Más opciones', icon: 'more', onclick: () => { setPaused(true, 'button'); postMenu(it, () => close()); } }),
       h('button', { class: 'iconbtn plain', style: 'color:#fff', 'aria-label': 'Cerrar', icon: 'close', onclick: close })].filter(Boolean));
     cap.replaceChildren(...[it.caption ? h('div', {}, it.caption) : null,
-      it.song_url ? h('div', { style: 'margin-top:' + (it.caption ? '10px' : '0') }, songChip(it.song_url, it.song_title, { dark: true, before: () => setPaused(true, 'button') })) : null].filter(Boolean));
+      it.song_url ? h('div', { style: 'margin-top:' + (it.caption ? '10px' : '0') }, songChip(it.song_url, it.song_title, { dark: true, preview: it.song_preview, art: it.song_art, before: () => { if (!it.song_preview) setPaused(true, 'button'); } })) : null].filter(Boolean));
     cap.style.display = (it.caption || it.song_url) ? 'block' : 'none';
+    if (it.song_preview) { playSong(it.song_preview, cap.querySelector('.song-chip')); if (paused && SONG.audio) SONG.audio.pause(); } else stopSong();
     paintPause();
     if (it.media_type === 'video') {
       isImg = false;
@@ -1247,7 +1300,7 @@ function rideCard(p) {
       h('button', { class: 'who', onclick: () => go('profile', { profileId: p.user_id }) }, avatar(prof, 40), h('b', {}, prof.username || 'usuario')),
       p.animals && h('div', { style: 'margin-bottom:8px' }, animalTag(p.animals)),
       p.caption && h('p', {}, p.caption),
-      p.song_url && h('div', { style: 'margin-bottom:8px' }, songChip(p.song_url, p.song_title, { dark: true, before: () => { try { video.pause(); } catch (_) {} } })),
+      p.song_url && h('div', { style: 'margin-bottom:8px' }, songChip(p.song_url, p.song_title, { dark: true, preview: p.song_preview, art: p.song_art, before: () => { if (!p.song_preview) try { video.pause(); } catch (_) {} } })),
       h('div', { style: 'display:flex;gap:8px;align-items:center' }, p.category && h('span', { class: 'tag' }, p.category), h('small', { style: 'color:rgba(255,255,255,.8)' }, timeAgo(p.created_at)))),
     h('div', { class: 'ride-side' },
       likeBtn, countEl,
@@ -1331,21 +1384,52 @@ function renderUpload() {
   };
   paintCats();
 
-  const songInput = h('input', { class: 'input', id: 'song', type: 'url', inputmode: 'url', placeholder: 'Pega aquí el enlace de YouTube o Spotify', autocomplete: 'off' });
-  const songPrev = h('div', { class: 'song-prev' });
-  const songHelp = h('small', { class: 'hint' }, 'En YouTube o Spotify toca Compartir → Copiar enlace, y pégalo aquí.');
-  let songT = null, songTimer;
-  const paintSong = async () => {
-    const sg = parseSong(songInput.value); songPrev.replaceChildren(); songT = null;
-    if (!songInput.value.trim()) return;
-    if (!sg) { songPrev.append(h('small', { class: 'err', style: 'margin:0' }, 'Ese enlace no es de una canción de YouTube o Spotify.')); return; }
-    songPrev.append(songChip(sg.url, 'Buscando nombre…'));
-    const t = await songTitle(sg.url); if (parseSong(songInput.value) !== null && parseSong(songInput.value).id === sg.id) { songT = t; songPrev.replaceChildren(songChip(sg.url, t)); }
+  // Canción: buscar por nombre (catálogo de Apple Music, avance de 30 s) o pegar enlace de YouTube/Spotify
+  const songInput = h('input', { class: 'input', id: 'song', type: 'search', placeholder: 'Busca por canción o artista…', autocomplete: 'off', enterkeyhint: 'search' });
+  const songList = h('div', { class: 'song-list' });
+  const songPick = h('div', { class: 'song-prev' });
+  const songHelp = h('small', { class: 'hint' }, 'Escribe el nombre y elige. También puedes pegar un enlace de YouTube o Spotify.');
+  let picked = null, songTimer, songSeq = 0;
+  const showPick = () => {
+    songPick.replaceChildren();
+    if (!picked) return;
+    songPick.append(h('div', { class: 'song-picked' },
+      songChip(picked.url, picked.title, { preview: picked.preview, art: picked.art }),
+      h('button', { type: 'button', class: 'linkbtn', style: 'text-decoration:underline', onclick: () => { stopSong(); picked = null; showPick(); songInput.focus(); } }, 'Quitar')));
   };
-  songInput.addEventListener('input', () => { clearTimeout(songTimer); songTimer = setTimeout(paintSong, 400); });
-  const songField = HAS_SONG ? h('div', { class: 'field' }, h('label', { for: 'song' }, '🎵 Canción (opcional)'), songInput, songHelp,
-    h('button', { type: 'button', class: 'linkbtn', style: 'align-self:flex-start;text-decoration:underline;font-size:13px', onclick: () => window.open('https://www.youtube.com/results?search_query=' + encodeURIComponent((songInput.value && !parseSong(songInput.value) ? songInput.value : '') || 'música regional mexicana'), '_blank') }, 'Buscar en YouTube'),
-    songPrev) : null;
+  const searchSongs = async () => {
+    const q = songInput.value.trim(); const seq = ++songSeq;
+    songList.replaceChildren();
+    if (!q) return;
+    const link = parseSong(q);
+    if (link) {
+      songList.append(h('small', { class: 'hint' }, 'Buscando el nombre…'));
+      const t = await songTitle(link.url); if (seq !== songSeq) return;
+      picked = { url: link.url, title: t, preview: null, art: null }; songInput.value = ''; songList.replaceChildren(); showPick(); return;
+    }
+    if (/^https?:/i.test(q)) { songList.append(h('small', { class: 'err', style: 'margin:0' }, 'Ese enlace no es de una canción de YouTube o Spotify.')); return; }
+    if (q.length < 2) return;
+    songList.append(h('small', { class: 'hint' }, 'Buscando…'));
+    try {
+      const r = await fetch('https://itunes.apple.com/search?' + new URLSearchParams({ term: q, country: 'MX', media: 'music', entity: 'song', limit: '10' }));
+      const j = await r.json(); if (seq !== songSeq) return;
+      const items = (j.results || []).filter(x => x.previewUrl && x.trackViewUrl);
+      songList.replaceChildren();
+      if (!items.length) { songList.append(h('small', { class: 'hint' }, 'No encontramos esa canción. Prueba con el nombre del artista.')); return; }
+      items.forEach(x => {
+        const title = (x.trackName + ' · ' + x.artistName).slice(0, 120);
+        const art = (x.artworkUrl100 || '').replace('100x100', '120x120');
+        const play = h('button', { type: 'button', class: 'song-play', 'aria-label': 'Escuchar ' + x.trackName, onclick: (e) => { e.stopPropagation(); playSong(x.previewUrl, play); } }, '▶');
+        songList.append(h('div', { class: 'song-row', role: 'button', tabindex: '0', onclick: () => {
+          picked = { url: x.trackViewUrl.split('&uo=')[0], title, preview: x.previewUrl, art };
+          stopSong(); songInput.value = ''; songList.replaceChildren(); showPick();
+        } }, h('img', { src: art, alt: '' }), h('div', { class: 'who' }, h('b', {}, x.trackName), h('small', {}, x.artistName)), play));
+      });
+      songList.append(h('small', { class: 'hint', style: 'display:block;margin-top:6px' }, 'Avances de 30 s de Apple Music.'));
+    } catch (_) { if (seq === songSeq) songList.replaceChildren(h('small', { class: 'err', style: 'margin:0' }, 'No se pudo buscar. Revisa tu conexión.')); }
+  };
+  songInput.addEventListener('input', () => { clearTimeout(songTimer); songTimer = setTimeout(searchSongs, 450); });
+  const songField = HAS_SONG ? h('div', { class: 'field' }, h('label', { for: 'song' }, '🎵 Canción (opcional)'), songInput, songHelp, songList, songPick) : null;
   const caption = h('textarea', { class: 'input', name: 'caption', id: 'cap', maxlength: '1000', placeholder: '¿Qué está pasando en el rancho?' });
   if (state.presetCaption) { caption.value = state.presetCaption; state.presetCaption = null; }
   const catField = h('div', {}, h('div', { class: 'field' }, h('label', {}, 'Sección')), catChips);
@@ -1395,8 +1479,8 @@ function renderUpload() {
       const row = { user_id: state.me.id, media_url: pub.publicUrl, media_type: isVideo ? 'video' : 'image', caption: caption.value.trim() || null, category: kind === 'sundown' ? null : category, shop_links };
       if (kind !== 'post') row.kind = kind;
       if (animalId) row.animal_id = animalId;
-      const sg = HAS_SONG ? parseSong(songInput.value) : null;
-      if (sg) { row.song_url = sg.url; row.song_title = songT || await songTitle(sg.url); }
+      if (HAS_SONG && picked) { row.song_url = picked.url; row.song_title = picked.title || null; if (picked.preview) { row.song_preview = picked.preview; row.song_art = picked.art || null; } }
+      stopSong();
       const ins = await sb.from('posts').insert(row);
       if (ins.error) { sb.storage.from('media').remove([path]); throw ins.error; }
       toast(kind === 'sundown' ? 'Sundown publicado. Se va con el sol en 24 h' : kind === 'ride' ? '¡Ride publicado! ¡Ajúa!' : '¡Publicado! ¡Ajúa!');
