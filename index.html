@@ -252,13 +252,12 @@ textarea.input{min-height:90px;resize:vertical}
 .wl-hat svg{width:140px;height:92px}
 
 /* ---- Caballo de yeehaw ---- */
-.horse{overflow:visible}
-.horse .hz{transform-box:view-box;transform-origin:72px 94px}
+.horse{overflow:visible;transform-origin:75% 96%;will-change:transform}
 .horse .fl-b{opacity:0}
 .liked .horse .hz{fill:url(#g)}
 .liked .horse .ln{stroke:url(#g)}
 .liked .horse{filter:drop-shadow(0 2px 6px rgba(255,90,26,.45))}
-.rear .horse .hz,.burst.go .horse .hz{animation:rear 1s cubic-bezier(.3,1.25,.5,1)}
+.rear .horse,.burst.go .horse{animation:rear 1s cubic-bezier(.3,1.25,.5,1)}
 .rear .horse .fl-s,.burst.go .horse .fl-s{animation:legS 1s linear}
 .rear .horse .fl-b,.burst.go .horse .fl-b{animation:legB 1s linear}
 @keyframes rear{0%{transform:rotate(0)}30%{transform:rotate(28deg)}55%{transform:rotate(22deg)}75%{transform:rotate(26deg)}100%{transform:rotate(0)}}
@@ -269,7 +268,7 @@ textarea.input{min-height:90px;resize:vertical}
 .burst-horse .ln{stroke:url(#g)}
 .burst-horse{filter:drop-shadow(0 4px 14px rgba(0,0,0,.55))}
 .wc-ico .horse{width:22px;height:22px}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (prefers-reduced-motion:reduce){*:not(.horse):not(.fl-s):not(.fl-b){animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
@@ -300,7 +299,7 @@ const ICONS = {
   camera: '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>',
   hat: '<svg width="70" height="46" viewBox="0 0 70 46" fill="url(#g)" stroke="#2A0E0F" stroke-width="2"><path d="M22 10c3-6 8-8 13-5 5-3 10-1 13 5l3 20H19z"/><path d="M2 30c6 8 20 12 33 12s27-4 33-12c-8 3-20 5-33 5S10 33 2 30z"/></svg>',
   horseshoe: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 21v-9a6 6 0 0 1 12 0v9"/><path d="M4.5 21h3M16.5 21h3"/><circle cx="7.2" cy="9" r=".6" fill="currentColor"/><circle cx="16.8" cy="9" r=".6" fill="currentColor"/><circle cx="6.4" cy="14" r=".6" fill="currentColor"/><circle cx="17.6" cy="14" r=".6" fill="currentColor"/></svg>',
-  sundown: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 17a5 5 0 0 0-10 0"/><path d="M2 17h20M6 21h12"/><path d="M12 6v3M4.9 9.9l1.5 1.5M19.1 9.9l-1.5 1.5"/></svg>',
+  sundown: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5V9.2a3.3 3.3 0 0 1 6.6 0v3.3"/><path d="M3.2 12.5h1.6M9.8 12.5h1.6"/><path d="M13.4 20.5v-3.3a3.3 3.3 0 0 1 6.6 0v3.3"/><path d="M12.6 20.5h1.6M19.2 20.5h1.6"/><path d="M14 4.5h.01M17.5 6.5h.01M6.5 18.5h.01" stroke-width="2.6"/></svg>',
   sound: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg>',
   mute: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="m22 9-6 6M16 9l6 6"/></svg>',
   playbig: '<svg width="34" height="34" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>',
@@ -362,7 +361,7 @@ function friendlyError(e) {
   if (/Email not confirmed/i.test(m)) return 'Falta confirmar tu correo. Revisa tu bandeja de entrada.';
   if (/Failed to fetch|NetworkError/i.test(m)) return 'Sin conexión. Revisa tu internet.';
   if (/animal/i.test(m)) return 'Falta actualizar la base de datos en Supabase (el paso del SQL de animales).';
-  if (/kind/i.test(m) && /column|columna/i.test(m)) return 'Falta actualizar la base de datos en Supabase (el paso del SQL de Rides y Sundowns).';
+  if (/kind/i.test(m) && /column|columna/i.test(m)) return 'Falta actualizar la base de datos en Supabase (el paso del SQL de Rides y Tracks).';
   return m;
 }
 async function compressImage(file, max = 1440) {
@@ -561,10 +560,10 @@ async function renderFeed() {
     const mine = groups.find(g => g.user.id === state.me.id);
     const others = groups.filter(g => g.user.id !== state.me.id).sort((a, b) => b.unseen - a.unseen);
     const newSundown = () => { state.uploadKind = 'sundown'; go('upload'); };
-    const myBubble = h('button', { class: 'story', 'aria-label': mine ? 'Ver tu sundown' : 'Subir tu sundown', onclick: () => mine ? openSundowns([mine, ...others], 0, paintSundowns) : newSundown() },
+    const myBubble = h('button', { class: 'story', 'aria-label': mine ? 'Ver tu track' : 'Subir tu track', onclick: () => mine ? openSundowns([mine, ...others], 0, paintSundowns) : newSundown() },
       h('div', { class: 'ring' + (mine ? (mine.unseen ? ' new' : ' seen') : ' blank') }, h('div', {}, avatar(state.me, 56)),
-        h('span', { class: 'sd-add', role: 'button', 'aria-label': 'Nuevo sundown', onclick: (e) => { e.stopPropagation(); newSundown(); } }, '+')),
-      h('span', {}, 'Tu sundown'));
+        h('span', { class: 'sd-add', role: 'button', 'aria-label': 'Nuevo track', onclick: (e) => { e.stopPropagation(); newSundown(); } }, '+')),
+      h('span', {}, 'Tu track'));
     stories.replaceChildren(myBubble, ...others.map((g, i) => h('button', { class: 'story', onclick: () => openSundowns(others, i, paintSundowns) },
       h('div', { class: 'ring ' + (g.unseen ? 'new' : 'seen') }, h('div', {}, avatar(g.user, 56))),
       h('span', {}, g.user.username || ''))));
@@ -596,10 +595,13 @@ function likeControls(p, short) {
     countEl.textContent = short ? likeCount.toLocaleString('es-MX') : `${likeCount.toLocaleString('es-MX')} ${likeCount === 1 ? 'yeehaw' : 'yeehaws'}`;
   };
   let busy = false;
+  const rear = () => { likeBtn.classList.remove('rear'); void likeBtn.offsetWidth; likeBtn.classList.add('rear'); try { navigator.vibrate && navigator.vibrate(25); } catch (_) {} };
+  likeBtn.addEventListener('animationend', (e) => { if (e.animationName === 'rear') likeBtn.classList.remove('rear'); });
   const setLike = async (want) => {
-    if (busy || want === liked) return;
+    if (busy) return;
+    if (want === liked) { if (want) rear(); return; }
     busy = true; liked = want; likeCount += want ? 1 : -1; paint();
-    likeBtn.classList.remove('rear'); void likeBtn.offsetWidth; if (want) likeBtn.classList.add('rear');
+    likeBtn.classList.remove('rear'); if (want) rear();
     const res = want ? await sb.from('likes').insert({ post_id: p.id, user_id: myId })
                      : await sb.from('likes').delete().eq('post_id', p.id).eq('user_id', myId);
     if (res.error) { liked = !want; likeCount += want ? -1 : 1; paint(); toast('No se pudo guardar, intenta de nuevo'); }
@@ -739,7 +741,7 @@ function welcomeCard() {
     h('div', { class: 'wc-tips' },
       tip('horse', 'Yeehaws', 'Toca el caballo o da doble toque a la foto y se levanta: ¡yeehaw!'),
       tip('horseshoe', 'Rides', 'Videos cortos y verticales: bailes, montas, caballos.'),
-      tip('sundown', 'Sundowns', 'Lo de hoy, que se va con el sol en 24 horas.'),
+      tip('sundown', 'Tracks', 'Tus huellas del día: se borran en 24 horas.'),
       tip('user', 'Animales', 'Tu caballo o tu vaca con su propio perfil y seguidores.')),
     h('button', { class: 'btn', style: 'margin-top:14px', onclick: () => { state.uploadKind = 'post'; state.presetCaption = presentText(); go('upload'); } }, 'Preséntate con una foto'));
   return card;
@@ -937,7 +939,7 @@ function openSundowns(groups, gi, onClose) {
     h('button', { class: 'sd-zone prev', 'aria-label': 'Anterior', onclick: () => prev() }),
     h('button', { class: 'sd-zone next', 'aria-label': 'Siguiente', onclick: () => next() }),
     cap);
-  const viewer = h('div', { class: 'sd-viewer', role: 'dialog', 'aria-label': 'Sundowns' }, inner);
+  const viewer = h('div', { class: 'sd-viewer', role: 'dialog', 'aria-label': 'Tracks' }, inner);
   const stop = () => { clearTimeout(timer); if (video) { video.pause(); video = null; } };
   const close = () => { stop(); viewer.remove(); document.removeEventListener('keydown', onKey); if (onClose) onClose(); };
   const onKey = (e) => { if (e.key === 'Escape') close(); if (e.key === 'ArrowRight') next(); if (e.key === 'ArrowLeft') prev(); };
@@ -951,7 +953,7 @@ function openSundowns(groups, gi, onClose) {
     head.replaceChildren(...[avatar(g.user, 36),
       h('div', {}, h('b', {}, g.user.username || ''), h('br'), h('small', {}, timeAgo(it.created_at))),
       h('div', { class: 'sp' }),
-      it.user_id === state.me.id && h('button', { class: 'iconbtn plain', style: 'color:#fff', 'aria-label': 'Borrar sundown', icon: 'trash', onclick: async () => {
+      it.user_id === state.me.id && h('button', { class: 'iconbtn plain', style: 'color:#fff', 'aria-label': 'Borrar track', icon: 'trash', onclick: async () => {
         stop();
         if (await deletePost(it)) { g.items.splice(ii, 1); if (!g.items.length) { groups.splice(gi, 1); if (!groups.length) return close(); gi = Math.min(gi, groups.length - 1); ii = 0; } else ii = Math.min(ii, g.items.length - 1); }
         show();
@@ -969,7 +971,7 @@ function openSundowns(groups, gi, onClose) {
       stage.replaceChildren(video);
       timer = setTimeout(next, 60000);
     } else {
-      stage.replaceChildren(h('img', { src: it.media_url, alt: it.caption || 'Sundown de ' + (g.user.username || '') }));
+      stage.replaceChildren(h('img', { src: it.media_url, alt: it.caption || 'Track de ' + (g.user.username || '') }));
       requestAnimationFrame(() => requestAnimationFrame(() => { fill.style.transition = 'width 5s linear'; fill.style.width = '100%'; }));
       timer = setTimeout(next, 5000);
     }
@@ -1086,11 +1088,11 @@ function renderUpload() {
   const main = h('main', { class: 'page' });
   $app.append(h('header', { class: 'topbar' }, h('div', { class: 'logo', style: 'font-size:24px' }, 'Subir')), main);
 
-  const KINDS = [['post', 'Publicación', 'camera'], ['ride', 'Ride', 'horseshoe'], ['sundown', 'Sundown', 'sundown']];
+  const KINDS = [['post', 'Publicación', 'camera'], ['ride', 'Ride', 'horseshoe'], ['sundown', 'Track', 'sundown']];
   const HINTS = {
     post: 'Foto o video que se queda en el inicio y en tu perfil.',
     ride: 'Video corto y vertical, en pantalla completa. Ideal para bailes, montas y caballos.',
-    sundown: 'Foto o video que desaparece en 24 horas, cuando se pone el sol.'
+    sundown: 'Foto o video que deja huella solo por hoy: se borra a las 24 horas.'
   };
   const kindBar = h('div', { class: 'kinds', role: 'tablist' });
   const hint = h('p', { class: 'hint' });
@@ -1148,7 +1150,7 @@ function renderUpload() {
     catField.style.display = kind === 'sundown' ? 'none' : 'block';
     shopBox.style.display = kind !== 'sundown' && category === 'Outfits' ? 'block' : 'none';
     caption.placeholder = kind === 'sundown' ? 'Escribe algo (opcional)' : kind === 'ride' ? 'Describe tu ride…' : '¿Qué está pasando en el rancho?';
-    btn.textContent = kind === 'ride' ? 'Publicar ride' : kind === 'sundown' ? 'Publicar sundown' : 'Publicar';
+    btn.textContent = kind === 'ride' ? 'Publicar ride' : kind === 'sundown' ? 'Publicar track' : 'Publicar';
   };
   const err = h('p', { class: 'err', role: 'alert' });
   const btn = h('button', { class: 'btn', type: 'submit' }, 'Publicar');
@@ -1171,7 +1173,7 @@ function renderUpload() {
       if (animalId) row.animal_id = animalId;
       const ins = await sb.from('posts').insert(row);
       if (ins.error) { sb.storage.from('media').remove([path]); throw ins.error; }
-      toast(kind === 'sundown' ? 'Sundown publicado. Se va con el sol en 24 h' : kind === 'ride' ? '¡Ride publicado! Yeehaw' : '¡Publicado! Yeehaw');
+      toast(kind === 'sundown' ? 'Track publicado. Se borra en 24 horas' : kind === 'ride' ? '¡Ride publicado! Yeehaw' : '¡Publicado! Yeehaw');
       state.category = 'Todo'; state.uploadKind = 'post'; go(kind === 'ride' ? 'rides' : 'feed');
     } catch (ex) { err.textContent = friendlyError(ex); btn.disabled = false; paintKind(); }
   } },
@@ -1208,7 +1210,7 @@ async function renderProfile() {
 
   const showAnimals = HAS_ANIMALS && (animals.length || isMe);
   main.replaceChildren(...[
-    h('div', { class: 'prof-head' }, h('button', { style: 'border:none;background:none;padding:0', 'aria-label': sd ? 'Ver sundown' : 'Foto de perfil', onclick: () => { if (sd) openSundowns([sd], 0, () => render()); } },
+    h('div', { class: 'prof-head' }, h('button', { style: 'border:none;background:none;padding:0', 'aria-label': sd ? 'Ver track' : 'Foto de perfil', onclick: () => { if (sd) openSundowns([sd], 0, () => render()); } },
         h('div', { class: 'ring' + (sd ? (sd.unseen ? ' new' : ' seen') : ''), style: 'width:92px;height:92px' }, h('div', {}, avatar(prof, 80)))),
       h('div', { class: 'stats' },
         h('div', {}, h('b', {}, posts.length), h('span', {}, posts.length === 1 ? 'Publicación' : 'Publicaciones')),
