@@ -293,6 +293,17 @@ textarea.input{min-height:90px;resize:vertical}
 .composer textarea{flex:1;min-height:46px;max-height:130px;resize:none;border-radius:23px;padding:12px 16px;line-height:1.3}
 .composer .send{width:46px;height:46px;border-radius:23px;border:none;background:var(--grad);color:var(--ink);display:flex;align-items:center;justify-content:center;box-shadow:var(--glow);flex-shrink:0}
 .composer .send:disabled{opacity:.5}
+.composer .attach{width:46px;height:46px;border-radius:23px;border:1px solid var(--line);background:var(--surface);color:var(--text);display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0}
+.composer .attach svg{width:24px;height:24px}
+.msg.hasmedia{padding:4px;overflow:hidden;max-width:72%}
+.msg.hasmedia img,.msg.hasmedia video{display:block;width:100%;height:auto;max-height:340px;object-fit:cover;border-radius:16px;background:#000}
+.msg.hasmedia img{cursor:zoom-in}
+.msg.hasmedia p{margin:6px 10px 4px}
+.msg-media-ph{width:200px;height:150px;border-radius:16px;background:var(--line);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px}
+.msg-up{display:block;font-size:12px;margin:4px 10px 2px;opacity:.8}
+.mv{position:fixed;inset:0;z-index:40;background:rgba(10,4,4,.94);display:flex;align-items:center;justify-content:center;padding:20px}
+.mv img,.mv video{max-width:100%;max-height:100%;border-radius:10px}
+.mv-x{position:absolute;top:calc(10px + env(safe-area-inset-top));right:10px;color:#fff}
 @media (prefers-reduced-motion:reduce){*:not(.horse){animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -332,8 +343,8 @@ const ICONS = {
   flag: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22V4c5-3 9 3 16 0v10c-7 3-11-3-16 0"/></svg>',
   block: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="m5.7 5.7 12.6 12.6"/></svg>',
   horse: '<i class="horse" aria-hidden="true"></i>',
-  shots: '<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.82 15.16 L11.18 13.40 L10.05 9.00 L4.58 11.21 Z" fill="url(#g)" opacity="0.95" stroke="none"/><path d="M7.63 16.89 L11.80 15.20 L9.06 5.09 L2.57 7.71 Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M6.93 15.55 L11.38 13.75" fill="none" stroke="currentColor" stroke-width="1.26" stroke-linecap="round"/><path d="M12.82 13.40 L17.18 15.16 L19.42 11.21 L13.95 9.00 Z" fill="url(#g)" opacity="0.95" stroke="none"/><path d="M12.20 15.20 L16.37 16.89 L21.43 7.71 L14.94 5.09 Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12.62 13.75 L17.07 15.55" fill="none" stroke="currentColor" stroke-width="1.26" stroke-linecap="round"/><path d="M12 16.4 C13.4 16.4 13.6 18.6 13.3 20.8 C13.1 22.2 12.6 23 12 23 C11.4 23 10.9 22.2 10.7 20.8 C10.4 18.6 10.6 16.4 12 16.4 Z" fill="currentColor" opacity="0.4"/></svg>',
-  shotsbig: '<svg width="96" height="96" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.82 15.16 L11.18 13.40 L10.05 9.00 L4.58 11.21 Z" fill="url(#g)" opacity="1" stroke="none"/><path d="M7.63 16.89 L11.80 15.20 L9.06 5.09 L2.57 7.71 Z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M6.93 15.55 L11.38 13.75" fill="none" stroke="currentColor" stroke-width="0.9099999999999999" stroke-linecap="round"/><path d="M12.82 13.40 L17.18 15.16 L19.42 11.21 L13.95 9.00 Z" fill="url(#g)" opacity="1" stroke="none"/><path d="M12.20 15.20 L16.37 16.89 L21.43 7.71 L14.94 5.09 Z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M12.62 13.75 L17.07 15.55" fill="none" stroke="currentColor" stroke-width="0.9099999999999999" stroke-linecap="round"/><path d="M12 16.4 C13.4 16.4 13.6 18.6 13.3 20.8 C13.1 22.2 12.6 23 12 23 C11.4 23 10.9 22.2 10.7 20.8 C10.4 18.6 10.6 16.4 12 16.4 Z" fill="currentColor" opacity="0.3"/></svg>',
+  shots: '<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7.6 C17.6 7.6 21.4 10.6 21.4 14.4 C21.4 18.2 17.6 21 12 21 C10.9 21 9.8 20.9 8.8 20.6 L4.4 22.4 L5.6 18.8 C3.6 17.6 2.6 16.1 2.6 14.4 C2.6 10.6 6.4 7.6 12 7.6 Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="8.2" cy="14.4" r="1.15" fill="url(#g)"/><circle cx="12" cy="14.4" r="1.15" fill="url(#g)"/><circle cx="15.8" cy="14.4" r="1.15" fill="url(#g)"/><g transform="translate(12 6.4) rotate(-10) scale(.25) translate(-50 -20)"><path d="M14 21.5 C18 25.5 26 26.6 34 26 C40 25.6 44 24.4 50 24.4 C56 24.4 60 25.6 66 26 C74 26.6 82 25.5 86 21.5 C84 25 80 29 72 30.4 C64 31.6 58 30.2 50 30.2 C42 30.2 36 31.6 28 30.4 C20 29 16 25 14 21.5 Z M33 25.6 C33.4 19 34.6 12 38 8.4 C40 6.4 43 7 45 8.6 C47.4 10.4 48.6 10.6 50 10.6 C51.4 10.6 52.6 10.4 55 8.6 C57 7 60 6.4 62 8.4 C65.4 12 66.6 19 67 25.6 C62 24.6 56 24 50 24 C44 24 38 24.6 33 25.6 Z" fill="currentColor"/><path d="M33.6 21.6 C40 20.4 60 20.4 66.4 21.6 L66.8 24.6 C60 23.4 40 23.4 33.2 24.6 Z" fill="url(#g)"/></g></svg>',
+  shotsbig: '<svg width="96" height="96" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7.6 C17.6 7.6 21.4 10.6 21.4 14.4 C21.4 18.2 17.6 21 12 21 C10.9 21 9.8 20.9 8.8 20.6 L4.4 22.4 L5.6 18.8 C3.6 17.6 2.6 16.1 2.6 14.4 C2.6 10.6 6.4 7.6 12 7.6 Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="8.2" cy="14.4" r="1.15" fill="url(#g)"/><circle cx="12" cy="14.4" r="1.15" fill="url(#g)"/><circle cx="15.8" cy="14.4" r="1.15" fill="url(#g)"/><g transform="translate(12 6.4) rotate(-10) scale(.25) translate(-50 -20)"><path d="M14 21.5 C18 25.5 26 26.6 34 26 C40 25.6 44 24.4 50 24.4 C56 24.4 60 25.6 66 26 C74 26.6 82 25.5 86 21.5 C84 25 80 29 72 30.4 C64 31.6 58 30.2 50 30.2 C42 30.2 36 31.6 28 30.4 C20 29 16 25 14 21.5 Z M33 25.6 C33.4 19 34.6 12 38 8.4 C40 6.4 43 7 45 8.6 C47.4 10.4 48.6 10.6 50 10.6 C51.4 10.6 52.6 10.4 55 8.6 C57 7 60 6.4 62 8.4 C65.4 12 66.6 19 67 25.6 C62 24.6 56 24 50 24 C44 24 38 24.6 33 25.6 Z" fill="currentColor"/><path d="M33.6 21.6 C40 20.4 60 20.4 66.4 21.6 L66.8 24.6 C60 23.4 40 23.4 33.2 24.6 Z" fill="url(#g)"/></g></svg>',
   send: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>',
   pause: '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>',
   resume: '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>',
@@ -1511,7 +1522,7 @@ async function renderInbox() {
   const ids = (convs || []).map(c => c.id);
   let msgs = [];
   if (ids.length) {
-    const r = await sb.from('messages').select('id,conversation_id,sender_id,body,created_at,read_at').in('conversation_id', ids).order('created_at', { ascending: false }).limit(400);
+    const r = await sb.from('messages').select('id,conversation_id,sender_id,body,media_type,created_at,read_at').in('conversation_id', ids).order('created_at', { ascending: false }).limit(400);
     msgs = r.data || [];
   }
   const last = new Map(), unread = new Map();
@@ -1528,8 +1539,27 @@ async function renderInbox() {
     h('b', {}, '¡Salud! Aquí van tus mensajes'), 'Busca a alguien arriba o entra a su perfil y toca "Mensaje".'));
   list.replaceChildren(...rows.map(({ c, other, m, n }) => h('button', { class: 'inbox-row' + (n ? ' unread' : ''), onclick: () => { state.chat = { id: c.id, other }; go('chat'); } },
     avatar(other, 52),
-    h('div', { class: 'who' }, h('b', {}, other.username), h('span', {}, (m.sender_id === state.me.id ? 'Tú: ' : '') + m.body)),
+    h('div', { class: 'who' }, h('b', {}, other.username), h('span', {}, (m.sender_id === state.me.id ? 'Tú: ' : '') + (m.body || (m.media_type === 'video' ? '🎥 Video' : '📷 Foto')))),
     h('small', {}, shortTime(m.created_at)), n ? h('span', { class: 'inbox-dot', 'aria-label': n + ' sin leer' }) : null)));
+}
+const DM_SIGNED = new Map(); // ruta -> { url, exp }
+async function signDm(paths) {
+  const now = Date.now();
+  const need = [...new Set(paths)].filter(p => { const c = DM_SIGNED.get(p); return !c || c.exp < now + 60e3; });
+  if (!need.length) return;
+  try {
+    const { data } = await sb.storage.from('dm').createSignedUrls(need, 3600);
+    (data || []).forEach(d => { if (d && d.signedUrl) DM_SIGNED.set(d.path || need[data.indexOf(d)], { url: d.signedUrl, exp: now + 3500e3 }); });
+  } catch (_) {}
+}
+function openMediaViewer(src, type) {
+  const close = () => { bg.remove(); document.removeEventListener('keydown', onKey); };
+  const onKey = (e) => { if (e.key === 'Escape') close(); };
+  const media = type === 'video' ? h('video', { src, controls: true, autoplay: true, playsinline: true }) : h('img', { src, alt: 'Foto del mensaje' });
+  const bg = h('div', { class: 'mv', role: 'dialog', 'aria-label': type === 'video' ? 'Video' : 'Foto', onclick: (e) => { if (e.target === bg) close(); } },
+    h('button', { class: 'iconbtn plain mv-x', 'aria-label': 'Cerrar', icon: 'close', onclick: close }), media);
+  document.addEventListener('keydown', onKey);
+  document.body.append(bg);
 }
 async function renderChat() {
   const chat = state.chat;
@@ -1541,39 +1571,72 @@ async function renderChat() {
   const box = h('main', { class: 'chat' }, h('div', { class: 'spinner' }));
   const input = h('textarea', { class: 'input', rows: 1, maxlength: '2000', placeholder: 'Escribe un mensaje…', 'aria-label': 'Mensaje' });
   const send = h('button', { class: 'send', type: 'submit', 'aria-label': 'Enviar', icon: 'send', disabled: true });
-  const form = h('form', { onsubmit: (e) => { e.preventDefault(); submit(); } }, input, send);
+  const picker = h('input', { type: 'file', accept: 'image/*,video/*', hidden: true });
+  const attach = h('button', { class: 'attach', type: 'button', 'aria-label': 'Mandar foto o video', icon: 'camera', onclick: () => picker.click() });
+  const form = h('form', { onsubmit: (e) => { e.preventDefault(); submit(); } }, attach, picker, input, send);
   $app.append(box, h('div', { class: 'composer' }, form));
   const blockedNow = state.blocked && state.blocked.has(other.id);
-  if (blockedNow) { input.disabled = true; input.placeholder = 'Bloqueaste a esta persona'; }
+  if (blockedNow) { input.disabled = true; attach.disabled = true; input.placeholder = 'Bloqueaste a esta persona'; }
 
   const grow = () => { input.style.height = 'auto'; input.style.height = Math.min(130, input.scrollHeight) + 'px'; send.disabled = !input.value.trim() || blockedNow; };
   input.addEventListener('input', grow);
   input.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && !('ontouchstart' in window)) { e.preventDefault(); submit(); } });
+  picker.addEventListener('change', () => { const f = picker.files && picker.files[0]; picker.value = ''; if (f) sendMedia(f); });
 
-  let msgs = [], alive = true;
+  let msgs = [], alive = true, lastCount = -1;
   const seen = new Set();
+  const nodes = new Map(); // id -> elemento (para que los videos no se reinicien)
+  function bubble(m) {
+    const key = m.id + (m.pending ? 'p' : '');
+    if (nodes.has(key)) return nodes.get(key);
+    const mine = m.sender_id === state.me.id;
+    let el;
+    if (m.media_path || m.localUrl) {
+      const src = m.localUrl || (DM_SIGNED.get(m.media_path) || {}).url;
+      const media = !src ? h('div', { class: 'msg-media-ph' }, 'Cargando…')
+        : m.media_type === 'video' ? h('video', { src, controls: true, playsinline: true, preload: 'metadata' })
+        : h('img', { src, alt: 'Foto', loading: 'lazy', onclick: () => openMediaViewer(src, 'image') });
+      el = h('div', { class: 'msg hasmedia ' + (mine ? 'me' : 'them') + (m.pending ? ' pending' : '') }, media, m.body ? h('p', {}, m.body) : null,
+        m.pending ? h('span', { class: 'msg-up' }, 'Enviando…') : null);
+      if (!src) return el; // sin enlace todavía: no guardar, se vuelve a intentar
+    } else {
+      el = h('div', { class: 'msg ' + (mine ? 'me' : 'them') + (m.pending ? ' pending' : '') }, m.body);
+    }
+    nodes.set(key, el);
+    return el;
+  }
   function paint() {
     const kids = []; let prev = null;
     for (const m of msgs) {
       if (!prev || new Date(m.created_at) - new Date(prev.created_at) > 15 * 60e3) kids.push(h('div', { class: 'msg-time' }, shortTime(m.created_at)));
-      kids.push(h('div', { class: 'msg ' + (m.sender_id === state.me.id ? 'me' : 'them') + (m.pending ? ' pending' : '') }, m.body));
+      kids.push(bubble(m));
       prev = m;
     }
     const lastMine = [...msgs].reverse().find(m => m.sender_id === state.me.id && !m.pending);
     if (lastMine && msgs[msgs.length - 1] === lastMine && lastMine.read_at) kids.push(h('div', { class: 'msg-seen' }, 'Visto'));
     if (!msgs.length) kids.push(h('div', { class: 'dm-empty' }, h('div', { icon: 'shotsbig' }), h('b', {}, '¡Salud!'), `Mándale el primer mensaje a @${other.username || ''}.`));
     box.replaceChildren(...kids);
-    window.scrollTo(0, document.body.scrollHeight);
+    if (msgs.length !== lastCount) { lastCount = msgs.length; window.scrollTo(0, document.body.scrollHeight); }
   }
+  const COLS = 'id,sender_id,body,media_path,media_type,created_at,read_at';
   async function load() {
-    const { data, error } = await sb.from('messages').select('id,sender_id,body,created_at,read_at').eq('conversation_id', chat.id).order('created_at', { ascending: true }).limit(300);
+    const { data, error } = await sb.from('messages').select(COLS).eq('conversation_id', chat.id).order('created_at', { ascending: true }).limit(300);
     if (!alive) return;
     if (error) return box.replaceChildren(h('div', { class: 'empty' }, friendlyError(error)));
+    await signDm((data || []).filter(m => m.media_path).map(m => m.media_path));
+    if (!alive) return;
     const pend = msgs.filter(m => m.pending);
     msgs = (data || []).concat(pend);
     msgs.forEach(m => seen.add(m.id));
     paint();
     if (msgs.some(m => m.sender_id !== state.me.id && !m.read_at)) sb.rpc('mark_read', { conv: chat.id }).then(() => {}, () => {});
+  }
+  function failMsg(error) {
+    const m = (error && error.message) || '';
+    if (/row-level|policy/i.test(m)) return 'No puedes mandarle mensajes a esta persona';
+    if (/bucket|not found/i.test(m)) return 'Falta activar las fotos de mensajes en Supabase';
+    if (/size|large|exceed/i.test(m)) return 'El archivo es muy pesado (máx. 50 MB)';
+    return 'No se pudo enviar';
   }
   async function submit() {
     const text = input.value.trim();
@@ -1581,10 +1644,32 @@ async function renderChat() {
     input.value = ''; grow();
     const tmp = { id: 'tmp' + Date.now(), sender_id: state.me.id, body: text, created_at: new Date().toISOString(), pending: true };
     msgs.push(tmp); paint();
-    const { data, error } = await sb.from('messages').insert({ conversation_id: chat.id, sender_id: state.me.id, body: text }).select('id,sender_id,body,created_at,read_at').single();
+    const { data, error } = await sb.from('messages').insert({ conversation_id: chat.id, sender_id: state.me.id, body: text }).select(COLS).single();
     msgs = msgs.filter(m => m !== tmp);
-    if (error) { input.value = text; grow(); paint(); return toast(/row-level|policy/i.test(error.message || '') ? 'No puedes mandarle mensajes a esta persona' : 'No se pudo enviar'); }
+    if (error) { input.value = text; grow(); paint(); return toast(failMsg(error)); }
     if (data && !seen.has(data.id)) { seen.add(data.id); msgs.push(data); }
+    paint();
+  }
+  async function sendMedia(file) {
+    if (blockedNow) return;
+    const isVideo = (file.type || '').startsWith('video/');
+    if (!isVideo && !(file.type || '').startsWith('image/')) return toast('Solo se pueden mandar fotos o videos');
+    if (file.size > 50 * 1024 * 1024) return toast('El video es muy pesado (máx. 50 MB)');
+    const blob = isVideo ? file : await compressImage(file, 1600);
+    const localUrl = URL.createObjectURL(blob);
+    const tmp = { id: 'tmp' + Date.now(), sender_id: state.me.id, media_type: isVideo ? 'video' : 'image', localUrl, created_at: new Date().toISOString(), pending: true };
+    msgs.push(tmp); paint();
+    const ext = isVideo ? ((file.name.split('.').pop() || 'mp4').toLowerCase().replace(/[^a-z0-9]/g, '') || 'mp4') : 'jpg';
+    const path = `${chat.id}/${state.me.id}-${Date.now()}.${ext}`;
+    const up = await sb.storage.from('dm').upload(path, blob, { contentType: isVideo ? (file.type || 'video/mp4') : 'image/jpeg', upsert: false });
+    let data = null, error = up.error;
+    if (!error) {
+      const r = await sb.from('messages').insert({ conversation_id: chat.id, sender_id: state.me.id, media_path: path, media_type: tmp.media_type }).select(COLS).single();
+      data = r.data; error = r.error;
+    }
+    msgs = msgs.filter(m => m !== tmp);
+    if (error) { paint(); URL.revokeObjectURL(localUrl); return toast(failMsg(error)); }
+    if (data) { DM_SIGNED.set(path, { url: localUrl, exp: Date.now() + 3500e3 }); if (!seen.has(data.id)) { seen.add(data.id); msgs.push(data); } }
     paint();
   }
   let channel = null;
