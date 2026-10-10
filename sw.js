@@ -1,4 +1,4 @@
-// Yeehaw: permite instalar la app. Todo se carga siempre desde internet,
+// Herria: permite instalar la app. Todo se carga siempre desde internet,
 // y la página principal siempre se revisa para que los cambios lleguen al momento.
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
