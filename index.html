@@ -168,6 +168,12 @@ textarea.input{min-height:90px;resize:vertical}
 .sd-zone.next{right:0;width:67%}
 .sd-cap{position:absolute;left:0;right:0;bottom:0;z-index:3;padding:24px 18px calc(22px + env(safe-area-inset-bottom));background:linear-gradient(transparent,rgba(0,0,0,.7));font-size:15px;line-height:1.4;text-align:center;white-space:pre-wrap;word-wrap:break-word}
 .sd-label{display:inline-flex;align-items:center;gap:6px;font-family:Rye,serif;font-size:13px;color:var(--gold)}
+
+.sd-viewer .sd-top,.sd-viewer .sd-cap{transition:opacity .2s}
+.sd-viewer.is-held .sd-top,.sd-viewer.is-held .sd-cap{opacity:0}
+.sd-paused{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:3;display:none;align-items:center;gap:8px;padding:10px 16px;border-radius:22px;background:rgba(0,0,0,.55);color:#fff;font-weight:700;font-size:14px;pointer-events:none}
+.sd-paused svg{width:18px;height:18px}
+.sd-zone{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
 /* ---- Rides ---- */
 .rides{color:#fff;position:fixed;top:0;bottom:0;left:0;right:0;max-width:520px;margin:0 auto;overflow-y:auto;scroll-snap-type:y mandatory;background:#000;scrollbar-width:none;z-index:1}
 .rides::-webkit-scrollbar{display:none}
@@ -252,23 +258,25 @@ textarea.input{min-height:90px;resize:vertical}
 .wl-hat svg{width:140px;height:92px}
 
 /* ---- Caballo de yeehaw ---- */
-.horse{overflow:visible;transform-origin:75% 96%;will-change:transform}
+.horse{overflow:visible;transform-origin:75% 96%;will-change:transform;transition:transform .35s ease}
 .horse .fl-b{opacity:0}
+.liked .horse{transform:rotate(26deg)}
+.liked .horse .fl-s{opacity:0}
+.liked .horse .fl-b{opacity:1}
 .liked .horse .hz{fill:url(#g)}
 .liked .horse .ln{stroke:url(#g)}
 .liked .horse{filter:drop-shadow(0 2px 6px rgba(255,90,26,.45))}
-.rear .horse,.burst.go .horse{animation:rear 1s cubic-bezier(.3,1.25,.5,1)}
-.rear .horse .fl-s,.burst.go .horse .fl-s{animation:legS 1s linear}
-.rear .horse .fl-b,.burst.go .horse .fl-b{animation:legB 1s linear}
-@keyframes rear{0%{transform:rotate(0)}30%{transform:rotate(28deg)}55%{transform:rotate(22deg)}75%{transform:rotate(26deg)}100%{transform:rotate(0)}}
-@keyframes legS{0%,8%{opacity:1}12%,85%{opacity:0}92%,100%{opacity:1}}
-@keyframes legB{0%,8%{opacity:0}12%,85%{opacity:1}92%,100%{opacity:0}}
+.rear .horse,.burst.go .horse{animation:rear .9s cubic-bezier(.3,1.25,.5,1) both}
+@keyframes rear{0%{transform:rotate(0)}35%{transform:rotate(32deg)}60%{transform:rotate(22deg)}80%{transform:rotate(28deg)}100%{transform:rotate(26deg)}}
+.burst-horse .fl-s{opacity:0}
+.burst-horse .fl-b{opacity:1}
 .burst-horse svg{width:120px;height:120px}
 .burst-horse .hz{fill:url(#g)}
 .burst-horse .ln{stroke:url(#g)}
 .burst-horse{filter:drop-shadow(0 4px 14px rgba(0,0,0,.55))}
 .wc-ico .horse{width:22px;height:22px}
-@media (prefers-reduced-motion:reduce){*:not(.horse):not(.fl-s):not(.fl-b){animation:none!important;transition:none!important}}
+.wc-ico .horse .fl-s{opacity:1}.wc-ico .horse .fl-b{opacity:0}
+@media (prefers-reduced-motion:reduce){*:not(.horse){animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
@@ -299,7 +307,7 @@ const ICONS = {
   camera: '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>',
   hat: '<svg width="70" height="46" viewBox="0 0 70 46" fill="url(#g)" stroke="#2A0E0F" stroke-width="2"><path d="M22 10c3-6 8-8 13-5 5-3 10-1 13 5l3 20H19z"/><path d="M2 30c6 8 20 12 33 12s27-4 33-12c-8 3-20 5-33 5S10 33 2 30z"/></svg>',
   horseshoe: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 21v-9a6 6 0 0 1 12 0v9"/><path d="M4.5 21h3M16.5 21h3"/><circle cx="7.2" cy="9" r=".6" fill="currentColor"/><circle cx="16.8" cy="9" r=".6" fill="currentColor"/><circle cx="6.4" cy="14" r=".6" fill="currentColor"/><circle cx="17.6" cy="14" r=".6" fill="currentColor"/></svg>',
-  sundown: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5V9.2a3.3 3.3 0 0 1 6.6 0v3.3"/><path d="M3.2 12.5h1.6M9.8 12.5h1.6"/><path d="M13.4 20.5v-3.3a3.3 3.3 0 0 1 6.6 0v3.3"/><path d="M12.6 20.5h1.6M19.2 20.5h1.6"/><path d="M14 4.5h.01M17.5 6.5h.01M6.5 18.5h.01" stroke-width="2.6"/></svg>',
+  sundown: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 17a5 5 0 0 0-10 0"/><path d="M2 17h20M6 21h12"/><path d="M12 6v3M4.9 9.9l1.5 1.5M19.1 9.9l-1.5 1.5"/></svg>',
   sound: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg>',
   mute: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="m22 9-6 6M16 9l6 6"/></svg>',
   playbig: '<svg width="34" height="34" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>',
@@ -307,6 +315,8 @@ const ICONS = {
   flag: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22V4c5-3 9 3 16 0v10c-7 3-11-3-16 0"/></svg>',
   block: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="m5.7 5.7 12.6 12.6"/></svg>',
   horse: '<svg class="horse" width="30" height="30" viewBox="0 0 96 98" aria-hidden="true"><g class="hz" fill="currentColor"><path d="M66 64 L64 77 L62.4 87.6 L63.4 93 L57.4 94 L58.2 88 L60 77 L61.4 66 Z"/><path d="M79 44 C86 46 89.5 56 87.5 66 C86.5 72 84 78 80 82.5 C82 74 82.2 66 80.6 58.5 C79.6 52.5 79.2 48.5 77 46 Z"/><path d="M9 39 C9 36 11 34 13 32 L21 21 L23.6 17.6 L24.4 11 L28 16.4 L29.4 15.6 L31 11.4 L32.6 17.8 C38 22 41 30 44 38 C50 40 56 41 62 41 C68 40 74 38 78 41 C82 44 83 50 81 56 C79 60 76 62 75 66 L77 76 C76 80 75 84 75 88 L76 93 L69.4 94 L70 89 L70 80 C70 76 69 73 67 70 C66 67 64 65 62 65 C54 66 47 66 41 64 L31 62 C29 56 27 49 24 44 C21 42 18 43 15 44 C12 45 9 44 9 41 Z"/><path d="M44 37 C40 28 36 22 31 17.6 L33.6 23 L31.6 24.6 L36.6 27.4 L34.4 30 L39.6 31.6 L37.8 34 Z"/><g class="fl-s"><path d="M38 64 L36.5 79 L35.6 88 L36.6 93 L30.6 94 L31.4 88.5 L32.4 79 L33.5 64 Z"/><path d="M41.4 63.6 C40 70 40 76 39 80 L39 88 L40 93 L33.4 94 L34 89 L34 80 C34 74 33 68 30.6 61.6 Z"/></g><g class="fl-b"><path d="M41 64 C37 66 30 66 25.6 67.6 L22.4 73.6 L24 78 L20 79 L18.6 73.4 L22 64 L31 61.6 Z"/><path d="M37.4 64.6 C34 67.4 30 69.6 28 72 L29.6 77.6 L25.6 78.6 L24.4 72 L31 64 Z"/></g><path d="M54.6 36 L49.6 47 L49.8 56.6 L45.6 58.6 L45.6 61 L54 61 L54 57 L55 47.4 L58.6 38.4 Z"/><path d="M53.4 39.4 L50.2 22.6 C51.4 20.8 55.6 20.4 57.2 21.6 L60.4 38.4 Z"/><circle cx="53.8" cy="16.6" r="3.7"/><path d="M51.6 23.6 L44 32.4 L45.6 34.2 L54.4 27 Z"/><path d="M56 22.4 L62.6 12 L65 13.4 L59.4 24.4 Z"/><g transform="rotate(-20 66 8)"><path d="M58.6 9.4 C63 7.2 74.4 7.2 79 9.4 C74.6 10.8 63 10.8 58.6 9.4 Z"/><path d="M63.2 8.6 C63 4 64.8 1.6 66.8 2.2 C67.8 2.6 68.4 3.4 68.8 3.4 C69.2 3.4 69.8 2.6 70.8 2.2 C72.8 1.6 74.6 4 74.4 8.6 Z"/></g><path d="M50.6 13.6 C51 11.6 56.6 11.4 57.2 13.4 Z"/><path class="ln" d="M44.8 33.4 C33 36 22 38.6 13.4 40.6" fill="none" stroke="currentColor" stroke-width="1.1"/></g></svg>',
+  pause: '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>',
+  resume: '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>',
   trash: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>'
 };
 
@@ -361,7 +371,7 @@ function friendlyError(e) {
   if (/Email not confirmed/i.test(m)) return 'Falta confirmar tu correo. Revisa tu bandeja de entrada.';
   if (/Failed to fetch|NetworkError/i.test(m)) return 'Sin conexión. Revisa tu internet.';
   if (/animal/i.test(m)) return 'Falta actualizar la base de datos en Supabase (el paso del SQL de animales).';
-  if (/kind/i.test(m) && /column|columna/i.test(m)) return 'Falta actualizar la base de datos en Supabase (el paso del SQL de Rides y Tracks).';
+  if (/kind/i.test(m) && /column|columna/i.test(m)) return 'Falta actualizar la base de datos en Supabase (el paso del SQL de Rides y Sundowns).';
   return m;
 }
 async function compressImage(file, max = 1440) {
@@ -560,10 +570,10 @@ async function renderFeed() {
     const mine = groups.find(g => g.user.id === state.me.id);
     const others = groups.filter(g => g.user.id !== state.me.id).sort((a, b) => b.unseen - a.unseen);
     const newSundown = () => { state.uploadKind = 'sundown'; go('upload'); };
-    const myBubble = h('button', { class: 'story', 'aria-label': mine ? 'Ver tu track' : 'Subir tu track', onclick: () => mine ? openSundowns([mine, ...others], 0, paintSundowns) : newSundown() },
+    const myBubble = h('button', { class: 'story', 'aria-label': mine ? 'Ver tu sundown' : 'Subir tu sundown', onclick: () => mine ? openSundowns([mine, ...others], 0, paintSundowns) : newSundown() },
       h('div', { class: 'ring' + (mine ? (mine.unseen ? ' new' : ' seen') : ' blank') }, h('div', {}, avatar(state.me, 56)),
-        h('span', { class: 'sd-add', role: 'button', 'aria-label': 'Nuevo track', onclick: (e) => { e.stopPropagation(); newSundown(); } }, '+')),
-      h('span', {}, 'Tu track'));
+        h('span', { class: 'sd-add', role: 'button', 'aria-label': 'Nuevo sundown', onclick: (e) => { e.stopPropagation(); newSundown(); } }, '+')),
+      h('span', {}, 'Tu sundown'));
     stories.replaceChildren(myBubble, ...others.map((g, i) => h('button', { class: 'story', onclick: () => openSundowns(others, i, paintSundowns) },
       h('div', { class: 'ring ' + (g.unseen ? 'new' : 'seen') }, h('div', {}, avatar(g.user, 56))),
       h('span', {}, g.user.username || ''))));
@@ -741,7 +751,7 @@ function welcomeCard() {
     h('div', { class: 'wc-tips' },
       tip('horse', 'Yeehaws', 'Toca el caballo o da doble toque a la foto y se levanta: ¡yeehaw!'),
       tip('horseshoe', 'Rides', 'Videos cortos y verticales: bailes, montas, caballos.'),
-      tip('sundown', 'Tracks', 'Tus huellas del día: se borran en 24 horas.'),
+      tip('sundown', 'Sundowns', 'Lo de hoy, que se va con el sol en 24 horas.'),
       tip('user', 'Animales', 'Tu caballo o tu vaca con su propio perfil y seguidores.')),
     h('button', { class: 'btn', style: 'margin-top:14px', onclick: () => { state.uploadKind = 'post'; state.presetCaption = presentText(); go('upload'); } }, 'Preséntate con una foto'));
   return card;
@@ -929,51 +939,89 @@ function openRules() {
 // ---------- Sundowns (desaparecen en 24 horas) ----------
 function openSundowns(groups, gi, onClose) {
   if (!groups.length) return;
-  let ii = 0, timer = null, video = null;
+  const IMG_MS = 5000;
+  let ii = 0, video = null, raf = 0, elapsed = 0, lastT = 0, paused = false, userPaused = false, safety = null, fill = null, isImg = false;
+  let holdTimer = null, held = false, suppressClick = false;
   const bars = h('div', { class: 'sd-bars' });
   const head = h('div', { class: 'sd-head' });
   const stage = h('div', { style: 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center' });
   const cap = h('div', { class: 'sd-cap' });
+  const pausedBadge = h('div', { class: 'sd-paused', 'aria-hidden': 'true' }, h('span', { icon: 'pause' }), 'En pausa');
+  const zone = (cls, label, fn) => {
+    const z = h('button', { class: 'sd-zone ' + cls, 'aria-label': label });
+    z.addEventListener('pointerdown', () => { clearTimeout(holdTimer); held = false; holdTimer = setTimeout(() => { held = true; setPaused(true, 'hold'); }, 220); });
+    const release = () => { clearTimeout(holdTimer); if (held) { suppressClick = true; held = false; if (!userPaused) setPaused(false, 'hold'); } };
+    z.addEventListener('pointerup', release); z.addEventListener('pointercancel', release); z.addEventListener('pointerleave', release);
+    z.addEventListener('contextmenu', (e) => e.preventDefault());
+    z.addEventListener('click', () => { if (suppressClick) { suppressClick = false; return; } fn(); });
+    return z;
+  };
   const inner = h('div', { class: 'sd-in' }, stage,
     h('div', { class: 'sd-top' }, bars, head),
-    h('button', { class: 'sd-zone prev', 'aria-label': 'Anterior', onclick: () => prev() }),
-    h('button', { class: 'sd-zone next', 'aria-label': 'Siguiente', onclick: () => next() }),
-    cap);
-  const viewer = h('div', { class: 'sd-viewer', role: 'dialog', 'aria-label': 'Tracks' }, inner);
-  const stop = () => { clearTimeout(timer); if (video) { video.pause(); video = null; } };
+    zone('prev', 'Anterior', () => prev()),
+    zone('next', 'Siguiente', () => next()),
+    pausedBadge, cap);
+  const viewer = h('div', { class: 'sd-viewer', role: 'dialog', 'aria-label': 'Sundowns' }, inner);
+  let pauseBtn = null;
+  function paintPause() {
+    if (pauseBtn) { pauseBtn.innerHTML = ICONS[paused ? 'resume' : 'pause']; pauseBtn.setAttribute('aria-label', paused ? 'Continuar' : 'Pausar'); }
+    viewer.classList.toggle('is-paused', paused);
+    viewer.classList.toggle('is-held', paused && !userPaused);
+    pausedBadge.style.display = userPaused ? 'flex' : 'none';
+  }
+  function setPaused(p, why) {
+    if (why === 'button') userPaused = p;
+    paused = p || userPaused;
+    if (video) { if (paused) video.pause(); else video.play().catch(() => {}); }
+    lastT = performance.now();
+    paintPause();
+  }
+  function tick(t) {
+    if (!isImg) return;
+    if (!paused) { elapsed += t - lastT; }
+    lastT = t;
+    if (fill) fill.style.width = Math.min(100, elapsed / IMG_MS * 100) + '%';
+    if (elapsed >= IMG_MS) return next();
+    raf = requestAnimationFrame(tick);
+  }
+  const stop = () => { cancelAnimationFrame(raf); clearTimeout(safety); if (video) { video.pause(); video = null; } };
   const close = () => { stop(); viewer.remove(); document.removeEventListener('keydown', onKey); if (onClose) onClose(); };
-  const onKey = (e) => { if (e.key === 'Escape') close(); if (e.key === 'ArrowRight') next(); if (e.key === 'ArrowLeft') prev(); };
+  const onKey = (e) => { if (e.key === 'Escape') close(); if (e.key === 'ArrowRight') next(); if (e.key === 'ArrowLeft') prev(); if (e.key === ' ') { e.preventDefault(); setPaused(!userPaused, 'button'); } };
   document.addEventListener('keydown', onKey);
   function show() {
     stop();
+    elapsed = 0; userPaused = false; paused = false;
     const g = groups[gi]; const it = g.items[ii];
     markSeen(it.id);
     bars.replaceChildren(...g.items.map((_, k) => h('div', { class: 'sd-bar' }, h('i', { style: `width:${k < ii ? 100 : 0}%` }))));
-    const fill = bars.children[ii].firstChild;
+    fill = bars.children[ii].firstChild;
+    pauseBtn = h('button', { class: 'iconbtn plain', style: 'color:#fff', 'aria-label': 'Pausar', icon: 'pause', onclick: () => setPaused(!userPaused, 'button') });
     head.replaceChildren(...[avatar(g.user, 36),
       h('div', {}, h('b', {}, g.user.username || ''), h('br'), h('small', {}, timeAgo(it.created_at))),
       h('div', { class: 'sp' }),
-      it.user_id === state.me.id && h('button', { class: 'iconbtn plain', style: 'color:#fff', 'aria-label': 'Borrar track', icon: 'trash', onclick: async () => {
-        stop();
-        if (await deletePost(it)) { g.items.splice(ii, 1); if (!g.items.length) { groups.splice(gi, 1); if (!groups.length) return close(); gi = Math.min(gi, groups.length - 1); ii = 0; } else ii = Math.min(ii, g.items.length - 1); }
-        show();
+      pauseBtn,
+      it.user_id === state.me.id && h('button', { class: 'iconbtn plain', style: 'color:#fff', 'aria-label': 'Borrar sundown', icon: 'trash', onclick: async () => {
+        setPaused(true, 'button');
+        if (await deletePost(it)) { g.items.splice(ii, 1); if (!g.items.length) { groups.splice(gi, 1); if (!groups.length) return close(); gi = Math.min(gi, groups.length - 1); ii = 0; } else ii = Math.min(ii, g.items.length - 1); show(); }
       } }),
-      it.user_id !== state.me.id && h('button', { class: 'iconbtn plain', style: 'color:#fff', 'aria-label': 'Más opciones', icon: 'more', onclick: () => { stop(); postMenu(it, () => close()); } }),
+      it.user_id !== state.me.id && h('button', { class: 'iconbtn plain', style: 'color:#fff', 'aria-label': 'Más opciones', icon: 'more', onclick: () => { setPaused(true, 'button'); postMenu(it, () => close()); } }),
       h('button', { class: 'iconbtn plain', style: 'color:#fff', 'aria-label': 'Cerrar', icon: 'close', onclick: close })].filter(Boolean));
     cap.textContent = it.caption || '';
     cap.style.display = it.caption ? 'block' : 'none';
+    paintPause();
     if (it.media_type === 'video') {
+      isImg = false;
       video = h('video', { src: it.media_url, playsInline: true, autoplay: true });
-      video.addEventListener('timeupdate', () => { if (video && video.duration) fill.style.width = (video.currentTime / video.duration * 100) + '%'; });
+      video.addEventListener('timeupdate', () => { if (video && video.duration && fill) fill.style.width = (video.currentTime / video.duration * 100) + '%'; });
       video.addEventListener('ended', () => next());
-      video.addEventListener('error', () => { timer = setTimeout(next, 3000); });
+      video.addEventListener('error', () => { safety = setTimeout(next, 3000); });
       video.play().catch(() => { if (video) { video.muted = true; video.play().catch(() => {}); } });
       stage.replaceChildren(video);
-      timer = setTimeout(next, 60000);
     } else {
-      stage.replaceChildren(h('img', { src: it.media_url, alt: it.caption || 'Track de ' + (g.user.username || '') }));
-      requestAnimationFrame(() => requestAnimationFrame(() => { fill.style.transition = 'width 5s linear'; fill.style.width = '100%'; }));
-      timer = setTimeout(next, 5000);
+      isImg = true;
+      stage.replaceChildren(h('img', { src: it.media_url, alt: it.caption || 'Sundown de ' + (g.user.username || '') }));
+      lastT = performance.now();
+      raf = requestAnimationFrame(tick);
     }
   }
   function next() { const g = groups[gi]; if (ii < g.items.length - 1) ii++; else if (gi < groups.length - 1) { gi++; ii = 0; } else return close(); show(); }
@@ -1088,11 +1136,11 @@ function renderUpload() {
   const main = h('main', { class: 'page' });
   $app.append(h('header', { class: 'topbar' }, h('div', { class: 'logo', style: 'font-size:24px' }, 'Subir')), main);
 
-  const KINDS = [['post', 'Publicación', 'camera'], ['ride', 'Ride', 'horseshoe'], ['sundown', 'Track', 'sundown']];
+  const KINDS = [['post', 'Publicación', 'camera'], ['ride', 'Ride', 'horseshoe'], ['sundown', 'Sundown', 'sundown']];
   const HINTS = {
     post: 'Foto o video que se queda en el inicio y en tu perfil.',
     ride: 'Video corto y vertical, en pantalla completa. Ideal para bailes, montas y caballos.',
-    sundown: 'Foto o video que deja huella solo por hoy: se borra a las 24 horas.'
+    sundown: 'Foto o video que desaparece en 24 horas, cuando se pone el sol.'
   };
   const kindBar = h('div', { class: 'kinds', role: 'tablist' });
   const hint = h('p', { class: 'hint' });
@@ -1150,7 +1198,7 @@ function renderUpload() {
     catField.style.display = kind === 'sundown' ? 'none' : 'block';
     shopBox.style.display = kind !== 'sundown' && category === 'Outfits' ? 'block' : 'none';
     caption.placeholder = kind === 'sundown' ? 'Escribe algo (opcional)' : kind === 'ride' ? 'Describe tu ride…' : '¿Qué está pasando en el rancho?';
-    btn.textContent = kind === 'ride' ? 'Publicar ride' : kind === 'sundown' ? 'Publicar track' : 'Publicar';
+    btn.textContent = kind === 'ride' ? 'Publicar ride' : kind === 'sundown' ? 'Publicar sundown' : 'Publicar';
   };
   const err = h('p', { class: 'err', role: 'alert' });
   const btn = h('button', { class: 'btn', type: 'submit' }, 'Publicar');
@@ -1173,7 +1221,7 @@ function renderUpload() {
       if (animalId) row.animal_id = animalId;
       const ins = await sb.from('posts').insert(row);
       if (ins.error) { sb.storage.from('media').remove([path]); throw ins.error; }
-      toast(kind === 'sundown' ? 'Track publicado. Se borra en 24 horas' : kind === 'ride' ? '¡Ride publicado! Yeehaw' : '¡Publicado! Yeehaw');
+      toast(kind === 'sundown' ? 'Sundown publicado. Se va con el sol en 24 h' : kind === 'ride' ? '¡Ride publicado! Yeehaw' : '¡Publicado! Yeehaw');
       state.category = 'Todo'; state.uploadKind = 'post'; go(kind === 'ride' ? 'rides' : 'feed');
     } catch (ex) { err.textContent = friendlyError(ex); btn.disabled = false; paintKind(); }
   } },
@@ -1210,7 +1258,7 @@ async function renderProfile() {
 
   const showAnimals = HAS_ANIMALS && (animals.length || isMe);
   main.replaceChildren(...[
-    h('div', { class: 'prof-head' }, h('button', { style: 'border:none;background:none;padding:0', 'aria-label': sd ? 'Ver track' : 'Foto de perfil', onclick: () => { if (sd) openSundowns([sd], 0, () => render()); } },
+    h('div', { class: 'prof-head' }, h('button', { style: 'border:none;background:none;padding:0', 'aria-label': sd ? 'Ver sundown' : 'Foto de perfil', onclick: () => { if (sd) openSundowns([sd], 0, () => render()); } },
         h('div', { class: 'ring' + (sd ? (sd.unseen ? ' new' : ' seen') : ''), style: 'width:92px;height:92px' }, h('div', {}, avatar(prof, 80)))),
       h('div', { class: 'stats' },
         h('div', {}, h('b', {}, posts.length), h('span', {}, posts.length === 1 ? 'Publicación' : 'Publicaciones')),
