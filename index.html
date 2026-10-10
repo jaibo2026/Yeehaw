@@ -309,6 +309,31 @@ textarea.input{min-height:90px;resize:vertical}
 .mv img,.mv video{max-width:100%;max-height:100%;border-radius:10px}
 .mv-x{position:absolute;top:calc(10px + env(safe-area-inset-top));right:10px;color:#fff}
 @media (prefers-reduced-motion:reduce){*:not(.horse){animation:none!important;transition:none!important}}
+/* ---------- Tema: Cuero ---------- */
+.topbar .who,.topbar>b{color:#F7E6C4}
+:root{--text:#3B2314;--soft:#5A3A24;--muted:#8A6A4E;--ink:#2B160A;--accent:#C9362A;--line:#D6BC93}
+
+:root{--bg:#F7F0E3;--surface:#FBF6EC;--surface2:#FFFDF8;--grad:linear-gradient(120deg,#F6C445 0%,#EE8A2A 45%,#C9362A 100%);--stitch:1.5px dashed rgba(139,74,34,.4);--glow:0 6px 16px rgba(120,60,20,.25)}
+html,body{background:#F7F0E3 url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAcFBQYFBAcGBgYIBwcICxILCwoKCxYPEA0SGhYbGhkWGRgcICgiHB4mHhgZIzAkJiorLS4tGyIyNTEsNSgsLSz/2wBDAQcICAsJCxULCxUsHRkdLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCz/wAARCAB4AHgDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAAEH/8QAJhAAAgICAQMFAQEBAQAAAAAAAAERkiFxMUFCUgISInKCYVFigf/EABYBAQEBAAAAAAAAAAAAAAAAAAABBP/EABQRAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhEDEQA/ANuq4RauEKuESrhGFpKuFsvPPtcLZK8F48XCCI/y4Wy1cInD7XgVwgq1cIdO1whV42KuEEK4WxVwtkrhCrhAXL8XCJVwhVwh17XC2Beva4Wxy+14H8+OEKuEBKuFsCrhbAVauFslXCFXCFXC2EWrhbHXtcIP8vBKuEBf58XCJV4FXCLVwgJV4LVwtkq8CrhAWrj0k69uEXH/AC8Eq4QFq8CrwK8Eq4QFq4RKuFstcIlXgBVwgOna4WwFEvq4Wy1eCVcLYq4QCrhCrhbFXCLz4uEEKvAq4RKuFsde1wgq8+OEOva4Qj6uEK8bCJV42Xr2vBKuEWrhAKuEKuFsj/LwI+rhbAtXCHPi4RP/AH04Wy1cIAseLxsEq4WwBV+XCFXCHWPi4Wx17XgCfz44Wy1whVwhVwgpV4C/L+I37XCJVwthFq8Dp24RKuEK8bCqvy4Q17eCVcItXjYQq4Qq8Cr+I69rhAK8bJV4FcItXjYErhbBavGwFOPFwidO1whXC2KuFsItXCFeCf348B/l4ClXCFXCLVwhXCCJXgcLteBH1cIteAqVcLYrhFq4Qq4QQq4RJnxeC1whVwthUf5eCz9XCFXgk/XC2EVR/npcLYFXCACrxslXC2KuEWrhAOfFwtkq4Qq4Wy79rhAKvBKvGy1wtk6drhbAtXC2SrxstXC2Tr2vACrhFq8Cr+JKuEFK4Rd+1wiVeA19XC2EWvAq4WxVwiVeNgWrhAVwgFSrhFb+rhbJVwhVx6Qir/PjhCrxsnTtwhVwgq79rhbJ17XCL17XglcLYQq8Fq4Qq4Q6drhbAVwtk48XCFeBV4Aq/PGx17XCFeNirj0gKvGyde142KuFsVcIC1cIEq/iAq1cIc+LhbACHXHtcekc+LhbACpVwtlf5cLYACrhbC/LhbACFXCIvy4WwAGf+XCFXHpACrVx6SVcLYACrhAAI//Z) repeat;background-size:120px}
+.topbar{background:linear-gradient(180deg,#8B4A22,#6A3415);border-bottom:none;box-shadow:0 4px 14px rgba(70,30,10,.3);outline:1.5px dashed rgba(247,230,196,.45);outline-offset:-6px}
+.topbar .logo{background:linear-gradient(180deg,#FFE3A3,#F2B24C);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:0;filter:drop-shadow(0 2px 0 rgba(0,0,0,.35))}
+.topbar b,.topbar .iconbtn.plain{color:#F7E6C4}
+.topbar .iconbtn{background:rgba(247,230,196,.15);border-color:rgba(247,230,196,.4);color:#F7E6C4}
+.logo{background:linear-gradient(180deg,#B5652E,#6A3415);-webkit-background-clip:text;background-clip:text;color:transparent;filter:none}
+.post,.welcome-card,.sheet,.auth form{background:#FFFDF8;border:1px solid #E2CFAF;box-shadow:0 4px 14px rgba(90,45,15,.12)}
+.post-head{background:linear-gradient(180deg,#F3E3C6,#EAD3AC);margin:0;border-bottom:1.5px dashed rgba(139,74,34,.35)}
+.btn{background:linear-gradient(180deg,#A0582A,#7A3E1C);color:#FFF4DE;box-shadow:0 3px 0 #4E2410;outline:1.5px dashed rgba(255,244,222,.45);outline-offset:-6px}
+.btn.ghost{background:#FFFDF8;color:var(--text);border:1.5px solid #A0582A;outline:none;box-shadow:none}
+.chip{background:#FFFDF8;border-color:#E2CFAF}
+.chip.on{background:linear-gradient(180deg,#A0582A,#7A3E1C);color:#FFF4DE;box-shadow:none}
+.tag{background:linear-gradient(120deg,#F6C445 0%,#EE8A2A 45%,#C9362A 100%);color:#2B160A}
+.nav-in{background:linear-gradient(180deg,#8B4A22,#6A3415);border:none;box-shadow:0 8px 24px rgba(60,28,10,.35);outline:1.5px dashed rgba(247,230,196,.4);outline-offset:-5px}
+.nav button{color:rgba(247,230,196,.7)}
+.nav button.on{color:#FFE3A3}
+.nav .plus{background:linear-gradient(120deg,#F6C445 0%,#EE8A2A 45%,#C9362A 100%);color:#2B160A}
+.auth::before{background:radial-gradient(60% 40% at 50% 0%,rgba(238,138,42,.45),transparent 70%);animation:none}
+.msg.me{background:linear-gradient(180deg,#A0582A,#7A3E1C);color:#FFF4DE}
+
 </style>
 </head>
 <body>
