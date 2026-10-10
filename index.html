@@ -334,6 +334,15 @@ textarea.input{min-height:90px;resize:vertical}
 .song-body{padding:12px 12px 20px}
 .song-frame{width:100%;aspect-ratio:16/9;border:0;border-radius:14px;background:#000;display:block}
 .song-frame.sp{aspect-ratio:auto;height:152px;background:transparent}
+.yt-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:8px;padding:10px 12px;border-radius:14px;border:1px solid #D6BC93;background:#FFFDF8;color:#3B2314;font-weight:700;font-size:14px}
+.yt-btn .yt-logo{display:inline-flex;align-items:center;justify-content:center;width:26px;height:18px;border-radius:5px;background:#FF0000;color:#fff;font-size:10px}
+.song-row img.yt{width:64px;height:46px}
+.yt-prev{width:100%;aspect-ratio:16/9;border:0;border-radius:12px;background:#000;display:block;margin-top:10px}
+.sd-yt{position:absolute;right:10px;top:calc(76px + env(safe-area-inset-top));width:200px;height:200px;z-index:4;border-radius:14px;overflow:hidden;background:#000;box-shadow:0 6px 18px rgba(0,0,0,.5);border:2px solid rgba(251,240,216,.85)}
+.sd-yt iframe{width:100%;height:100%;border:0;display:block}
+.sd-viewer.is-held .sd-yt{opacity:.35}
+.sd-song{display:inline-flex;align-items:center;gap:6px;max-width:100%;padding:5px 12px;border-radius:20px;background:rgba(0,0,0,.45);font-size:13px;font-weight:600}
+.sd-song span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .join{text-align:center;padding:10px 20px 22px}
 .join .join-ico{display:flex;justify-content:center;color:var(--text)}
 .join b{display:block;font-size:18px;margin:8px 0 6px}
@@ -413,6 +422,8 @@ html,body{background:#F7F0E3 url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQAB
 // ===== CONFIGURACIÓN (la llena Claude con tus datos de Supabase) =====
 const SUPABASE_URL = 'https://olflxehmwfxvsnzoqzrm.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_-GRf3to9PdSARsBT_PXAnw_K2Kqgwtp';
+// Clave de YouTube (Google Cloud → YouTube Data API v3). Vacía = no aparece la búsqueda en YouTube.
+const YT_KEY = '';
 // =====================================================================
 
 const CATEGORIES = ['Bailes', 'Outfits', 'Caballos', 'Jaripeo', 'Ganado', 'Comida'];
@@ -585,6 +596,27 @@ async function songTitle(url) {
 }
 // Reproductor único para los avances de 30 s (Apple Music)
 const SONG = { audio: null, chip: null };
+// ---------- YouTube: buscar por nombre y reproducir en miniatura ----------
+function fmtSec(t) { t = Math.max(0, Math.floor(t || 0)); const m = Math.floor(t / 60); return m + ':' + String(t % 60).padStart(2, '0'); }
+function unEsc(x) { const d = document.createElement('textarea'); d.innerHTML = x || ''; return d.value; }
+async function ytSearch(q) {
+  const r = await fetch('https://www.googleapis.com/youtube/v3/search?' + new URLSearchParams({ part: 'snippet', type: 'video', videoEmbeddable: 'true', videoCategoryId: '10', regionCode: 'MX', maxResults: '8', q, key: YT_KEY }));
+  const j = await r.json(); if (j.error) throw new Error(j.error.message || 'yt');
+  return (j.items || []).filter(x => x.id && x.id.videoId).map(x => ({ id: x.id.videoId, title: unEsc(x.snippet.title), who: unEsc(x.snippet.channelTitle || '').replace(/ - Topic$/, ''), thumb: `https://i.ytimg.com/vi/${x.id.videoId}/mqdefault.jpg` }));
+}
+async function ytDuration(id) {
+  try {
+    const r = await fetch('https://www.googleapis.com/youtube/v3/videos?' + new URLSearchParams({ part: 'contentDetails', id, key: YT_KEY }));
+    const j = await r.json(); const d = j.items && j.items[0] && j.items[0].contentDetails.duration;
+    const m = d && d.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/); if (!m) return 0;
+    return (+m[1] || 0) * 3600 + (+m[2] || 0) * 60 + (+m[3] || 0);
+  } catch (_) { return 0; }
+}
+function ytFrame(id, start, cls) {
+  const src = `https://www.youtube-nocookie.com/embed/${id}?` + new URLSearchParams({ autoplay: '1', playsinline: '1', rel: '0', start: String(Math.max(0, Math.floor(start || 0))), enablejsapi: '1', origin: location.origin });
+  return h('iframe', { src, class: cls || '', allow: 'autoplay; encrypted-media; picture-in-picture', title: 'Canción de YouTube' });
+}
+function ytCmd(frame, func) { try { frame.contentWindow.postMessage(JSON.stringify({ event: 'command', func, args: [] }), '*'); } catch (_) {} }
 function stopSong() {
   if (SONG.audio) { try { SONG.audio.pause(); } catch (_) {} }
   if (SONG.chip) SONG.chip.classList.remove('playing');
@@ -1170,7 +1202,7 @@ function openSundowns(groups, gi, onClose) {
   const IMG_MS = 8000;   // fotos: 8 s (15 s si llevan canción)
   let curMs = IMG_MS;
   let ii = 0, video = null, raf = 0, elapsed = 0, lastT = 0, paused = false, userPaused = false, safety = null, fill = null, isImg = false;
-  let holdTimer = null, held = false, suppressClick = false;
+  let holdTimer = null, held = false, suppressClick = false, ytBox = null;
   const bars = h('div', { class: 'sd-bars' });
   const head = h('div', { class: 'sd-head' });
   const stage = h('div', { style: 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center' });
@@ -1203,6 +1235,7 @@ function openSundowns(groups, gi, onClose) {
     paused = p || userPaused;
     if (video) { if (paused) video.pause(); else video.play().catch(() => {}); }
     if (SONG.audio) { if (paused) SONG.audio.pause(); else SONG.audio.play().catch(() => {}); }
+    if (ytBox) ytCmd(ytBox.firstChild, paused ? 'pauseVideo' : 'playVideo');
     lastT = performance.now();
     paintPause();
   }
@@ -1214,7 +1247,7 @@ function openSundowns(groups, gi, onClose) {
     if (elapsed >= curMs) return next();
     raf = requestAnimationFrame(tick);
   }
-  const stop = () => { cancelAnimationFrame(raf); clearTimeout(safety); if (video) { video.pause(); video = null; } };
+  const stop = () => { cancelAnimationFrame(raf); clearTimeout(safety); if (video) { video.pause(); video = null; } if (ytBox) { ytBox.remove(); ytBox = null; } };
   const close = () => { stop(); stopSong(); viewer.remove(); document.removeEventListener('keydown', onKey); if (onClose) onClose(); };
   const onKey = (e) => { if (e.key === 'Escape') close(); if (e.key === 'ArrowRight') next(); if (e.key === 'ArrowLeft') prev(); if (e.key === ' ') { e.preventDefault(); setPaused(!userPaused, 'button'); } };
   document.addEventListener('keydown', onKey);
@@ -1237,15 +1270,20 @@ function openSundowns(groups, gi, onClose) {
       } }),
       it.user_id !== state.me.id && h('button', { class: 'iconbtn plain', style: 'color:#fff', 'aria-label': 'Más opciones', icon: 'more', onclick: () => { setPaused(true, 'button'); postMenu(it, () => close()); } }),
       h('button', { class: 'iconbtn plain', style: 'color:#fff', 'aria-label': 'Cerrar', icon: 'close', onclick: close })].filter(Boolean));
+    const ytSong = !it.song_preview && it.song_url ? parseSong(it.song_url) : null;
+    const ytId = ytSong && ytSong.type === 'yt' ? ytSong.id : null;
     cap.replaceChildren(...[it.caption ? h('div', {}, it.caption) : null,
+      ytId ? h('div', { style: 'margin-top:' + (it.caption ? '10px' : '0') }, h('div', { class: 'sd-song' }, '🎵', h('span', {}, it.song_title || 'Canción de YouTube'))) :
       it.song_url ? h('div', { style: 'margin-top:' + (it.caption ? '10px' : '0') }, songChip(it.song_url, it.song_title, { dark: true, preview: it.song_preview, art: it.song_art, start: it.song_start, before: () => { if (!it.song_preview) setPaused(true, 'button'); } })) : null].filter(Boolean));
     cap.style.display = (it.caption || it.song_url) ? 'block' : 'none';
-    curMs = it.song_preview ? 15000 : IMG_MS;
-    if (it.song_preview) { playSong(it.song_preview, cap.querySelector('.song-chip'), it.song_start || 0); if (paused && SONG.audio) SONG.audio.pause(); } else stopSong();
+    curMs = it.song_preview ? 15000 : ytId ? 30000 : IMG_MS;
+    if (ytId) { stopSong(); ytBox = h('div', { class: 'sd-yt' }, ytFrame(ytId, it.song_start || 0)); inner.append(ytBox); }
+    else if (it.song_preview) { playSong(it.song_preview, cap.querySelector('.song-chip'), it.song_start || 0); if (paused && SONG.audio) SONG.audio.pause(); } else stopSong();
     paintPause();
     if (it.media_type === 'video') {
       isImg = false;
-      video = h('video', { src: it.media_url, playsInline: true, autoplay: true });
+      video = h('video', { src: it.media_url, playsInline: true, autoplay: true, muted: !!ytId });
+      if (ytId) video.muted = true;
       video.addEventListener('timeupdate', () => { if (video && video.duration && fill) fill.style.width = (video.currentTime / video.duration * 100) + '%'; });
       video.addEventListener('ended', () => next());
       video.addEventListener('error', () => { safety = setTimeout(next, 3000); });
@@ -1417,6 +1455,22 @@ function renderUpload() {
     const chip = songChip(picked.url, picked.title, { preview: picked.preview, art: picked.art, start: picked.start });
     songPick.append(h('div', { class: 'song-picked' }, chip,
       h('button', { type: 'button', class: 'linkbtn', style: 'text-decoration:underline', onclick: () => { stopSong(); picked = null; showPick(); songInput.focus(); } }, 'Quitar')));
+    if (picked.yt) {
+      const lab = h('b', {}, fmtSec(picked.start));
+      let frame = null;
+      const box = h('div', {});
+      const listen = () => { stopSong(); frame = ytFrame(picked.yt, picked.start, 'yt-prev'); box.replaceChildren(frame); };
+      const max = Math.max(0, Math.min(3540, (picked.dur || 240) - 15));
+      const range = h('input', { type: 'range', min: '0', max: String(max), step: '1', value: String(picked.start || 0), class: 'song-range', 'aria-label': 'Desde qué segundo empieza la canción' });
+      range.addEventListener('input', () => { picked.start = Number(range.value); lab.textContent = fmtSec(picked.start); });
+      range.addEventListener('change', listen);
+      songPick.append(h('div', { class: 'song-cut' },
+        h('div', { class: 'song-cut-top' }, h('span', {}, '✂️ Parte de la canción: empieza en '), lab),
+        range,
+        h('div', { class: 'song-cut-help' }, h('small', {}, 'Canción completa de YouTube. En tu sundown se verá el video en chiquito.'), h('button', { type: 'button', class: 'song-play', 'aria-label': 'Escuchar desde ahí', onclick: listen }, '▶')),
+        box));
+      return;
+    }
     if (picked.preview) {
       const lab = h('b', {}, '0:' + String(picked.start || 0).padStart(2, '0'));
       const range = h('input', { type: 'range', min: '0', max: '25', step: '1', value: String(picked.start || 0), class: 'song-range', 'aria-label': 'Desde qué segundo empieza la canción' });
@@ -1429,6 +1483,25 @@ function renderUpload() {
         h('div', { class: 'song-cut-help' }, h('small', {}, 'Mueve la barrita y escucha. Suena desde ahí.'), h('button', { type: 'button', class: 'song-play', 'aria-label': 'Escuchar desde ahí', onclick: listen }, '▶'))));
     }
   };
+  const searchYouTube = async (q) => {
+    const seq = ++songSeq;
+    songList.replaceChildren(h('small', { class: 'hint' }, 'Buscando en YouTube…'));
+    try {
+      const items = await ytSearch(q); if (seq !== songSeq) return;
+      songList.replaceChildren();
+      if (!items.length) { songList.append(h('small', { class: 'hint' }, 'No salió nada en YouTube. Prueba con otro nombre.')); return; }
+      items.forEach(x => {
+        songList.append(h('div', { class: 'song-row', role: 'button', tabindex: '0', onclick: async () => {
+          stopSong(); songInput.value = ''; songList.replaceChildren(h('small', { class: 'hint' }, 'Cargando…'));
+          const dur = await ytDuration(x.id);
+          picked = { url: 'https://www.youtube.com/watch?v=' + x.id, title: (x.title + (x.who && !x.title.toLowerCase().includes(x.who.toLowerCase()) ? ' · ' + x.who : '')).slice(0, 120), preview: null, art: null, start: 0, yt: x.id, dur };
+          songList.replaceChildren(); showPick();
+        } }, h('img', { src: x.thumb, alt: '', class: 'yt' }), h('div', { class: 'who' }, h('b', {}, x.title), h('small', {}, x.who))));
+      });
+      songList.append(h('small', { class: 'hint', style: 'display:block;margin-top:6px' }, 'Canción completa · se verá el video en chiquito.'));
+    } catch (_) { if (seq === songSeq) songList.replaceChildren(h('small', { class: 'err', style: 'margin:0' }, 'No se pudo buscar en YouTube ahorita. Intenta más tarde.')); }
+  };
+  const ytButton = (q) => YT_KEY ? h('button', { type: 'button', class: 'yt-btn', onclick: () => searchYouTube(q) }, h('span', { class: 'yt-logo', 'aria-hidden': 'true' }, '▶'), 'Buscar en YouTube · canción completa') : null;
   const searchSongs = async () => {
     const q = songInput.value.trim(); const seq = ++songSeq;
     songList.replaceChildren();
@@ -1447,7 +1520,7 @@ function renderUpload() {
       const j = await r.json(); if (seq !== songSeq) return;
       const items = (j.results || []).filter(x => x.previewUrl && x.trackViewUrl);
       songList.replaceChildren();
-      if (!items.length) { songList.append(h('small', { class: 'hint' }, 'No encontramos esa canción. Prueba con el nombre del artista.')); return; }
+      if (!items.length) { songList.append(...[h('small', { class: 'hint' }, 'No encontramos esa canción. Prueba con el nombre del artista.'), ytButton(q)].filter(Boolean)); return; }
       items.forEach(x => {
         const title = (x.trackName + ' · ' + x.artistName).slice(0, 120);
         const art = (x.artworkUrl100 || '').replace('100x100', '120x120');
@@ -1457,7 +1530,7 @@ function renderUpload() {
           stopSong(); songInput.value = ''; songList.replaceChildren(); showPick();
         } }, h('img', { src: art, alt: '' }), h('div', { class: 'who' }, h('b', {}, x.trackName), h('small', {}, x.artistName)), play));
       });
-      songList.append(h('small', { class: 'hint', style: 'display:block;margin-top:6px' }, 'Avances de 30 s de Apple Music.'));
+      songList.append(...[h('small', { class: 'hint', style: 'display:block;margin-top:6px' }, 'Avances de 30 s de Apple Music.'), ytButton(q)].filter(Boolean));
     } catch (_) { if (seq === songSeq) songList.replaceChildren(h('small', { class: 'err', style: 'margin:0' }, 'No se pudo buscar. Revisa tu conexión.')); }
   };
   songInput.addEventListener('input', () => { clearTimeout(songTimer); songTimer = setTimeout(searchSongs, 450); });
@@ -1511,7 +1584,7 @@ function renderUpload() {
       const row = { user_id: state.me.id, media_url: pub.publicUrl, media_type: isVideo ? 'video' : 'image', caption: caption.value.trim() || null, category: kind === 'sundown' ? null : category, shop_links };
       if (kind !== 'post') row.kind = kind;
       if (animalId) row.animal_id = animalId;
-      if (HAS_SONG && picked) { row.song_url = picked.url; row.song_title = picked.title || null; if (picked.preview) { row.song_preview = picked.preview; row.song_art = picked.art || null; row.song_start = picked.start || 0; } }
+      if (HAS_SONG && picked) { row.song_url = picked.url; row.song_title = picked.title || null; if (picked.preview) { row.song_preview = picked.preview; row.song_art = picked.art || null; row.song_start = picked.start || 0; } else if (picked.yt) row.song_start = picked.start || 0; }
       stopSong();
       const ins = await sb.from('posts').insert(row);
       if (ins.error) { sb.storage.from('media').remove([path]); throw ins.error; }
