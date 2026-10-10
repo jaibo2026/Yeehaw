@@ -9,6 +9,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Yeehaw">
 <title>Yeehaw</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rye&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -187,6 +190,85 @@ textarea.input{min-height:90px;resize:vertical}
 .kinds button{height:44px;border:none;border-radius:16px;background:none;color:var(--soft);font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;gap:6px}
 .kinds button.on{background:var(--grad);color:var(--ink);box-shadow:var(--glow)}
 .hint{font-size:13px;color:var(--muted);margin:-6px 0 14px;line-height:1.4}
+
+/* ---- Animales ---- */
+.animal-pic{background:linear-gradient(135deg,#FFE7B8,#FFD0B0);color:#B5401A}
+.animal-pic>span{display:flex;align-items:center;justify-content:center;width:55%;height:55%}
+.animal-pic>span svg{width:100%;height:100%}
+.animal-tag{display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 12px 0 5px;border-radius:17px;border:1px solid var(--line);background:var(--surface);color:var(--text);font-size:13px}
+.ride .animal-tag{background:rgba(0,0,0,.4);border-color:rgba(255,255,255,.25);color:#fff}
+.herd{padding:0 0 16px}
+.herd h3{display:flex;align-items:center;gap:8px;margin:0 16px 10px;font-size:15px}
+.herd h3 svg{width:18px;height:18px;color:#D0451B}
+.herd-row{display:flex;gap:10px;overflow-x:auto;padding:2px 16px 4px;scrollbar-width:none}
+.herd-row::-webkit-scrollbar{display:none}
+.herd-card{flex-shrink:0;width:96px;padding:12px 6px;border-radius:18px;border:1px solid var(--line);background:#fff;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:0 4px 14px rgba(120,40,20,.07)}
+.herd-card b{font-size:13px;max-width:84px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.herd-card small{font-size:11px;color:var(--muted)}
+.herd-card.add{border:1.5px dashed rgba(232,120,26,.55);background:var(--surface);box-shadow:none}
+.herd-plus{width:64px;height:64px;border-radius:50%;background:var(--grad);color:var(--ink);font-size:32px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.animal-hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:10px 20px 16px}
+.animal-ring{padding:5px;border-radius:50%;background:var(--ring);box-shadow:var(--glow);margin-bottom:12px}
+.animal-ring .avatar{border:4px solid #fff}
+.animal-hero h1{margin:0;font-family:Rye,serif;font-weight:400;font-size:32px;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.animal-meta{color:var(--muted);font-size:14px;margin-top:4px}
+.animal-owner{display:inline-flex;align-items:center;gap:8px;margin-top:10px;border:none;background:none;color:var(--soft);font-size:14px;padding:4px}
+.animal-bio{margin:10px 0 0;font-size:14px;line-height:1.45;color:var(--soft);max-width:420px;white-space:pre-wrap}
+
+/* ---- Menú y reglas ---- */
+.menu{padding:8px 10px calc(14px + env(safe-area-inset-bottom))}
+.menu-item{width:100%;min-height:52px;display:flex;align-items:center;gap:12px;padding:0 12px;border:none;border-radius:14px;background:none;color:var(--text);font-size:15px;font-weight:600;text-align:left}
+.menu-item:active{background:var(--surface)}
+.menu-item.danger{color:#C2183A}
+.rules{font-size:14px;line-height:1.5;color:var(--soft);padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+.rules p{margin:0 0 14px}
+.rules-sec h4{margin:16px 0 6px;font-size:15px;color:var(--text)}
+.rules-sec ul{margin:0;padding-left:20px}
+.rules-sec li{margin-bottom:6px}
+
+/* ---- Bienvenida ---- */
+.welcome-card{margin:0 10px 16px;padding:16px;border-radius:24px;background:linear-gradient(135deg,rgba(255,210,63,.16),rgba(255,122,26,.12) 50%,rgba(232,23,46,.1));border:var(--stitch)}
+.wc-head{display:flex;align-items:flex-start;justify-content:space-between}
+.wc-kicker{font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.wc-lead{margin:6px 0 12px;font-size:14px;color:var(--soft)}
+.wc-tips{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.wc-tip{display:flex;gap:10px;align-items:flex-start;padding:10px;border-radius:16px;background:#fff;border:1px solid var(--line)}
+.wc-tip b{display:block;font-size:14px}
+.wc-tip small{display:block;font-size:12px;line-height:1.35;color:var(--muted);margin-top:2px}
+.wc-ico{flex-shrink:0;width:34px;height:34px;border-radius:50%;background:var(--grad);color:var(--ink);display:flex;align-items:center;justify-content:center}
+.wc-ico svg{width:18px;height:18px}
+.welcome{flex:1;display:flex;flex-direction:column;padding:calc(12px + env(safe-area-inset-top)) 22px calc(24px + env(safe-area-inset-bottom));position:relative;isolation:isolate}
+.welcome::before{content:"";position:fixed;inset:-20%;z-index:-1;background:radial-gradient(40% 30% at 20% 15%,rgba(255,210,63,.28),transparent 70%),radial-gradient(40% 30% at 85% 30%,rgba(255,122,26,.22),transparent 70%),radial-gradient(45% 35% at 50% 90%,rgba(232,23,46,.14),transparent 70%);filter:blur(30px)}
+.wl-top{display:flex;align-items:center;justify-content:space-between;min-height:44px}
+.wl-dots{display:flex;gap:6px}
+.wl-dots span{width:26px;height:6px;border-radius:3px;background:var(--line)}
+.wl-dots span.on{background:var(--grad)}
+.wl-body{flex:1;display:flex;flex-direction:column;justify-content:center;text-align:center;max-width:420px;width:100%;margin:0 auto}
+.wl-title{margin:0 0 8px;font-family:Rye,serif;font-weight:400;font-size:30px;line-height:1.15;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.wl-sub{margin:0 0 24px;color:var(--soft);font-size:15px;line-height:1.45}
+.wl-avatar{display:flex;justify-content:center;margin-bottom:12px}
+.wl-avatar .avatar{border:4px solid #fff;box-shadow:var(--glow)}
+.wl-hat{display:flex;justify-content:center;margin-bottom:18px}
+.wl-hat svg{width:140px;height:92px}
+
+/* ---- Caballo de yeehaw ---- */
+.horse{overflow:visible}
+.horse .hz{transform-box:view-box;transform-origin:72px 94px}
+.horse .fl-b{opacity:0}
+.liked .horse .hz{fill:url(#g)}
+.liked .horse .ln{stroke:url(#g)}
+.liked .horse{filter:drop-shadow(0 2px 6px rgba(255,90,26,.45))}
+.rear .horse .hz,.burst.go .horse .hz{animation:rear 1s cubic-bezier(.3,1.25,.5,1)}
+.rear .horse .fl-s,.burst.go .horse .fl-s{animation:legS 1s linear}
+.rear .horse .fl-b,.burst.go .horse .fl-b{animation:legB 1s linear}
+@keyframes rear{0%{transform:rotate(0)}30%{transform:rotate(28deg)}55%{transform:rotate(22deg)}75%{transform:rotate(26deg)}100%{transform:rotate(0)}}
+@keyframes legS{0%,8%{opacity:1}12%,85%{opacity:0}92%,100%{opacity:1}}
+@keyframes legB{0%,8%{opacity:0}12%,85%{opacity:1}92%,100%{opacity:0}}
+.burst-horse svg{width:120px;height:120px}
+.burst-horse .hz{fill:url(#g)}
+.burst-horse .ln{stroke:url(#g)}
+.burst-horse{filter:drop-shadow(0 4px 14px rgba(0,0,0,.55))}
+.wc-ico .horse{width:22px;height:22px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -201,6 +283,7 @@ const SUPABASE_KEY = 'sb_publishable_-GRf3to9PdSARsBT_PXAnw_K2Kqgwtp';
 
 const CATEGORIES = ['Bailes', 'Outfits', 'Caballos', 'Jaripeo', 'Ganado', 'Comida'];
 const MAX_VIDEO_MB = 50;
+const CONTACT = ''; // correo de contacto para la página de reglas (vacío = se usa la página de Facebook)
 
 const ICONS = {
   home: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>',
@@ -221,6 +304,10 @@ const ICONS = {
   sound: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg>',
   mute: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="m22 9-6 6M16 9l6 6"/></svg>',
   playbig: '<svg width="34" height="34" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>',
+  more: '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>',
+  flag: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22V4c5-3 9 3 16 0v10c-7 3-11-3-16 0"/></svg>',
+  block: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="m5.7 5.7 12.6 12.6"/></svg>',
+  horse: '<svg class="horse" width="30" height="30" viewBox="0 0 96 98" aria-hidden="true"><g class="hz" fill="currentColor"><path d="M66 64 L64 77 L62.4 87.6 L63.4 93 L57.4 94 L58.2 88 L60 77 L61.4 66 Z"/><path d="M79 44 C86 46 89.5 56 87.5 66 C86.5 72 84 78 80 82.5 C82 74 82.2 66 80.6 58.5 C79.6 52.5 79.2 48.5 77 46 Z"/><path d="M9 39 C9 36 11 34 13 32 L21 21 L23.6 17.6 L24.4 11 L28 16.4 L29.4 15.6 L31 11.4 L32.6 17.8 C38 22 41 30 44 38 C50 40 56 41 62 41 C68 40 74 38 78 41 C82 44 83 50 81 56 C79 60 76 62 75 66 L77 76 C76 80 75 84 75 88 L76 93 L69.4 94 L70 89 L70 80 C70 76 69 73 67 70 C66 67 64 65 62 65 C54 66 47 66 41 64 L31 62 C29 56 27 49 24 44 C21 42 18 43 15 44 C12 45 9 44 9 41 Z"/><path d="M44 37 C40 28 36 22 31 17.6 L33.6 23 L31.6 24.6 L36.6 27.4 L34.4 30 L39.6 31.6 L37.8 34 Z"/><g class="fl-s"><path d="M38 64 L36.5 79 L35.6 88 L36.6 93 L30.6 94 L31.4 88.5 L32.4 79 L33.5 64 Z"/><path d="M41.4 63.6 C40 70 40 76 39 80 L39 88 L40 93 L33.4 94 L34 89 L34 80 C34 74 33 68 30.6 61.6 Z"/></g><g class="fl-b"><path d="M41 64 C37 66 30 66 25.6 67.6 L22.4 73.6 L24 78 L20 79 L18.6 73.4 L22 64 L31 61.6 Z"/><path d="M37.4 64.6 C34 67.4 30 69.6 28 72 L29.6 77.6 L25.6 78.6 L24.4 72 L31 64 Z"/></g><path d="M54.6 36 L49.6 47 L49.8 56.6 L45.6 58.6 L45.6 61 L54 61 L54 57 L55 47.4 L58.6 38.4 Z"/><path d="M53.4 39.4 L50.2 22.6 C51.4 20.8 55.6 20.4 57.2 21.6 L60.4 38.4 Z"/><circle cx="53.8" cy="16.6" r="3.7"/><path d="M51.6 23.6 L44 32.4 L45.6 34.2 L54.4 27 Z"/><path d="M56 22.4 L62.6 12 L65 13.4 L59.4 24.4 Z"/><g transform="rotate(-20 66 8)"><path d="M58.6 9.4 C63 7.2 74.4 7.2 79 9.4 C74.6 10.8 63 10.8 58.6 9.4 Z"/><path d="M63.2 8.6 C63 4 64.8 1.6 66.8 2.2 C67.8 2.6 68.4 3.4 68.8 3.4 C69.2 3.4 69.8 2.6 70.8 2.2 C72.8 1.6 74.6 4 74.4 8.6 Z"/></g><path d="M50.6 13.6 C51 11.6 56.6 11.4 57.2 13.4 Z"/><path class="ln" d="M44.8 33.4 C33 36 22 38.6 13.4 40.6" fill="none" stroke="currentColor" stroke-width="1.1"/></g></svg>',
   trash: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>'
 };
 
@@ -274,6 +361,7 @@ function friendlyError(e) {
   if (/Password should be/i.test(m)) return 'La contraseña debe tener al menos 6 caracteres.';
   if (/Email not confirmed/i.test(m)) return 'Falta confirmar tu correo. Revisa tu bandeja de entrada.';
   if (/Failed to fetch|NetworkError/i.test(m)) return 'Sin conexión. Revisa tu internet.';
+  if (/animal/i.test(m)) return 'Falta actualizar la base de datos en Supabase (el paso del SQL de animales).';
   if (/kind/i.test(m) && /column|columna/i.test(m)) return 'Falta actualizar la base de datos en Supabase (el paso del SQL de Rides y Sundowns).';
   return m;
 }
@@ -312,27 +400,65 @@ const POST_SELECT = 'id,user_id,media_url,media_type,caption,category,shop_links
 async function loadMe() {
   const { data } = await sb.from('profiles').select('*').eq('id', state.session.user.id).maybeSingle();
   state.me = data;
+  const bl = await sb.from('blocks').select('blocked_id').eq('blocker_id', state.session.user.id);
+  state.blocked = new Set(bl.error ? [] : (bl.data || []).map(b => b.blocked_id));
 }
+const HIDDEN_KEY = 'yeehaw_hidden_posts';
+let hiddenPosts = new Set();
+try { hiddenPosts = new Set(JSON.parse(localStorage.getItem(HIDDEN_KEY) || '[]')); } catch (_) {}
+function hidePost(id) { hiddenPosts.add(id); try { localStorage.setItem(HIDDEN_KEY, JSON.stringify([...hiddenPosts].slice(-500))); } catch (_) {} }
+function visible(list) { const b = state.blocked || new Set(); return (list || []).filter(p => !b.has(p.user_id) && !hiddenPosts.has(p.id)); }
 let HAS_KIND = true;
-async function fetchPosts({ category, userId, kinds = ['post', 'ride'], since } = {}) {
-  const build = (withKind) => {
-    let q = sb.from('posts').select(POST_SELECT + (withKind ? ',kind' : '')).order('created_at', { ascending: false }).limit(60);
+let HAS_ANIMALS = true;
+const ANIMAL_EMBED = ',animal_id,animals!animal_id(id,name,species,photo_url)';
+async function fetchPosts({ category, userId, kinds = ['post', 'ride'], since, animalId } = {}) {
+  const build = () => {
+    let q = sb.from('posts').select(POST_SELECT + (HAS_KIND ? ',kind' : '') + (HAS_ANIMALS ? ANIMAL_EMBED : '')).order('created_at', { ascending: false }).limit(60);
     if (category && category !== 'Todo') q = q.eq('category', category);
     if (userId) q = q.eq('user_id', userId);
     if (since) q = q.gte('created_at', since);
-    if (withKind) q = q.in('kind', kinds);
+    if (animalId) q = q.eq('animal_id', animalId);
+    if (HAS_KIND) q = q.in('kind', kinds);
     return q;
   };
-  if (HAS_KIND) {
-    const { data, error } = await build(true);
-    if (!error) return data || [];
-    if (!/kind/i.test(error.message || '')) throw error;
-    HAS_KIND = false; // la base de datos aún no tiene Rides ni Sundowns
+  for (let i = 0; i < 3; i++) {
+    if (!HAS_KIND && !kinds.includes('post')) return [];
+    if (!HAS_ANIMALS && animalId) return [];
+    const { data, error } = await build();
+    if (!error) return visible(data);
+    const m = error.message || '';
+    if (HAS_ANIMALS && /animal/i.test(m)) { HAS_ANIMALS = false; continue; } // falta el SQL de animales
+    if (HAS_KIND && /kind/i.test(m)) { HAS_KIND = false; continue; }          // falta el SQL de Rides y Sundowns
+    throw error;
   }
-  if (!kinds.includes('post')) return [];
-  const { data, error } = await build(false);
-  if (error) throw error;
+  return [];
+}
+const SPECIES = ['Caballo', 'Yegua', 'Toro', 'Vaca', 'Becerro', 'Burro', 'Perro', 'Otro'];
+const ANIMAL_SELECT = 'id,owner_id,name,species,breed,birth_year,bio,photo_url,created_at,profiles!owner_id(id,username,full_name,avatar_url),animal_follows(user_id)';
+async function fetchAnimals({ ownerId, id, search } = {}) {
+  if (!HAS_ANIMALS) return [];
+  let q = sb.from('animals').select(ANIMAL_SELECT).order('created_at', { ascending: true }).limit(50);
+  if (ownerId) q = q.eq('owner_id', ownerId);
+  if (id) q = q.eq('id', id);
+  if (search) q = q.ilike('name', `%${search}%`);
+  const { data, error } = await q;
+  if (error) { if (/animal/i.test(error.message || '')) { HAS_ANIMALS = false; return []; } throw error; }
   return data || [];
+}
+function animalAge(a) {
+  if (!a.birth_year) return '';
+  const y = new Date().getFullYear() - a.birth_year;
+  return y <= 0 ? 'menos de 1 año' : y === 1 ? '1 año' : `${y} años`;
+}
+function animalPic(a, size) {
+  const el = h('div', { class: 'avatar animal-pic', style: `width:${size}px;height:${size}px` });
+  if (a && a.photo_url) el.append(h('img', { src: a.photo_url, alt: '' }));
+  else el.append(h('span', { icon: 'horseshoe' }));
+  return el;
+}
+function animalTag(a) {
+  if (!a) return null;
+  return h('button', { class: 'animal-tag', onclick: () => go('animal', { animalId: a.id }) }, animalPic(a, 24), h('span', {}, 'con ', h('b', {}, a.name)));
 }
 async function fetchSundownGroups(userId) {
   const items = await fetchPosts({ kinds: ['sundown'], since: new Date(Date.now() - DAY).toISOString(), userId }).catch(() => []);
@@ -341,13 +467,15 @@ async function fetchSundownGroups(userId) {
     if (!map.has(it.user_id)) map.set(it.user_id, { user: it.profiles || { id: it.user_id }, items: [] });
     map.get(it.user_id).items.push(it);
   });
-  return [...map.values()].map(g => ({ ...g, unseen: g.items.some(i => !seenSundowns.has(i.id)) }));
+  return [...map.values()].map(g => ({ ...g, unseen: g.items.some(i => !seenSundowns.has(i.id)) }));  // fetchPosts ya quita bloqueados y reportados
 }
 
 // ---------- navegación ----------
 function go(view, extra) {
+  if (view !== state.view) state.prevView = state.view;
   state.view = view;
   if (extra && 'profileId' in extra) state.profileId = extra.profileId;
+  if (extra && 'animalId' in extra) state.animalId = extra.animalId;
   window.scrollTo(0, 0);
   render();
 }
@@ -369,7 +497,8 @@ function render() {
   $app.replaceChildren();
   if (!state.session) return renderAuth();
   if (!state.me) { $app.append(h('div', { class: 'spinner' })); return; }
-  const views = { feed: renderFeed, rides: renderRides, explore: renderExplore, upload: renderUpload, profile: renderProfile };
+  if (state.view === 'welcome') return renderWelcome();
+  const views = { feed: renderFeed, rides: renderRides, explore: renderExplore, upload: renderUpload, profile: renderProfile, animal: renderAnimal };
   (views[state.view] || renderFeed)();
   $app.append(navBar());
 }
@@ -402,7 +531,9 @@ function renderAuth() {
     f('Correo', { name: 'email', type: 'email', required: true, autocomplete: 'email', autocapitalize: 'off' }),
     f('Contraseña', { name: 'password', type: 'password', required: true, minlength: '6', autocomplete: isLogin ? 'current-password' : 'new-password' }),
     err,
-    h('button', { class: 'btn', type: 'submit' }, isLogin ? 'Entrar' : 'Crear cuenta')
+    h('button', { class: 'btn', type: 'submit' }, isLogin ? 'Entrar' : 'Crear cuenta'),
+    !isLogin && h('p', { class: 'hint', style: 'margin:12px 0 0;text-align:center' }, 'Al crear tu cuenta aceptas las ',
+      h('button', { type: 'button', class: 'linkbtn', style: 'text-decoration:underline;font-size:13px', onclick: openRules }, 'reglas y privacidad'), ' de Yeehaw.')
   );
   $app.append(h('div', { class: 'auth' },
     h('div', { class: 'logo' }, 'Yeehaw'),
@@ -422,7 +553,7 @@ async function renderFeed() {
   const chips = h('div', { class: 'chips' }, ['Todo', ...CATEGORIES].map(c =>
     h('button', { class: 'chip' + (state.category === c ? ' on' : ''), onclick: () => { state.category = c; render(); } }, c)));
   const list = h('div', {}, h('div', { class: 'spinner' }));
-  main.append(stories, chips, list);
+  main.append(...[stories, welcomeCard(), chips, list].filter(Boolean));
 
   // Sundowns: lo que subieron en las últimas 24 horas
   const paintSundowns = async () => {
@@ -458,7 +589,7 @@ function likeControls(p, short) {
   let liked = (p.likes || []).some(l => l.user_id === myId);
   let likeCount = (p.likes || []).length;
   const countEl = h('span', { class: short ? '' : 'count' });
-  const likeBtn = h('button', { class: 'iconbtn' + (short ? '' : ' plain'), 'aria-label': 'Dar yeehaw', icon: 'heart' });
+  const likeBtn = h('button', { class: 'iconbtn' + (short ? '' : ' plain'), 'aria-label': 'Dar yeehaw', icon: 'horse' });
   const paint = () => {
     likeBtn.classList.toggle('liked', liked);
     likeBtn.setAttribute('aria-pressed', String(liked));
@@ -468,7 +599,7 @@ function likeControls(p, short) {
   const setLike = async (want) => {
     if (busy || want === liked) return;
     busy = true; liked = want; likeCount += want ? 1 : -1; paint();
-    likeBtn.classList.remove('pop'); void likeBtn.offsetWidth; likeBtn.classList.add('pop');
+    likeBtn.classList.remove('rear'); void likeBtn.offsetWidth; if (want) likeBtn.classList.add('rear');
     const res = want ? await sb.from('likes').insert({ post_id: p.id, user_id: myId })
                      : await sb.from('likes').delete().eq('post_id', p.id).eq('user_id', myId);
     if (res.error) { liked = !want; likeCount += want ? -1 : 1; paint(); toast('No se pudo guardar, intenta de nuevo'); }
@@ -478,7 +609,7 @@ function likeControls(p, short) {
   paint();
   return { likeBtn, countEl, setLike };
 }
-function burstEl() { return h('div', { class: 'burst', 'aria-hidden': 'true' }, h('span', { icon: 'hat' }), h('b', {}, 'YEEHAW!')); }
+function burstEl() { return h('div', { class: 'burst', 'aria-hidden': 'true' }, h('span', { class: 'burst-horse', icon: 'horse' }), h('b', {}, 'YEEHAW!')); }
 function fireBurst(b) { b.classList.remove('go'); void b.offsetWidth; b.classList.add('go'); }
 async function sharePost(p) {
   const data = { title: 'Yeehaw', text: (p.caption || 'Mira esto en Yeehaw') + '\n', url: location.href };
@@ -520,7 +651,7 @@ function postCard(p) {
       h('button', { class: 'who', onclick: () => go('profile', { profileId: p.user_id }) },
         h('b', {}, prof.username || 'usuario'), h('small', {}, p.kind === 'ride' ? 'Ride · ' + timeAgo(p.created_at) : (prof.rancho || timeAgo(p.created_at)))),
       p.category && h('span', { class: 'tag' }, p.category),
-      p.user_id === myId && h('button', { class: 'iconbtn plain', 'aria-label': 'Borrar publicación', icon: 'trash', onclick: async () => { if (await deletePost(p)) card.remove(); } })
+      h('button', { class: 'iconbtn plain', 'aria-label': 'Más opciones', icon: 'more', onclick: () => postMenu(p, () => card.remove()) })
     ),
     media,
     links.length > 0 && h('div', { class: 'shop' },
@@ -532,6 +663,7 @@ function postCard(p) {
       h('button', { class: 'iconbtn plain', 'aria-label': 'Comentarios', icon: 'comment', onclick: () => openComments(p) }),
       h('button', { class: 'iconbtn plain', 'aria-label': 'Compartir', icon: 'share', onclick: () => sharePost(p) }),
       countEl),
+    p.animals && h('div', { style: 'padding:2px 12px 4px' }, animalTag(p.animals)),
     p.caption && h('p', { class: 'caption' }, h('b', {}, prof.username || ''), ' ', p.caption),
     h('div', { class: 'meta' },
       h('button', { class: 'linkbtn', onclick: () => openComments(p) }, commentCount ? `Ver ${commentCount === 1 ? 'el comentario' : `los ${commentCount} comentarios`}` : 'Comentar'),
@@ -569,7 +701,7 @@ async function openComments(p) {
     if (error) return body.replaceChildren(h('p', { class: 'err' }, friendlyError(error)));
     body.replaceChildren();
     if (!data.length) body.append(h('p', { class: 'empty', style: 'padding:30px 10px' }, 'Sé el primero en comentar.'));
-    data.forEach(c => body.append(h('div', { class: 'cmt' }, avatar(c.profiles, 34),
+    visible(data).forEach(c => body.append(h('div', { class: 'cmt' }, avatar(c.profiles, 34),
       h('div', {}, h('p', {}, h('b', {}, (c.profiles && c.profiles.username) || ''), ' ', c.body), h('small', {}, timeAgo(c.created_at))))));
     body.scrollTop = body.scrollHeight;
   }
@@ -586,6 +718,211 @@ function gridOf(posts, onEmpty) {
                              : h('img', { src: p.media_url, alt: '', loading: 'lazy' }))));
 }
 
+
+
+
+// ---------- Bienvenida para usuarios nuevos ----------
+function flagKey(name) { return `yeehaw_${name}_${state.me.id}`; }
+function getFlag(name) { try { return localStorage.getItem(flagKey(name)) === '1'; } catch (_) { return false; } }
+function setFlag(name) { try { localStorage.setItem(flagKey(name), '1'); } catch (_) {} }
+function needsWelcome() { return state.me && !getFlag('welcomed') && !state.me.avatar_url && !state.me.rancho; }
+function finishWelcome() { setFlag('welcomed'); state.view = 'feed'; render(); }
+
+function welcomeCard() {
+  if (getFlag('card_closed')) return null;
+  const card = h('section', { class: 'welcome-card', 'aria-label': 'Bienvenida' });
+  const tip = (icon, title, text) => h('div', { class: 'wc-tip' }, h('span', { class: 'wc-ico', icon }), h('div', {}, h('b', {}, title), h('small', {}, text)));
+  card.append(
+    h('div', { class: 'wc-head' }, h('div', {}, h('div', { class: 'wc-kicker' }, 'Bienvenido a'), h('div', { class: 'logo', style: 'font-size:26px' }, 'Yeehaw')),
+      h('button', { class: 'iconbtn plain', 'aria-label': 'Cerrar bienvenida', icon: 'close', onclick: () => { setFlag('card_closed'); card.remove(); } })),
+    h('p', { class: 'wc-lead' }, 'La vida de rancho, en un solo lugar. Así funciona:'),
+    h('div', { class: 'wc-tips' },
+      tip('horse', 'Yeehaws', 'Toca el caballo o da doble toque a la foto y se levanta: ¡yeehaw!'),
+      tip('horseshoe', 'Rides', 'Videos cortos y verticales: bailes, montas, caballos.'),
+      tip('sundown', 'Sundowns', 'Lo de hoy, que se va con el sol en 24 horas.'),
+      tip('user', 'Animales', 'Tu caballo o tu vaca con su propio perfil y seguidores.')),
+    h('button', { class: 'btn', style: 'margin-top:14px', onclick: () => { state.uploadKind = 'post'; state.presetCaption = presentText(); go('upload'); } }, 'Preséntate con una foto'));
+  return card;
+}
+function presentText() {
+  const r = state.me && state.me.rancho;
+  return r ? `¡Qué tal, raza! Aquí desde ${r}.` : '¡Qué tal, raza! Así se vive en mi rancho.';
+}
+
+async function renderWelcome() {
+  const step = state.welcomeStep || 0;
+  const steps = HAS_ANIMALS ? 3 : 2;
+  const next = () => { state.welcomeStep = step + 1; if (state.welcomeStep >= steps) { state.welcomeStep = steps - 1; } render(); };
+  const dots = h('div', { class: 'wl-dots', 'aria-label': `Paso ${step + 1} de ${steps}` }, ...Array.from({ length: steps }, (_, i) => h('span', { class: i <= step ? 'on' : '' })));
+  const skip = h('button', { class: 'linkbtn', style: 'font-size:14px;padding:10px', onclick: finishWelcome }, 'Saltar');
+  const page = h('div', { class: 'welcome' }, h('div', { class: 'wl-top' }, dots, skip));
+  $app.append(page);
+  const err = h('p', { class: 'err', role: 'alert' });
+
+  // Paso 1: foto y rancho
+  if (step === 0) {
+    let photo = null;
+    const prev = h('div', { class: 'wl-avatar' }, avatar(state.me, 120));
+    const fileIn = h('input', { type: 'file', accept: 'image/*', class: 'sr', id: 'wl_av' });
+    fileIn.addEventListener('change', () => {
+      photo = fileIn.files[0]; if (!photo) return;
+      prev.replaceChildren(h('div', { class: 'avatar', style: 'width:120px;height:120px' }, h('img', { src: URL.createObjectURL(photo), alt: 'Tu foto' })));
+    });
+    const rancho = h('input', { class: 'input', id: 'wl_r', maxlength: '60', placeholder: 'ej. Rancho El Mezquite, León' });
+    const save = h('button', { class: 'btn', type: 'submit' }, 'Siguiente');
+    page.append(h('form', { class: 'wl-body', onsubmit: async (e) => {
+      e.preventDefault(); err.textContent = ''; save.disabled = true;
+      try {
+        const patch = {};
+        if (rancho.value.trim()) patch.rancho = rancho.value.trim();
+        if (photo) {
+          const blob = await compressImage(photo, 480);
+          const path = `${state.me.id}/avatar-${Date.now()}.jpg`;
+          const up = await sb.storage.from('media').upload(path, blob, { contentType: 'image/jpeg' });
+          if (up.error) throw up.error;
+          patch.avatar_url = sb.storage.from('media').getPublicUrl(path).data.publicUrl;
+        }
+        if (Object.keys(patch).length) {
+          const { error } = await sb.from('profiles').update(patch).eq('id', state.me.id);
+          if (error) throw error;
+          await loadMe();
+        }
+        next();
+      } catch (ex) { err.textContent = friendlyError(ex); save.disabled = false; }
+    } },
+      h('h1', { class: 'wl-title' }, `¡Bienvenido, ${(state.me.full_name || state.me.username || '').split(' ')[0]}!`),
+      h('p', { class: 'wl-sub' }, 'Ponle cara a tu perfil para que la raza te reconozca.'),
+      prev, fileIn,
+      h('label', { for: 'wl_av', class: 'btn ghost small', style: 'display:inline-flex;align-items:center;cursor:pointer;margin:0 auto 22px' }, 'Elegir foto'),
+      h('div', { class: 'field', style: 'text-align:left' }, h('label', { for: 'wl_r' }, '¿De qué rancho o pueblo eres?'), rancho),
+      err, save));
+    return;
+  }
+
+  // Paso 2: su animal (si la base de datos ya tiene animales)
+  if (step === 1 && HAS_ANIMALS) {
+    let photo = null, species = 'Caballo';
+    const prev = h('div', { class: 'wl-avatar' }, animalPic(null, 120));
+    const fileIn = h('input', { type: 'file', accept: 'image/*', class: 'sr', id: 'wl_an' });
+    fileIn.addEventListener('change', () => {
+      photo = fileIn.files[0]; if (!photo) return;
+      prev.replaceChildren(h('div', { class: 'avatar animal-pic', style: 'width:120px;height:120px' }, h('img', { src: URL.createObjectURL(photo), alt: '' })));
+    });
+    const name = h('input', { class: 'input', id: 'wl_n', maxlength: '40', placeholder: 'ej. Lucero' });
+    const chips = h('div', { class: 'chips', style: 'padding:0 0 14px;flex-wrap:wrap;justify-content:center' });
+    const paint = () => chips.replaceChildren(...SPECIES.map(sp => h('button', { type: 'button', class: 'chip' + (sp === species ? ' on' : ''), onclick: () => { species = sp; paint(); } }, sp)));
+    paint();
+    const save = h('button', { class: 'btn', type: 'submit' }, 'Crear su perfil');
+    page.append(h('form', { class: 'wl-body', onsubmit: async (e) => {
+      e.preventDefault(); err.textContent = '';
+      if (!name.value.trim()) return (err.textContent = 'Ponle su nombre, o toca "Ahorita no".');
+      save.disabled = true;
+      try {
+        const row = { owner_id: state.me.id, name: name.value.trim(), species };
+        if (photo) {
+          const blob = await compressImage(photo, 900);
+          const path = `${state.me.id}/animal-${Date.now()}.jpg`;
+          const up = await sb.storage.from('media').upload(path, blob, { contentType: 'image/jpeg' });
+          if (up.error) throw up.error;
+          row.photo_url = sb.storage.from('media').getPublicUrl(path).data.publicUrl;
+        }
+        const { error } = await sb.from('animals').insert(row);
+        if (error) throw error;
+        toast(`¡${row.name} ya tiene su perfil!`);
+        next();
+      } catch (ex) { err.textContent = friendlyError(ex); save.disabled = false; }
+    } },
+      h('h1', { class: 'wl-title' }, 'Preséntanos a tu animal'),
+      h('p', { class: 'wl-sub' }, 'Tu caballo, tu vaca o tu perro también tienen perfil en Yeehaw. La gente los puede seguir.'),
+      prev, fileIn,
+      h('label', { for: 'wl_an', class: 'btn ghost small', style: 'display:inline-flex;align-items:center;cursor:pointer;margin:0 auto 22px' }, 'Elegir foto'),
+      h('div', { class: 'field', style: 'text-align:left' }, h('label', { for: 'wl_n' }, '¿Cómo se llama?'), name),
+      chips, err, save,
+      h('button', { type: 'button', class: 'linkbtn', style: 'margin-top:14px;font-size:14px;padding:8px', onclick: next }, 'Ahorita no')));
+    return;
+  }
+
+  // Último paso: primera publicación
+  page.append(h('div', { class: 'wl-body' },
+    h('div', { class: 'wl-hat', icon: 'hat' }),
+    h('h1', { class: 'wl-title' }, '¡Ya eres parte de la raza!'),
+    h('p', { class: 'wl-sub' }, 'Sube tu primera foto y preséntate. Te dejamos el texto listo, solo cámbialo si quieres.'),
+    h('button', { class: 'btn', onclick: () => { setFlag('welcomed'); state.uploadKind = 'post'; state.presetCaption = presentText(); go('upload'); } }, 'Subir mi primera foto'),
+    h('button', { class: 'linkbtn', style: 'margin-top:16px;font-size:14px;padding:8px', onclick: finishWelcome }, 'Primero quiero ver qué hay')));
+}
+
+// ---------- Reportar, bloquear, borrar ----------
+const REPORT_REASONS = ['Contenido sexual o desnudos', 'Violencia o maltrato animal', 'Acoso o insultos', 'Spam, estafa o venta ilegal', 'Algo más'];
+function postMenu(p, onGone) {
+  const mine = p.user_id === state.me.id;
+  const who = (p.profiles && p.profiles.username) || 'esta persona';
+  const body = h('div', { class: 'sheet-body menu' });
+  let close;
+  const item = (icon, label, fn, danger) => h('button', { class: 'menu-item' + (danger ? ' danger' : ''), onclick: fn }, h('span', { icon }), label);
+  if (mine) {
+    body.append(item('trash', 'Borrar publicación', async () => { close(); if (await deletePost(p)) onGone && onGone(); }, true));
+  } else {
+    body.append(
+      item('flag', 'Reportar publicación', () => { close(); reportPost(p, onGone); }, true),
+      item('block', `Bloquear a @${who}`, async () => { close(); if (await blockUser(p.user_id, who)) onGone && onGone(); }, true));
+  }
+  body.append(item('close', 'Cancelar', () => close()));
+  close = openSheet('Opciones', body);
+}
+function reportPost(p, onGone) {
+  const body = h('div', { class: 'sheet-body menu' }, h('p', { class: 'hint', style: 'margin:0 0 10px' }, '¿Por qué la reportas? Nadie más sabrá que fuiste tú.'));
+  let close;
+  REPORT_REASONS.forEach(r => body.append(h('button', { class: 'menu-item', onclick: async () => {
+    close();
+    const { error } = await sb.from('reports').insert({ post_id: p.id, reported_user: p.user_id, reporter_id: state.me.id, reason: r });
+    if (error) return toast(/reports/i.test(error.message || '') ? 'Falta activar los reportes en la base de datos' : 'No se pudo enviar el reporte');
+    hidePost(p.id); toast('Gracias, lo vamos a revisar. Ya no la verás.');
+    onGone && onGone();
+  } }, r)));
+  close = openSheet('Reportar', body);
+}
+async function blockUser(userId, username) {
+  if (!confirm(`¿Bloquear a @${username}? Ya no verás nada de esta persona. Lo puedes deshacer desde su perfil.`)) return false;
+  const { error } = await sb.from('blocks').insert({ blocker_id: state.me.id, blocked_id: userId });
+  if (error && !/duplicate/i.test(error.message || '')) { toast(/blocks/i.test(error.message || '') ? 'Falta activar los bloqueos en la base de datos' : 'No se pudo bloquear'); return false; }
+  (state.blocked = state.blocked || new Set()).add(userId);
+  toast(`Bloqueaste a @${username}`);
+  return true;
+}
+async function unblockUser(userId, username) {
+  const { error } = await sb.from('blocks').delete().eq('blocker_id', state.me.id).eq('blocked_id', userId);
+  if (error) return toast('No se pudo desbloquear');
+  state.blocked && state.blocked.delete(userId);
+  toast(`Desbloqueaste a @${username}`);
+  render();
+}
+
+// ---------- Reglas y privacidad ----------
+function openRules() {
+  const sec = (title, items) => h('section', { class: 'rules-sec' }, h('h4', {}, title), h('ul', {}, ...items.map(t => h('li', {}, t))));
+  const body = h('div', { class: 'sheet-body rules' },
+    h('p', {}, 'Yeehaw es para compartir la vida de rancho con respeto. Al usar la app aceptas estas reglas.'),
+    sec('Lo que no se permite', [
+      'Desnudos o contenido sexual.',
+      'Maltrato animal, violencia o peleas.',
+      'Insultos, acoso, amenazas o burlas a otras personas.',
+      'Vender drogas, armas o animales robados, o hacer estafas.',
+      'Subir fotos o videos de otras personas sin su permiso, o contenido que no es tuyo.',
+      'Fotos o videos de menores de edad en situaciones que los expongan.']),
+    sec('Qué pasa si alguien rompe las reglas', [
+      'Cualquiera puede reportar una publicación con el botón ⋯.',
+      'Revisamos los reportes y podemos borrar publicaciones o cuentas.',
+      'Si alguien te molesta, bloquéalo: ya no verás nada suyo.']),
+    sec('Tu privacidad', [
+      'Guardamos tu correo, tu nombre, tu usuario, tu foto y lo que publicas.',
+      'Solo las personas con cuenta en Yeehaw pueden ver tus publicaciones dentro de la app.',
+      'Ojo: quien tenga el enlace directo de una foto o video la puede abrir, así que no subas nada privado.',
+      'Tus datos se guardan en Supabase, el servicio que usa Yeehaw. No los vendemos ni los compartimos.',
+      'Tú puedes borrar tus publicaciones cuando quieras.',
+      'Para borrar tu cuenta completa, escríbenos y la borramos con todo lo que subiste.']),
+    sec('Contacto', [CONTACT || 'Escríbenos por mensaje a la página de Yeehaw en Facebook.']));
+  openSheet('Reglas y privacidad', body);
+}
 
 // ---------- Sundowns (desaparecen en 24 horas) ----------
 function openSundowns(groups, gi, onClose) {
@@ -619,6 +956,7 @@ function openSundowns(groups, gi, onClose) {
         if (await deletePost(it)) { g.items.splice(ii, 1); if (!g.items.length) { groups.splice(gi, 1); if (!groups.length) return close(); gi = Math.min(gi, groups.length - 1); ii = 0; } else ii = Math.min(ii, g.items.length - 1); }
         show();
       } }),
+      it.user_id !== state.me.id && h('button', { class: 'iconbtn plain', style: 'color:#fff', 'aria-label': 'Más opciones', icon: 'more', onclick: () => { stop(); postMenu(it, () => close()); } }),
       h('button', { class: 'iconbtn plain', style: 'color:#fff', 'aria-label': 'Cerrar', icon: 'close', onclick: close })].filter(Boolean));
     cap.textContent = it.caption || '';
     cap.style.display = it.caption ? 'block' : 'none';
@@ -697,6 +1035,7 @@ function rideCard(p) {
     video, tapLayer, burst, paused,
     h('div', { class: 'ride-info' },
       h('button', { class: 'who', onclick: () => go('profile', { profileId: p.user_id }) }, avatar(prof, 40), h('b', {}, prof.username || 'usuario')),
+      p.animals && h('div', { style: 'margin-bottom:8px' }, animalTag(p.animals)),
       p.caption && h('p', {}, p.caption),
       h('div', { style: 'display:flex;gap:8px;align-items:center' }, p.category && h('span', { class: 'tag' }, p.category), h('small', { style: 'color:rgba(255,255,255,.8)' }, timeAgo(p.created_at)))),
     h('div', { class: 'ride-side' },
@@ -704,14 +1043,14 @@ function rideCard(p) {
       h('button', { class: 'iconbtn', 'aria-label': 'Comentarios', icon: 'comment', onclick: () => openComments(p) }), h('span', {}, String(commentCount)),
       h('button', { class: 'iconbtn', 'aria-label': 'Compartir', icon: 'share', onclick: () => sharePost(p) }), h('span', {}, ' '),
       muteBtn,
-      p.user_id === state.me.id && h('button', { class: 'iconbtn', 'aria-label': 'Borrar ride', icon: 'trash', style: 'margin-top:6px', onclick: async () => { pause(); if (await deletePost(p)) el.remove(); } })));
+      h('button', { class: 'iconbtn', 'aria-label': 'Más opciones', icon: 'more', style: 'margin-top:6px', onclick: () => { pause(); postMenu(p, () => el.remove()); } })))
   return { el, play, pause };
 }
 
 async function renderExplore() {
   const main = h('main');
   $app.append(h('header', { class: 'topbar' }, h('div', { class: 'logo', style: 'font-size:24px' }, 'Explorar')), main);
-  const search = h('input', { class: 'input', type: 'search', placeholder: 'Buscar personas o ranchos…', 'aria-label': 'Buscar' });
+  const search = h('input', { class: 'input', type: 'search', placeholder: 'Buscar personas, ranchos o animales…', 'aria-label': 'Buscar' });
   const people = h('div', { style: 'padding:0 16px' });
   const chips = h('div', { class: 'chips', style: 'padding-top:12px' }, ['Todo', ...CATEGORIES].map(c =>
     h('button', { class: 'chip' + (state.category === c ? ' on' : ''), onclick: () => { state.category = c; render(); } }, c)));
@@ -724,11 +1063,16 @@ async function renderExplore() {
     timer = setTimeout(async () => {
       const q = search.value.trim().replace(/[%,()]/g, '');
       if (!q) return people.replaceChildren();
-      const { data } = await sb.from('profiles').select('id,username,full_name,avatar_url,rancho')
-        .or(`username.ilike.%${q}%,full_name.ilike.%${q}%,rancho.ilike.%${q}%`).limit(10);
-      people.replaceChildren(...(data || []).map(p => h('button', { class: 'post-head', style: 'width:100%;border:none;background:none;padding:10px 0;text-align:left', onclick: () => go('profile', { profileId: p.id }) },
-        avatar(p, 44), h('div', { class: 'who' }, h('b', {}, p.username), h('small', {}, [p.full_name, p.rancho].filter(Boolean).join(' · '))))));
-      if (data && !data.length) people.append(h('p', { style: 'color:var(--muted)' }, 'No encontramos a nadie con ese nombre.'));
+      const [{ data }, animals] = await Promise.all([
+        sb.from('profiles').select('id,username,full_name,avatar_url,rancho').or(`username.ilike.%${q}%,full_name.ilike.%${q}%,rancho.ilike.%${q}%`).limit(10),
+        fetchAnimals({ search: q }).catch(() => [])]);
+      const rowStyle = 'width:100%;border:none;background:none;padding:10px 0;text-align:left';
+      people.replaceChildren(
+        ...(data || []).map(p => h('button', { class: 'post-head', style: rowStyle, onclick: () => go('profile', { profileId: p.id }) },
+          avatar(p, 44), h('div', { class: 'who' }, h('b', {}, p.username), h('small', {}, [p.full_name, p.rancho].filter(Boolean).join(' · '))))),
+        ...animals.slice(0, 10).map(a => h('button', { class: 'post-head', style: rowStyle, onclick: () => go('animal', { animalId: a.id }) },
+          animalPic(a, 44), h('div', { class: 'who' }, h('b', {}, a.name), h('small', {}, [a.species, a.profiles && ('de @' + a.profiles.username)].filter(Boolean).join(' · '))))));
+      if (data && !data.length && !animals.length) people.append(h('p', { style: 'color:var(--muted)' }, 'No encontramos a nadie con ese nombre.'));
     }, 300);
   });
 
@@ -777,7 +1121,19 @@ function renderUpload() {
   paintCats();
 
   const caption = h('textarea', { class: 'input', name: 'caption', id: 'cap', maxlength: '1000', placeholder: '¿Qué está pasando en el rancho?' });
+  if (state.presetCaption) { caption.value = state.presetCaption; state.presetCaption = null; }
   const catField = h('div', {}, h('div', { class: 'field' }, h('label', {}, 'Sección')), catChips);
+  let animalId = state.tagAnimal || null;
+  state.tagAnimal = null;
+  const animalChips = h('div', { class: 'chips', style: 'padding:0 0 14px;flex-wrap:wrap' });
+  const animalField = h('div', { style: 'display:none' }, h('div', { class: 'field' }, h('label', {}, '¿Quién sale? (opcional)')), animalChips);
+  fetchAnimals({ ownerId: state.me.id }).then(list => {
+    if (!list.length) return;
+    const paintAnimals = () => animalChips.replaceChildren(...list.map(a => h('button', { type: 'button', class: 'chip' + (animalId === a.id ? ' on' : ''), style: 'display:flex;align-items:center;gap:6px;padding-left:6px',
+      onclick: () => { animalId = animalId === a.id ? null : a.id; paintAnimals(); } }, animalPic(a, 26), a.name)));
+    paintAnimals();
+    animalField.style.display = 'block';
+  }).catch(() => {});
   const paintKind = () => {
     kindBar.replaceChildren(...KINDS.map(([k, label, icon]) => h('button', { type: 'button', role: 'tab', 'aria-selected': String(k === kind), class: k === kind ? 'on' : '', onclick: () => {
       kind = k; state.uploadKind = k;
@@ -812,6 +1168,7 @@ function renderUpload() {
       const shop_links = kind !== 'sundown' && category === 'Outfits' ? [0, 1, 2].map(i => ({ name: String(fd.get('shop_name_' + i) || '').trim(), url: String(fd.get('shop_url_' + i) || '').trim() })).filter(l => safeUrl(l.url)) : [];
       const row = { user_id: state.me.id, media_url: pub.publicUrl, media_type: isVideo ? 'video' : 'image', caption: caption.value.trim() || null, category: kind === 'sundown' ? null : category, shop_links };
       if (kind !== 'post') row.kind = kind;
+      if (animalId) row.animal_id = animalId;
       const ins = await sb.from('posts').insert(row);
       if (ins.error) { sb.storage.from('media').remove([path]); throw ins.error; }
       toast(kind === 'sundown' ? 'Sundown publicado. Se va con el sol en 24 h' : kind === 'ride' ? '¡Ride publicado! Yeehaw' : '¡Publicado! Yeehaw');
@@ -820,6 +1177,7 @@ function renderUpload() {
   } },
     kindBar, hint, fileInput, picker,
     catField,
+    animalField,
     shopBox,
     h('div', { class: 'field' }, h('label', { for: 'cap' }, 'Descripción'), caption),
     err, btn);
@@ -837,17 +1195,19 @@ async function renderProfile() {
   $app.append(top, main);
   main.append(h('div', { class: 'spinner' }));
 
-  const [{ data: prof }, posts, sdGroups] = await Promise.all([
+  const [{ data: prof }, posts, sdGroups, animals] = await Promise.all([
     sb.from('profiles').select('*').eq('id', id).maybeSingle(),
     fetchPosts({ userId: id }).catch(() => []),
-    fetchSundownGroups(id)
+    fetchSundownGroups(id),
+    fetchAnimals({ ownerId: id }).catch(() => [])
   ]);
   const sd = sdGroups[0];
   if (!prof) return main.replaceChildren(h('div', { class: 'empty' }, 'No encontramos este perfil.'));
   const totalLikes = posts.reduce((s, p) => s + (p.likes || []).length, 0);
   if (!isMe) top.children[1].replaceWith(h('b', { style: 'font-size:17px' }, prof.username), h('div', { style: 'width:44px' }));
 
-  main.replaceChildren(
+  const showAnimals = HAS_ANIMALS && (animals.length || isMe);
+  main.replaceChildren(...[
     h('div', { class: 'prof-head' }, h('button', { style: 'border:none;background:none;padding:0', 'aria-label': sd ? 'Ver sundown' : 'Foto de perfil', onclick: () => { if (sd) openSundowns([sd], 0, () => render()); } },
         h('div', { class: 'ring' + (sd ? (sd.unseen ? ' new' : ' seen') : ''), style: 'width:92px;height:92px' }, h('div', {}, avatar(prof, 80)))),
       h('div', { class: 'stats' },
@@ -857,8 +1217,129 @@ async function renderProfile() {
     isMe && h('div', { class: 'prof-btns' },
       h('button', { class: 'btn ghost', onclick: () => editProfile(prof) }, 'Editar perfil'),
       h('button', { class: 'btn ghost', onclick: async () => { await sb.auth.signOut(); } }, 'Cerrar sesión')),
-    gridOf(posts, isMe ? 'Aún no subes nada. Toca el botón + para tu primera publicación.' : 'Todavía no ha subido nada.')
-  );
+    !isMe && h('div', { class: 'prof-btns' }, (state.blocked && state.blocked.has(id))
+      ? h('button', { class: 'btn ghost', onclick: () => unblockUser(id, prof.username) }, 'Desbloquear')
+      : h('button', { class: 'btn ghost', onclick: async () => { if (await blockUser(id, prof.username)) go('feed'); } }, 'Bloquear')),
+    showAnimals && h('section', { class: 'herd' },
+      h('h3', {}, h('span', { icon: 'horseshoe' }), isMe ? 'Mis animales' : 'Sus animales'),
+      h('div', { class: 'herd-row' },
+        ...animals.map(a => h('button', { class: 'herd-card', onclick: () => go('animal', { animalId: a.id }) },
+          animalPic(a, 64), h('b', {}, a.name), h('small', {}, a.species))),
+        isMe && h('button', { class: 'herd-card add', onclick: () => editAnimal(null) },
+          h('div', { class: 'herd-plus' }, '+'), h('b', {}, 'Agregar'), h('small', {}, 'caballo, vaca…')))),
+    gridOf(posts, isMe ? 'Aún no subes nada. Toca el botón + para tu primera publicación.' : 'Todavía no ha subido nada.'),
+    isMe && h('div', { style: 'text-align:center;padding:22px 0 8px' }, h('button', { class: 'linkbtn', style: 'font-size:14px;text-decoration:underline', onclick: openRules }, 'Reglas y privacidad'))
+  ].filter(Boolean));
+}
+
+// ---------- Perfiles de animales ----------
+async function renderAnimal() {
+  const main = h('main');
+  const top = h('header', { class: 'topbar' },
+    h('button', { class: 'iconbtn plain', 'aria-label': 'Regresar', icon: 'back', onclick: () => history.length > 1 && state.prevView ? go(state.prevView) : go('feed') }),
+    h('b', { style: 'font-size:17px' }, ''), h('div', { style: 'width:44px' }));
+  $app.append(top, main);
+  main.append(h('div', { class: 'spinner' }));
+  const [a] = await fetchAnimals({ id: state.animalId }).catch(() => []);
+  if (!a) return main.replaceChildren(h('div', { class: 'empty' }, HAS_ANIMALS ? 'No encontramos este animal.' : 'Los perfiles de animales todavía no están activados. Corre el SQL de animales en Supabase.'));
+  top.children[1].textContent = a.name;
+  const posts = await fetchPosts({ animalId: a.id }).catch(() => []);
+  const isOwner = a.owner_id === state.me.id;
+  let following = (a.animal_follows || []).some(f => f.user_id === state.me.id);
+  let followers = (a.animal_follows || []).length;
+  const totalLikes = posts.reduce((s, p) => s + (p.likes || []).length, 0);
+  const folCount = h('b', {});
+  const folBtn = h('button', { class: 'btn' });
+  const paint = () => {
+    folCount.textContent = followers.toLocaleString('es-MX');
+    folBtn.textContent = following ? 'Siguiendo' : 'Seguir';
+    folBtn.className = following ? 'btn ghost' : 'btn';
+  };
+  folBtn.addEventListener('click', async () => {
+    const want = !following; following = want; followers += want ? 1 : -1; paint();
+    const res = want ? await sb.from('animal_follows').insert({ animal_id: a.id, user_id: state.me.id })
+                     : await sb.from('animal_follows').delete().eq('animal_id', a.id).eq('user_id', state.me.id);
+    if (res.error) { following = !want; followers += want ? -1 : 1; paint(); toast('No se pudo guardar'); }
+  });
+  paint();
+  const details = [a.species, a.breed, animalAge(a)].filter(Boolean).join(' · ');
+  main.replaceChildren(...[
+    h('div', { class: 'animal-hero' },
+      h('div', { class: 'animal-ring' }, animalPic(a, 116)),
+      h('h1', {}, a.name),
+      h('div', { class: 'animal-meta' }, details),
+      a.profiles && h('button', { class: 'animal-owner', onclick: () => go('profile', { profileId: a.owner_id }) }, avatar(a.profiles, 26), h('span', {}, 'de ', h('b', {}, '@' + a.profiles.username))),
+      a.bio && h('p', { class: 'animal-bio' }, a.bio)),
+    h('div', { class: 'stats', style: 'grid-template-columns:repeat(3,minmax(0,1fr));padding:0 16px 14px' },
+      h('div', {}, folCount, h('span', {}, 'Seguidores')),
+      h('div', {}, h('b', {}, posts.length), h('span', {}, posts.length === 1 ? 'Publicación' : 'Publicaciones')),
+      h('div', {}, h('b', {}, totalLikes.toLocaleString('es-MX')), h('span', {}, 'Yeehaws'))),
+    h('div', { class: 'prof-btns' }, isOwner
+      ? [h('button', { class: 'btn', onclick: () => { state.uploadKind = 'post'; state.tagAnimal = a.id; go('upload'); } }, 'Subir foto de ' + a.name),
+         h('button', { class: 'btn ghost', onclick: () => editAnimal(a) }, 'Editar')]
+      : folBtn),
+    gridOf(posts, isOwner ? `Todavía no hay fotos de ${a.name}. Al subir una publicación, elígelo en "¿Quién sale?".` : `Todavía no hay fotos de ${a.name}.`)
+  ].filter(Boolean));
+}
+
+function editAnimal(a) {
+  const isNew = !a;
+  let photo = null;
+  let species = (a && a.species) || 'Caballo';
+  const prev = h('div', {}, animalPic(a, 84));
+  const fileIn = h('input', { type: 'file', accept: 'image/*', class: 'sr', id: 'anp' });
+  fileIn.addEventListener('change', () => {
+    photo = fileIn.files[0]; if (!photo) return;
+    prev.replaceChildren(h('div', { class: 'avatar animal-pic', style: 'width:84px;height:84px' }, h('img', { src: URL.createObjectURL(photo), alt: '' })));
+  });
+  const name = h('input', { class: 'input', id: 'an_n', value: (a && a.name) || '', maxlength: '40', required: true, placeholder: 'ej. Lucero' });
+  const breed = h('input', { class: 'input', id: 'an_b', value: (a && a.breed) || '', maxlength: '40', placeholder: 'ej. Cuarto de milla, Holstein' });
+  const year = h('input', { class: 'input', id: 'an_y', type: 'number', inputmode: 'numeric', min: '1980', max: String(new Date().getFullYear()), value: (a && a.birth_year) || '', placeholder: 'ej. 2019' });
+  const bio = h('textarea', { class: 'input', id: 'an_d', maxlength: '300', placeholder: 'Lo que lo hace especial: su carácter, sus premios, su historia…' });
+  bio.value = (a && a.bio) || '';
+  const spChips = h('div', { class: 'chips', style: 'padding:0 0 14px;flex-wrap:wrap' });
+  const paintSp = () => spChips.replaceChildren(...SPECIES.map(sp => h('button', { type: 'button', class: 'chip' + (sp === species ? ' on' : ''), onclick: () => { species = sp; paintSp(); } }, sp)));
+  paintSp();
+  const err = h('p', { class: 'err', role: 'alert' });
+  const save = h('button', { class: 'btn', type: 'submit' }, isNew ? 'Agregar animal' : 'Guardar');
+  let close;
+  const body = h('form', { class: 'sheet-body', onsubmit: async (e) => {
+    e.preventDefault(); err.textContent = '';
+    if (!name.value.trim()) return (err.textContent = 'Ponle un nombre.');
+    save.disabled = true;
+    try {
+      const y = parseInt(year.value, 10);
+      const row = { name: name.value.trim(), species, breed: breed.value.trim() || null, birth_year: y >= 1980 && y <= new Date().getFullYear() ? y : null, bio: bio.value.trim() || null };
+      if (photo) {
+        const blob = await compressImage(photo, 900);
+        const path = `${state.me.id}/animal-${Date.now()}.jpg`;
+        const up = await sb.storage.from('media').upload(path, blob, { contentType: 'image/jpeg' });
+        if (up.error) throw up.error;
+        row.photo_url = sb.storage.from('media').getPublicUrl(path).data.publicUrl;
+      }
+      let res;
+      if (isNew) res = await sb.from('animals').insert({ ...row, owner_id: state.me.id }).select('id').single();
+      else res = await sb.from('animals').update(row).eq('id', a.id).select('id').single();
+      if (res.error) throw res.error;
+      close(); toast(isNew ? `¡${row.name} ya tiene su perfil!` : 'Guardado');
+      go('animal', { animalId: res.data.id });
+    } catch (ex) { err.textContent = friendlyError(ex); save.disabled = false; }
+  } },
+    h('div', { style: 'display:flex;align-items:center;gap:16px;margin-bottom:18px' }, prev,
+      fileIn, h('label', { for: 'anp', class: 'btn ghost small', style: 'display:inline-flex;align-items:center;cursor:pointer' }, a && a.photo_url ? 'Cambiar foto' : 'Poner foto')),
+    h('div', { class: 'field' }, h('label', { for: 'an_n' }, 'Nombre'), name),
+    h('div', { class: 'field' }, h('label', {}, '¿Qué es?')), spChips,
+    h('div', { class: 'field' }, h('label', { for: 'an_b' }, 'Raza (opcional)'), breed),
+    h('div', { class: 'field' }, h('label', { for: 'an_y' }, 'Año en que nació (opcional)'), year),
+    h('div', { class: 'field' }, h('label', { for: 'an_d' }, 'Descripción (opcional)'), bio),
+    err, save,
+    !isNew && h('button', { type: 'button', class: 'btn ghost', style: 'margin-top:10px;color:#C2183A', onclick: async () => {
+      if (!confirm(`¿Borrar el perfil de ${a.name}? Sus fotos se quedan en tus publicaciones.`)) return;
+      const { error } = await sb.from('animals').delete().eq('id', a.id);
+      if (error) return toast('No se pudo borrar');
+      close(); toast('Perfil borrado'); go('profile', { profileId: state.me.id });
+    } }, 'Borrar perfil'));
+  close = openSheet(isNew ? 'Nuevo animal' : 'Editar ' + a.name, body);
 }
 
 function editProfile(prof) {
@@ -900,6 +1381,7 @@ function editProfile(prof) {
 }
 
 // ---------- arranque ----------
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 let started = false;
 sb.auth.onAuthStateChange((_event, session) => {
   const changed = !started || (session && session.user.id) !== (state.session && state.session.user.id);
@@ -907,7 +1389,7 @@ sb.auth.onAuthStateChange((_event, session) => {
   state.session = session;
   if (!changed) return;
   state.me = null; state.view = 'feed'; render();
-  if (session) setTimeout(async () => { await loadMe(); render(); }, 0);
+  if (session) setTimeout(async () => { await loadMe(); if (needsWelcome()) { state.view = 'welcome'; state.welcomeStep = 0; } render(); }, 0);
 });
 </script>
 </body>
