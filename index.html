@@ -303,6 +303,14 @@ textarea.input{min-height:90px;resize:vertical}
 .song-chip .song-t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .song-chip.dark{background:rgba(20,8,2,.55);border-color:rgba(247,226,186,.45);color:#FBF0D8;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);text-shadow:none}
 .song-prev{margin-top:4px}
+.song-cut{margin-top:10px;padding:10px 12px;border-radius:14px;background:#FFFDF8;border:1px solid #E2CFAF}
+.song-cut-top{display:flex;align-items:center;gap:6px;font-size:14px}
+.song-cut-help{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.song-cut-help small{color:var(--muted)}
+.song-range{width:100%;margin:10px 0 6px;accent-color:#8B4A22;height:28px}
+.ring>div.sd-thumb-wrap{position:relative;overflow:visible;background:#2B160A}
+.sd-thumb-wrap .sd-thumb{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
+.sd-mini{position:absolute;left:-4px;bottom:-4px;border-radius:50%;border:2px solid var(--bg);display:flex;overflow:hidden;max-width:none!important}
 .song-picked{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .song-list{display:flex;flex-direction:column;gap:6px;margin-top:6px}
 .song-row{display:flex;align-items:center;gap:10px;padding:6px;border-radius:14px;background:#FFFDF8;border:1px solid #E2CFAF;cursor:pointer}
@@ -582,17 +590,20 @@ function stopSong() {
   if (SONG.chip) SONG.chip.classList.remove('playing');
   SONG.audio = null; SONG.chip = null;
 }
-function playSong(preview, chip) {
+function playSong(preview, chip, start) {
   if (SONG.chip === chip && SONG.audio && !SONG.audio.paused) { stopSong(); return false; }
   stopSong();
-  const a = new Audio(preview); a.loop = true; a.volume = 1;
+  const st = Math.max(0, Math.min(25, Number(start) || 0));
+  const a = new Audio(preview); a.volume = 1;
+  if (st) a.addEventListener('loadedmetadata', () => { try { a.currentTime = st; } catch (_) {} }, { once: true });
+  a.addEventListener('ended', () => { try { a.currentTime = st; a.play().catch(() => {}); } catch (_) {} });
   SONG.audio = a; SONG.chip = chip; if (chip) chip.classList.add('playing');
   a.play().catch(() => { if (chip) chip.classList.remove('playing'); });
   return true;
 }
 function songChip(url, title, opts = {}) {
   if (opts.preview) {
-    const chip = h('button', { class: 'song-chip' + (opts.dark ? ' dark' : ''), type: 'button', 'aria-label': 'Escuchar: ' + (title || 'canción'), onclick: (e) => { e.stopPropagation(); if (playSong(opts.preview, chip) && opts.before) opts.before(); } },
+    const chip = h('button', { class: 'song-chip' + (opts.dark ? ' dark' : ''), type: 'button', 'aria-label': 'Escuchar: ' + (title || 'canción'), onclick: (e) => { e.stopPropagation(); if (playSong(opts.preview, chip, opts.start) && opts.before) opts.before(); } },
       opts.art ? h('img', { src: opts.art, alt: '' }) : h('span', { class: 'song-sp am', 'aria-hidden': 'true' }, '♫'),
       h('span', { class: 'song-pl', 'aria-hidden': 'true' }, '▶'),
       h('span', { class: 'song-eq', 'aria-hidden': 'true' }, h('i'), h('i'), h('i')),
@@ -618,7 +629,7 @@ let HAS_ANIMALS = true;
 const ANIMAL_EMBED = ',animal_id,animals!animal_id(id,name,species,photo_url)';
 async function fetchPosts({ category, userId, kinds = ['post', 'ride'], since, animalId } = {}) {
   const build = () => {
-    let q = sb.from('posts').select(POST_SELECT + (HAS_KIND ? ',kind' : '') + (HAS_SONG ? ',song_url,song_title,song_preview,song_art' : '') + (HAS_ANIMALS ? ANIMAL_EMBED : '')).order('created_at', { ascending: false }).limit(60);
+    let q = sb.from('posts').select(POST_SELECT + (HAS_KIND ? ',kind' : '') + (HAS_SONG ? ',song_url,song_title,song_preview,song_art,song_start' : '') + (HAS_ANIMALS ? ANIMAL_EMBED : '')).order('created_at', { ascending: false }).limit(60);
     if (category && category !== 'Todo') q = q.eq('category', category);
     if (userId) q = q.eq('user_id', userId);
     if (since) q = q.gte('created_at', since);
@@ -665,6 +676,14 @@ function animalPic(a, size) {
 function animalTag(a) {
   if (!a) return null;
   return h('button', { class: 'animal-tag', onclick: () => go('animal', { animalId: a.id }) }, animalPic(a, 24), h('span', {}, 'con ', h('b', {}, a.name)));
+}
+function sdThumb(g) {
+  const it = g.items.find(i => !seenSundowns.has(i.id)) || g.items[g.items.length - 1];
+  const media = !it ? null : it.media_type === 'video'
+    ? h('video', { src: it.media_url + '#t=0.5', muted: true, playsInline: true, preload: 'metadata', class: 'sd-thumb' })
+    : h('img', { src: it.media_url, alt: '', loading: 'lazy', class: 'sd-thumb' });
+  if (media && media.tagName === 'VIDEO') media.muted = true;
+  return h('div', { class: 'sd-thumb-wrap' }, media || avatar(g.user, 56), media ? h('span', { class: 'sd-mini' }, avatar(g.user, 22)) : null);
 }
 async function fetchSundownGroups(userId) {
   const items = await fetchPosts({ kinds: ['sundown'], since: new Date(Date.now() - DAY).toISOString(), userId }).catch(() => []);
@@ -771,13 +790,13 @@ async function renderFeed() {
     const others = groups.filter(g => g.user.id !== state.me.id).sort((a, b) => b.unseen - a.unseen);
     const newSundown = () => { if (needLogin('Crea tu cuenta para subir tu sundown')) return; state.uploadKind = 'sundown'; go('upload'); };
     const myBubble = h('button', { class: 'story', 'aria-label': mine ? 'Ver tu sundown' : 'Subir tu sundown', onclick: () => mine ? openSundowns([mine, ...others], 0, paintSundowns) : newSundown() },
-      h('div', { class: 'ring' + (mine ? (mine.unseen ? ' new' : ' seen') : ' blank') }, h('div', {}, avatar(state.me, 56)),
+      h('div', { class: 'ring' + (mine ? (mine.unseen ? ' new' : ' seen') : ' blank') }, mine ? sdThumb(mine) : h('div', {}, avatar(state.me, 56)),
         h('span', { class: 'sd-add', role: 'button', 'aria-label': 'Nuevo sundown', onclick: (e) => { e.stopPropagation(); newSundown(); } }, '+')),
       h('span', {}, 'Tu sundown'));
     const addBubble = h('button', { class: 'story', 'aria-label': 'Agregar otro sundown', onclick: newSundown },
       h('div', { class: 'ring blank sd-new' }, h('div', {}, h('span', { class: 'sd-plus' }, '+'))), h('span', {}, 'Agregar'));
     stories.replaceChildren(...(isGuest() ? [] : mine ? [addBubble, myBubble] : [myBubble]), ...others.map((g, i) => h('button', { class: 'story', onclick: () => openSundowns(others, i, paintSundowns) },
-      h('div', { class: 'ring ' + (g.unseen ? 'new' : 'seen') }, h('div', {}, avatar(g.user, 56))),
+      h('div', { class: 'ring ' + (g.unseen ? 'new' : 'seen') }, sdThumb(g)),
       h('span', {}, g.user.username || ''))));
   };
   paintSundowns();
@@ -880,7 +899,7 @@ function postCard(p) {
       countEl),
     p.animals && h('div', { style: 'padding:2px 12px 4px' }, animalTag(p.animals)),
     p.caption && h('p', { class: 'caption' }, h('b', {}, prof.username || ''), ' ', p.caption),
-    p.song_url && h('div', { style: 'margin:8px 16px 0' }, songChip(p.song_url, p.song_title, { preview: p.song_preview, art: p.song_art })),
+    p.song_url && h('div', { style: 'margin:8px 16px 0' }, songChip(p.song_url, p.song_title, { preview: p.song_preview, art: p.song_art, start: p.song_start })),
     h('div', { class: 'meta' },
       h('button', { class: 'linkbtn', onclick: () => openComments(p) }, commentCount ? `Ver ${commentCount === 1 ? 'el comentario' : `los ${commentCount} comentarios`}` : 'Comentar'),
       ' · ', timeAgo(p.created_at))
@@ -1148,7 +1167,8 @@ function openRules() {
 // ---------- Sundowns (desaparecen en 24 horas) ----------
 function openSundowns(groups, gi, onClose) {
   if (!groups.length) return;
-  const IMG_MS = 5000;
+  const IMG_MS = 8000;   // fotos: 8 s (15 s si llevan canción)
+  let curMs = IMG_MS;
   let ii = 0, video = null, raf = 0, elapsed = 0, lastT = 0, paused = false, userPaused = false, safety = null, fill = null, isImg = false;
   let holdTimer = null, held = false, suppressClick = false;
   const bars = h('div', { class: 'sd-bars' });
@@ -1190,8 +1210,8 @@ function openSundowns(groups, gi, onClose) {
     if (!isImg) return;
     if (!paused) { elapsed += t - lastT; }
     lastT = t;
-    if (fill) fill.style.width = Math.min(100, elapsed / IMG_MS * 100) + '%';
-    if (elapsed >= IMG_MS) return next();
+    if (fill) fill.style.width = Math.min(100, elapsed / curMs * 100) + '%';
+    if (elapsed >= curMs) return next();
     raf = requestAnimationFrame(tick);
   }
   const stop = () => { cancelAnimationFrame(raf); clearTimeout(safety); if (video) { video.pause(); video = null; } };
@@ -1218,9 +1238,10 @@ function openSundowns(groups, gi, onClose) {
       it.user_id !== state.me.id && h('button', { class: 'iconbtn plain', style: 'color:#fff', 'aria-label': 'Más opciones', icon: 'more', onclick: () => { setPaused(true, 'button'); postMenu(it, () => close()); } }),
       h('button', { class: 'iconbtn plain', style: 'color:#fff', 'aria-label': 'Cerrar', icon: 'close', onclick: close })].filter(Boolean));
     cap.replaceChildren(...[it.caption ? h('div', {}, it.caption) : null,
-      it.song_url ? h('div', { style: 'margin-top:' + (it.caption ? '10px' : '0') }, songChip(it.song_url, it.song_title, { dark: true, preview: it.song_preview, art: it.song_art, before: () => { if (!it.song_preview) setPaused(true, 'button'); } })) : null].filter(Boolean));
+      it.song_url ? h('div', { style: 'margin-top:' + (it.caption ? '10px' : '0') }, songChip(it.song_url, it.song_title, { dark: true, preview: it.song_preview, art: it.song_art, start: it.song_start, before: () => { if (!it.song_preview) setPaused(true, 'button'); } })) : null].filter(Boolean));
     cap.style.display = (it.caption || it.song_url) ? 'block' : 'none';
-    if (it.song_preview) { playSong(it.song_preview, cap.querySelector('.song-chip')); if (paused && SONG.audio) SONG.audio.pause(); } else stopSong();
+    curMs = it.song_preview ? 15000 : IMG_MS;
+    if (it.song_preview) { playSong(it.song_preview, cap.querySelector('.song-chip'), it.song_start || 0); if (paused && SONG.audio) SONG.audio.pause(); } else stopSong();
     paintPause();
     if (it.media_type === 'video') {
       isImg = false;
@@ -1300,7 +1321,7 @@ function rideCard(p) {
       h('button', { class: 'who', onclick: () => go('profile', { profileId: p.user_id }) }, avatar(prof, 40), h('b', {}, prof.username || 'usuario')),
       p.animals && h('div', { style: 'margin-bottom:8px' }, animalTag(p.animals)),
       p.caption && h('p', {}, p.caption),
-      p.song_url && h('div', { style: 'margin-bottom:8px' }, songChip(p.song_url, p.song_title, { dark: true, preview: p.song_preview, art: p.song_art, before: () => { if (!p.song_preview) try { video.pause(); } catch (_) {} } })),
+      p.song_url && h('div', { style: 'margin-bottom:8px' }, songChip(p.song_url, p.song_title, { dark: true, preview: p.song_preview, art: p.song_art, start: p.song_start, before: () => { if (!p.song_preview) try { video.pause(); } catch (_) {} } })),
       h('div', { style: 'display:flex;gap:8px;align-items:center' }, p.category && h('span', { class: 'tag' }, p.category), h('small', { style: 'color:rgba(255,255,255,.8)' }, timeAgo(p.created_at)))),
     h('div', { class: 'ride-side' },
       likeBtn, countEl,
@@ -1393,9 +1414,20 @@ function renderUpload() {
   const showPick = () => {
     songPick.replaceChildren();
     if (!picked) return;
-    songPick.append(h('div', { class: 'song-picked' },
-      songChip(picked.url, picked.title, { preview: picked.preview, art: picked.art }),
+    const chip = songChip(picked.url, picked.title, { preview: picked.preview, art: picked.art, start: picked.start });
+    songPick.append(h('div', { class: 'song-picked' }, chip,
       h('button', { type: 'button', class: 'linkbtn', style: 'text-decoration:underline', onclick: () => { stopSong(); picked = null; showPick(); songInput.focus(); } }, 'Quitar')));
+    if (picked.preview) {
+      const lab = h('b', {}, '0:' + String(picked.start || 0).padStart(2, '0'));
+      const range = h('input', { type: 'range', min: '0', max: '25', step: '1', value: String(picked.start || 0), class: 'song-range', 'aria-label': 'Desde qué segundo empieza la canción' });
+      const listen = () => { stopSong(); playSong(picked.preview, chip, picked.start); };
+      range.addEventListener('input', () => { picked.start = Number(range.value); lab.textContent = '0:' + String(picked.start).padStart(2, '0'); });
+      range.addEventListener('change', listen);
+      songPick.append(h('div', { class: 'song-cut' },
+        h('div', { class: 'song-cut-top' }, h('span', {}, '✂️ Parte de la canción: empieza en '), lab),
+        range,
+        h('div', { class: 'song-cut-help' }, h('small', {}, 'Mueve la barrita y escucha. Suena desde ahí.'), h('button', { type: 'button', class: 'song-play', 'aria-label': 'Escuchar desde ahí', onclick: listen }, '▶'))));
+    }
   };
   const searchSongs = async () => {
     const q = songInput.value.trim(); const seq = ++songSeq;
@@ -1421,7 +1453,7 @@ function renderUpload() {
         const art = (x.artworkUrl100 || '').replace('100x100', '120x120');
         const play = h('button', { type: 'button', class: 'song-play', 'aria-label': 'Escuchar ' + x.trackName, onclick: (e) => { e.stopPropagation(); playSong(x.previewUrl, play); } }, '▶');
         songList.append(h('div', { class: 'song-row', role: 'button', tabindex: '0', onclick: () => {
-          picked = { url: x.trackViewUrl.split('&uo=')[0], title, preview: x.previewUrl, art };
+          picked = { url: x.trackViewUrl.split('&uo=')[0], title, preview: x.previewUrl, art, start: 0 };
           stopSong(); songInput.value = ''; songList.replaceChildren(); showPick();
         } }, h('img', { src: art, alt: '' }), h('div', { class: 'who' }, h('b', {}, x.trackName), h('small', {}, x.artistName)), play));
       });
@@ -1479,7 +1511,7 @@ function renderUpload() {
       const row = { user_id: state.me.id, media_url: pub.publicUrl, media_type: isVideo ? 'video' : 'image', caption: caption.value.trim() || null, category: kind === 'sundown' ? null : category, shop_links };
       if (kind !== 'post') row.kind = kind;
       if (animalId) row.animal_id = animalId;
-      if (HAS_SONG && picked) { row.song_url = picked.url; row.song_title = picked.title || null; if (picked.preview) { row.song_preview = picked.preview; row.song_art = picked.art || null; } }
+      if (HAS_SONG && picked) { row.song_url = picked.url; row.song_title = picked.title || null; if (picked.preview) { row.song_preview = picked.preview; row.song_art = picked.art || null; row.song_start = picked.start || 0; } }
       stopSong();
       const ins = await sb.from('posts').insert(row);
       if (ins.error) { sb.storage.from('media').remove([path]); throw ins.error; }
