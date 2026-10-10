@@ -293,6 +293,10 @@ textarea.input{min-height:90px;resize:vertical}
 .composer textarea{flex:1;min-height:46px;max-height:130px;resize:none;border-radius:23px;padding:12px 16px;line-height:1.3}
 .composer .send{width:46px;height:46px;border-radius:23px;border:none;background:var(--grad);color:var(--ink);display:flex;align-items:center;justify-content:center;box-shadow:var(--glow);flex-shrink:0}
 .composer .send:disabled{opacity:.5}
+.join{text-align:center;padding:10px 20px 22px}
+.join .join-ico{display:flex;justify-content:center;color:var(--text)}
+.join b{display:block;font-size:18px;margin:8px 0 6px}
+.join p{color:var(--muted);margin:0 0 16px;line-height:1.45}
 .composer .attach{width:46px;height:46px;border-radius:23px;border:1px solid var(--line);background:var(--surface);color:var(--text);display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0}
 .composer .attach svg{width:24px;height:24px}
 .msg.hasmedia{padding:4px;overflow:hidden;max-width:72%}
@@ -443,6 +447,19 @@ async function loadMe() {
   const bl = await sb.from('blocks').select('blocked_id').eq('blocker_id', state.session.user.id);
   state.blocked = new Set(bl.error ? [] : (bl.data || []).map(b => b.blocked_id));
 }
+const GUEST = { id: '__guest__', username: 'invitado', guest: true };
+function isGuest() { return !state.session || !state.me || state.me.guest; }
+// Si no tiene cuenta, invita a registrarse. Devuelve true cuando hay que detenerse.
+function needLogin(why) {
+  if (!isGuest()) return false;
+  const close = openSheet('Únete a Yeehaw', h('div', { class: 'sheet-body join' },
+    h('div', { class: 'join-ico', icon: 'shotsbig' }),
+    h('b', {}, why || 'Crea tu cuenta para participar'),
+    h('p', {}, 'Es gratis y toma un minuto. Así puedes dar yeehaws, comentar, subir tus fotos y mandar mensajes.'),
+    h('button', { class: 'btn', onclick: () => { close(); state.authMode = 'signup'; go('auth'); } }, 'Crear cuenta'),
+    h('button', { class: 'btn ghost', style: 'margin-top:10px', onclick: () => { close(); state.authMode = 'login'; go('auth'); } }, 'Ya tengo cuenta')));
+  return true;
+}
 const HIDDEN_KEY = 'yeehaw_hidden_posts';
 let hiddenPosts = new Set();
 try { hiddenPosts = new Set(JSON.parse(localStorage.getItem(HIDDEN_KEY) || '[]')); } catch (_) {}
@@ -520,13 +537,13 @@ function go(view, extra) {
   render();
 }
 function navBar() {
-  const b = (v, icon, label, isOn) => h('button', { class: isOn ? 'on' : '', 'aria-label': label, onclick: () => go(v, v === 'profile' ? { profileId: state.me.id } : undefined) },
+  const b = (v, icon, label, isOn) => h('button', { class: isOn ? 'on' : '', 'aria-label': label, onclick: () => { if (v === 'profile' && needLogin('Crea tu cuenta para tener tu perfil')) return; go(v, v === 'profile' ? { profileId: state.me.id } : undefined); } },
     h('span', { icon }), label);
   const ownProfile = state.view === 'profile' && state.profileId === state.me.id;
   return h('nav', { class: 'nav' }, h('div', { class: 'nav-in' },
     b('feed', 'home', 'Inicio', state.view === 'feed'),
     b('rides', 'horseshoe', 'Rides', state.view === 'rides'),
-    h('button', { class: 'plus', 'aria-label': 'Subir', onclick: () => { state.uploadKind = state.view === 'rides' ? 'ride' : 'post'; go('upload'); }, icon: 'plus' }),
+    h('button', { class: 'plus', 'aria-label': 'Subir', onclick: () => { if (needLogin('Crea tu cuenta para subir tus fotos y videos')) return; state.uploadKind = state.view === 'rides' ? 'ride' : 'post'; go('upload'); }, icon: 'plus' }),
     b('explore', 'search', 'Explorar', state.view === 'explore'),
     b('profile', 'user', 'Perfil', ownProfile)
   ));
@@ -536,8 +553,9 @@ function navBar() {
 function render() {
   if (state.cleanup) { try { state.cleanup(); } catch (_) {} state.cleanup = null; }
   $app.replaceChildren();
-  if (!state.session) return renderAuth();
+  if (!state.session && state.view === 'auth') return renderAuth();
   if (!state.me) { $app.append(h('div', { class: 'spinner' })); return; }
+  if (isGuest() && !['feed', 'rides', 'explore', 'profile', 'animal'].includes(state.view)) state.view = 'feed';
   if (state.view === 'welcome') return renderWelcome();
   const views = { feed: renderFeed, rides: renderRides, explore: renderExplore, upload: renderUpload, profile: renderProfile, animal: renderAnimal, inbox: renderInbox, chat: renderChat };
   (views[state.view] || renderFeed)();
@@ -580,6 +598,7 @@ function renderAuth() {
     h('div', { class: 'logo' }, 'Yeehaw'),
     h('p', { class: 'lead' }, 'La vida de rancho, en un solo lugar'),
     form,
+    h('button', { type: 'button', class: 'linkbtn', style: 'margin-top:18px;text-decoration:underline;font-size:14px', onclick: () => go('feed') }, 'Seguir viendo sin cuenta'),
     h('div', { class: 'switch' }, isLogin ? '¿No tienes cuenta?' : '¿Ya tienes cuenta?',
       h('button', { type: 'button', onclick: () => { state.authMode = isLogin ? 'signup' : 'login'; render(); } }, isLogin ? 'Regístrate' : 'Inicia sesión'))
   ));
@@ -600,12 +619,12 @@ async function renderFeed() {
     const groups = await fetchSundownGroups();
     const mine = groups.find(g => g.user.id === state.me.id);
     const others = groups.filter(g => g.user.id !== state.me.id).sort((a, b) => b.unseen - a.unseen);
-    const newSundown = () => { state.uploadKind = 'sundown'; go('upload'); };
+    const newSundown = () => { if (needLogin('Crea tu cuenta para subir tu sundown')) return; state.uploadKind = 'sundown'; go('upload'); };
     const myBubble = h('button', { class: 'story', 'aria-label': mine ? 'Ver tu sundown' : 'Subir tu sundown', onclick: () => mine ? openSundowns([mine, ...others], 0, paintSundowns) : newSundown() },
       h('div', { class: 'ring' + (mine ? (mine.unseen ? ' new' : ' seen') : ' blank') }, h('div', {}, avatar(state.me, 56)),
         h('span', { class: 'sd-add', role: 'button', 'aria-label': 'Nuevo sundown', onclick: (e) => { e.stopPropagation(); newSundown(); } }, '+')),
       h('span', {}, 'Tu sundown'));
-    stories.replaceChildren(myBubble, ...others.map((g, i) => h('button', { class: 'story', onclick: () => openSundowns(others, i, paintSundowns) },
+    stories.replaceChildren(...(isGuest() ? [] : [myBubble]), ...others.map((g, i) => h('button', { class: 'story', onclick: () => openSundowns(others, i, paintSundowns) },
       h('div', { class: 'ring ' + (g.unseen ? 'new' : 'seen') }, h('div', {}, avatar(g.user, 56))),
       h('span', {}, g.user.username || ''))));
   };
@@ -639,6 +658,7 @@ function likeControls(p, short) {
   const rear = () => { likeBtn.classList.remove('rear'); void likeBtn.offsetWidth; likeBtn.classList.add('rear'); try { navigator.vibrate && navigator.vibrate(25); } catch (_) {} };
   likeBtn.addEventListener('animationend', (e) => { if (e.animationName === 'rear') likeBtn.classList.remove('rear'); });
   const setLike = async (want) => {
+    if (needLogin('Crea tu cuenta para dar yeehaw')) return;
     if (busy) return;
     if (want === liked) { if (want) rear(); return; }
     busy = true; liked = want; likeCount += want ? 1 : -1; paint();
@@ -738,7 +758,7 @@ async function openComments(p) {
     if (error) return toast('No se pudo enviar');
     input.value = ''; load();
   } }, input, send);
-  openSheet('Comentarios', body, foot);
+  openSheet('Comentarios', body, isGuest() ? h('div', { class: 'sheet-foot' }, h('button', { class: 'btn', onclick: () => { document.querySelectorAll('.sheet-bg').forEach(x => x.remove()); needLogin('Crea tu cuenta para comentar'); } }, 'Entra para comentar')) : foot);
   async function load() {
     const { data, error } = await sb.from('comments').select('id,body,created_at,user_id,profiles!user_id(username,full_name,avatar_url)').eq('post_id', p.id).order('created_at');
     if (error) return body.replaceChildren(h('p', { class: 'err' }, friendlyError(error)));
@@ -768,10 +788,14 @@ function gridOf(posts, onEmpty) {
 function flagKey(name) { return `yeehaw_${name}_${state.me.id}`; }
 function getFlag(name) { try { return localStorage.getItem(flagKey(name)) === '1'; } catch (_) { return false; } }
 function setFlag(name) { try { localStorage.setItem(flagKey(name), '1'); } catch (_) {} }
-function needsWelcome() { return state.me && !getFlag('welcomed') && !state.me.avatar_url && !state.me.rancho; }
+function needsWelcome() { return state.me && !state.me.guest && !getFlag('welcomed') && !state.me.avatar_url && !state.me.rancho; }
 function finishWelcome() { setFlag('welcomed'); state.view = 'feed'; render(); }
 
 function welcomeCard() {
+  if (isGuest()) return h('section', { class: 'welcome-card', 'aria-label': 'Únete' },
+    h('div', { class: 'wc-kicker' }, 'Estás viendo'), h('div', { class: 'logo', style: 'font-size:26px' }, 'Yeehaw'),
+    h('p', { class: 'wc-lead' }, 'La vida de rancho, en un solo lugar: bailes, caballos, outfits y el día a día del rancho. Mira todo lo que quieras; para dar yeehaw, comentar y subir lo tuyo, crea tu cuenta gratis.'),
+    h('button', { class: 'btn', style: 'margin-top:6px', onclick: () => { state.authMode = 'signup'; go('auth'); } }, 'Crear mi cuenta'));
   if (getFlag('card_closed')) return null;
   const card = h('section', { class: 'welcome-card', 'aria-label': 'Bienvenida' });
   const tip = (icon, title, text) => h('div', { class: 'wc-tip' }, h('span', { class: 'wc-ico', icon }), h('div', {}, h('b', {}, title), h('small', {}, text)));
@@ -897,6 +921,7 @@ async function renderWelcome() {
 // ---------- Reportar, bloquear, borrar ----------
 const REPORT_REASONS = ['Contenido sexual o desnudos', 'Violencia o maltrato animal', 'Acoso o insultos', 'Spam, estafa o venta ilegal', 'Algo más'];
 function postMenu(p, onGone) {
+  if (needLogin('Crea tu cuenta para reportar o bloquear')) return;
   const mine = p.user_id === state.me.id;
   const who = (p.profiles && p.profiles.username) || 'esta persona';
   const body = h('div', { class: 'sheet-body menu' });
@@ -1298,9 +1323,9 @@ async function renderProfile() {
     isMe && h('div', { class: 'prof-btns' },
       h('button', { class: 'btn ghost', onclick: () => editProfile(prof) }, 'Editar perfil'),
       h('button', { class: 'btn ghost', onclick: async () => { await sb.auth.signOut(); } }, 'Cerrar sesión')),
-    !isMe && h('div', { class: 'prof-btns' }, !(state.blocked && state.blocked.has(id)) && HAS_DM && h('button', { class: 'btn small', style: 'flex:1', onclick: () => openChatWith(prof) }, 'Mensaje'), (state.blocked && state.blocked.has(id))
+    !isMe && h('div', { class: 'prof-btns' }, !(state.blocked && state.blocked.has(id)) && (HAS_DM || isGuest()) && h('button', { class: 'btn small', style: 'flex:1', onclick: () => { if (!needLogin('Crea tu cuenta para mandar mensajes')) openChatWith(prof); } }, 'Mensaje'), (state.blocked && state.blocked.has(id))
       ? h('button', { class: 'btn ghost', onclick: () => unblockUser(id, prof.username) }, 'Desbloquear')
-      : h('button', { class: 'btn ghost', onclick: async () => { if (await blockUser(id, prof.username)) go('feed'); } }, 'Bloquear')),
+      : h('button', { class: 'btn ghost', onclick: async () => { if (needLogin('Crea tu cuenta para bloquear')) return; if (await blockUser(id, prof.username)) go('feed'); } }, 'Bloquear')),
     showAnimals && h('section', { class: 'herd' },
       h('h3', {}, h('span', { icon: 'horseshoe' }), isMe ? 'Mis animales' : 'Sus animales'),
       h('div', { class: 'herd-row' },
@@ -1337,6 +1362,7 @@ async function renderAnimal() {
     folBtn.className = following ? 'btn ghost' : 'btn';
   };
   folBtn.addEventListener('click', async () => {
+    if (needLogin('Crea tu cuenta para seguir a ' + a.name)) return;
     const want = !following; following = want; followers += want ? 1 : -1; paint();
     const res = want ? await sb.from('animal_follows').insert({ animal_id: a.id, user_id: state.me.id })
                      : await sb.from('animal_follows').delete().eq('animal_id', a.id).eq('user_id', state.me.id);
@@ -1465,13 +1491,14 @@ function editProfile(prof) {
 let HAS_DM = true;
 const PROF_MINI = 'id,username,full_name,avatar_url';
 function dmButton() {
+  if (isGuest()) return h('button', { class: 'btn small', style: 'height:40px;padding:0 18px', onclick: () => { state.authMode = 'login'; go('auth'); } }, 'Entrar');
   const badge = h('span', { class: 'dm-badge', hidden: true });
   const btn = h('button', { class: 'iconbtn dm-btn', 'aria-label': 'Mensajes', onclick: () => go('inbox') }, h('span', { icon: 'shots', style: 'display:flex' }), badge);
   refreshUnread(badge);
   return HAS_DM ? btn : h('div');
 }
 async function refreshUnread(badge) {
-  if (!HAS_DM || !state.me) return;
+  if (!HAS_DM || isGuest()) return;
   const { count, error } = await sb.from('messages').select('id', { count: 'exact', head: true }).is('read_at', null).neq('sender_id', state.me.id);
   if (error) { if (/messages|relation|schema/i.test(error.message || '')) HAS_DM = false; return; }
   const n = count || 0;
@@ -1695,7 +1722,8 @@ window.addEventListener('popstate', () => {
   if (viewerClose) return viewerClose.click();
   const sheets = document.querySelectorAll('.sheet-bg');
   if (sheets.length) { const c = sheets[sheets.length - 1].querySelector('.sheet-head [aria-label="Cerrar"]'); return c ? c.click() : sheets[sheets.length - 1].remove(); }
-  if (!state.session || !state.me || state.view === 'welcome') return;
+  if (state.view === 'auth') return go('feed');
+  if (!state.me || state.view === 'welcome') return;
   if (state.view === 'chat') return go('inbox');
   if (state.view !== 'feed') return go('feed');
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1707,7 +1735,7 @@ sb.auth.onAuthStateChange((_event, session) => {
   started = true;
   state.session = session;
   if (!changed) return;
-  state.me = null; state.view = 'feed'; render();
+  state.me = session ? null : GUEST; state.blocked = new Set(); state.view = 'feed'; render();
   if (session) setTimeout(async () => { await loadMe(); if (needsWelcome()) { state.view = 'welcome'; state.welcomeStep = 0; } render(); }, 0);
 });
 </script>
