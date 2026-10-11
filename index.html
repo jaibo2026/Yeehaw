@@ -495,6 +495,11 @@ textarea.input{min-height:90px;resize:vertical}
 .fx-mini .fx-feat{padding:2px 6px;font-size:11px}
 .fx-sell-cta{display:block;width:100%;margin-top:10px;padding:11px 12px;border:1.5px dashed #C7843B;border-radius:12px;background:#FFF6E4;color:#172531;font-weight:700;font-size:14px;text-align:left}
 @media (max-width:350px){.topbar .logo{font-size:24px!important}}
+.rules-links{display:flex;flex-direction:column;gap:8px;margin:14px 0}
+.rules-links a{display:block;padding:12px 14px;border:1px solid #D9CBB0;border-radius:12px;background:#FFFDF8;color:#172531;font-weight:700;text-decoration:none}
+.sheet .btn.danger-btn,.btn.danger-btn{width:100%;background:#B3261E!important;background-image:none!important;color:#fff!important;border-color:#B3261E!important;box-shadow:0 3px 0 #7a1a14!important}
+.btn.danger-btn::before,.btn.danger-btn::after{border-color:rgba(255,255,255,.45)!important}
+.danger-btn:disabled{opacity:.45}
 /* ---------- Verificada ---------- */
 .vbadge{display:inline-flex;align-items:center;justify-content:center;width:1.05em;height:1.05em;margin-left:.3em;border-radius:50%;background:#C7843B;color:#fff!important;font-size:.72em;font-weight:900;line-height:1;vertical-align:.08em;box-shadow:0 0 0 1.5px #F3BD68 inset;font-family:Inter,sans-serif}
 /* ---------- Aviso push ---------- */
@@ -784,7 +789,7 @@ const YT_KEY = '';
 
 const CATEGORIES = ['Bailes', 'Outfits', 'Caballos', 'Jaripeo', 'Ganado', 'Comida'];
 const MAX_VIDEO_MB = 50;
-const CONTACT = ''; // correo de contacto para la página de reglas (vacío = se usa la página de Facebook)
+const CONTACT = 'ranchfolk.app@gmail.com'; // correo de contacto para la página de reglas (vacío = se usa la página de Facebook)
 
 const ICONS = {
   home: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>',
@@ -1230,8 +1235,10 @@ function renderAuth() {
     f('Contraseña', { name: 'password', type: 'password', required: true, minlength: '6', autocomplete: isLogin ? 'current-password' : 'new-password' }),
     err,
     h('button', { class: 'btn', type: 'submit' }, isLogin ? 'Entrar' : 'Crear cuenta'),
-    !isLogin && h('p', { class: 'hint', style: 'margin:12px 0 0;text-align:center' }, 'Al crear tu cuenta aceptas las ',
-      h('button', { type: 'button', class: 'linkbtn', style: 'text-decoration:underline;font-size:13px', onclick: openRules }, 'reglas y privacidad'), ' de Ranchfolk.')
+    !isLogin && h('p', { class: 'hint', style: 'margin:12px 0 0;text-align:center' }, 'Al crear tu cuenta confirmas que eres mayor de 18 años y aceptas los ',
+      h('a', { href: 'terminos.html', target: '_blank', rel: 'noopener', style: 'text-decoration:underline' }, 'Términos'), ', el ',
+      h('a', { href: 'privacidad.html', target: '_blank', rel: 'noopener', style: 'text-decoration:underline' }, 'Aviso de privacidad'), ' y las ',
+      h('button', { type: 'button', class: 'linkbtn', style: 'text-decoration:underline;font-size:13px', onclick: openRules }, 'reglas'), ' de Ranchfolk.')
   );
   $app.append(h('div', { class: 'auth' },
     h('div', { class: 'logo' }, 'Ranchfolk'),
@@ -1839,8 +1846,11 @@ function openRules() {
       'Ojo: quien tenga el enlace directo de una foto o video la puede abrir, así que no subas nada privado.',
       'Tus datos se guardan en Supabase, el servicio que usa Ranchfolk. No los vendemos ni los compartimos.',
       'Tú puedes borrar tus publicaciones cuando quieras.',
-      'Para borrar tu cuenta completa, escríbenos y la borramos con todo lo que subiste.']),
-    sec('Contacto', [CONTACT || 'Escríbenos por mensaje a la página de Ranchfolk en Facebook.']));
+      'Puedes borrar tu cuenta completa en Menú → Configuración y privacidad → Borrar mi cuenta.']),
+    h('div', { class: 'rules-links' },
+      h('a', { href: 'privacidad.html', target: '_blank', rel: 'noopener' }, '📄 Aviso de privacidad completo'),
+      h('a', { href: 'terminos.html', target: '_blank', rel: 'noopener' }, '📄 Términos y condiciones')),
+    sec('Contacto', [CONTACT ? 'Escríbenos a ' + CONTACT : 'Escríbenos por mensaje a la página de Ranchfolk en Facebook.']));
   openSheet('Reglas y privacidad', body);
 }
 
@@ -2929,7 +2939,8 @@ function openMenu() {
     soundRow(),
     pushRow(),
     row('🚫', 'Personas bloqueadas', () => openBlockedList()),
-    row('📜', 'Reglas y privacidad', () => openRules())]);
+    row('📜', 'Reglas y privacidad', () => openRules()),
+    row('🗑️', 'Borrar mi cuenta', () => openDeleteAccount(), 'Elimina tu cuenta y todo lo que subiste')]);
   const head = guest
     ? h('div', { class: 'mn-me' }, h('div', { class: 'mn-guest' }, '🤠'), h('div', {}, h('b', {}, 'Estás como invitado'), h('small', {}, 'Crea tu cuenta para participar')))
     : h('button', { class: 'mn-me', type: 'button', onclick: goTo(() => go('profile', { profileId: state.me.id })) }, avatar(state.me, 52),
@@ -2959,6 +2970,39 @@ function openMenu() {
   const bg = h('div', { class: 'menu-bg', onclick: (e) => { if (e.target === bg) close(); } }, panel);
   bg._close = close;
   document.body.append(bg);
+}
+// ---------- Borrar mi cuenta ----------
+function openDeleteAccount() {
+  if (isGuest()) return;
+  const input = h('input', { class: 'input', placeholder: 'Escribe BORRAR', autocapitalize: 'characters', 'aria-label': 'Escribe BORRAR para confirmar' });
+  const btn = h('button', { class: 'btn danger-btn', disabled: true }, 'Borrar mi cuenta para siempre');
+  input.addEventListener('input', () => { btn.disabled = input.value.trim().toUpperCase() !== 'BORRAR'; });
+  const close = openSheet('Borrar mi cuenta', h('div', { class: 'sheet-body', style: 'line-height:1.5' },
+    h('p', {}, 'Se borrará tu cuenta de Ranchfolk y todo lo que subiste: tu perfil, publicaciones, sundowns, comentarios, reacciones, mensajes, animales, anuncios y eventos.'),
+    h('p', { style: 'font-weight:700' }, 'Esto no se puede deshacer.'),
+    h('p', { style: 'color:var(--muted);font-size:14px' }, 'Para confirmar, escribe BORRAR:'),
+    input, h('div', { style: 'height:12px' }), btn));
+  btn.onclick = async () => {
+    btn.disabled = true; btn.textContent = 'Borrando…';
+    const me = state.me.id;
+    try {
+      // 1. Tus fotos y videos públicos
+      const { data: files } = await sb.storage.from('media').list(me, { limit: 1000 });
+      if (files && files.length) await sb.storage.from('media').remove(files.filter(f => f.name).map(f => me + '/' + f.name));
+      // 2. Fotos y videos que mandaste por mensaje
+      const { data: dms } = await sb.from('messages').select('media_path').eq('sender_id', me).not('media_path', 'is', null).limit(1000);
+      if (dms && dms.length) await sb.storage.from('dm').remove(dms.map(m => m.media_path));
+      // 3. Avisos en este teléfono
+      try { const reg = await navigator.serviceWorker.ready; const sub = await reg.pushManager.getSubscription(); if (sub) await sub.unsubscribe(); } catch (_) {}
+    } catch (_) {}
+    // 4. La cuenta y todo lo demás
+    const { error } = await sb.rpc('delete_my_account');
+    if (error) { btn.disabled = false; btn.textContent = 'Borrar mi cuenta para siempre'; return toast(/oficial/i.test(error.message || '') ? 'La cuenta oficial no se puede borrar desde la app' : 'No se pudo borrar la cuenta. Intenta de nuevo.'); }
+    close();
+    try { await sb.auth.signOut(); } catch (_) {}
+    try { localStorage.clear(); } catch (_) {}
+    toast('Tu cuenta fue borrada. ¡Gracias por haber sido parte de Ranchfolk! 🤠');
+  };
 }
 async function openBlockedList() {
   const body = h('div', { class: 'sheet-body' }, h('div', { class: 'spinner' }));
