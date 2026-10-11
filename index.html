@@ -350,6 +350,37 @@ textarea.input{min-height:90px;resize:vertical}
 .sdc-emojis{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;padding:10px;overflow-y:auto}
 .sdc-emojis button{font-size:34px;border:none;background:none;padding:6px 0;border-radius:12px}
 .sdc-emojis button:active{background:#EFE6D4;transform:scale(1.2)}
+
+/* ---------- Menú ☰ ---------- */
+.sheet-bg{z-index:36}
+.menu-bg{position:fixed;inset:0;z-index:35;background:rgba(23,37,49,.45);display:flex;justify-content:flex-end}
+.mn-panel{width:min(100%,420px);height:100%;background:#F5EFE3;color:#172531;display:flex;flex-direction:column;box-shadow:-8px 0 30px rgba(0,0,0,.3);animation:mnin .2s ease-out}
+.mn-panel.out{transform:translateX(100%);transition:transform .18s ease-in}
+@keyframes mnin{from{transform:translateX(100%)}}
+.mn-top{display:flex;align-items:center;justify-content:space-between;padding:calc(12px + env(safe-area-inset-top)) 12px 10px 18px;background:linear-gradient(180deg,#2C4657,#172531);color:#F1E4CC}
+.mn-top b{font-size:22px;font-family:Rye,Georgia,serif;color:#F3BD68}
+.mn-top .iconbtn{color:#F1E4CC!important}
+.mn-scroll{flex:1;overflow-y:auto;padding:14px 14px calc(24px + env(safe-area-inset-bottom))}
+.mn-me{width:100%;display:flex;align-items:center;gap:12px;padding:12px;border:1px solid #D9CBB0;border-radius:16px;background:#FFFDF8;text-align:left;box-shadow:0 2px 8px rgba(23,37,49,.06)}
+.mn-me b{display:block;font-size:17px}.mn-me small{color:#4D6473;font-size:13px}
+.mn-guest{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#F3BD68,#C7843B);display:flex;align-items:center;justify-content:center;font-size:28px}
+.mn-h{font-size:15px;margin:18px 4px 10px;color:#4D6473}
+.mn-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mn-tile{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:12px;border:1px solid #D9CBB0;border-radius:14px;background:#FFFDF8;text-align:left;box-shadow:0 2px 6px rgba(23,37,49,.05)}
+.mn-tile b{font-size:14px}
+.mn-tile:active,.mn-row:active,.mn-sec-head:active{background:#EFE6D4}
+.mn-emo{font-size:26px;line-height:1}.mn-emo.sm{font-size:22px;width:38px;height:38px;border-radius:50%;background:#EFE6D4;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mn-sec{margin-top:12px;border-top:1px solid #D9CBB0}
+.mn-sec-head{width:100%;display:flex;align-items:center;gap:12px;padding:12px 4px;border:none;background:none;text-align:left;font-size:16px;color:#172531}
+.mn-sec-head b{flex:1}
+.mn-chev{font-size:22px;color:#4D6473;transition:transform .15s;line-height:1}
+.mn-sec-head.open .mn-chev{transform:rotate(180deg)}
+.mn-sec-body{padding:0 0 6px}
+.mn-row{width:100%;display:flex;align-items:center;gap:12px;padding:10px 8px;border:none;background:#FFFDF8;border-radius:12px;margin-bottom:6px;text-align:left;color:#172531}
+.mn-row b{display:block;font-size:15px}.mn-row small{color:#4D6473;font-size:13px}
+.mn-foot{text-align:center;color:#4D6473;font-size:12px;margin-top:18px}
+.mn-how{display:flex;gap:12px;align-items:flex-start;margin-bottom:14px}
+.mn-how b{font-size:15px}.mn-how p{margin:2px 0 0;color:#4D6473;font-size:14px;line-height:1.4}
 /* ---------- Reacciones ---------- */
 .r-emo{display:inline-flex;align-items:center;justify-content:center;font-size:26px;line-height:1}
 .r-horse{display:inline-flex}
@@ -658,6 +689,7 @@ const ICONS = {
   horse: '<i class="horse" aria-hidden="true"></i>',
   shots: '<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7.6 C17.6 7.6 21.4 10.6 21.4 14.4 C21.4 18.2 17.6 21 12 21 C10.9 21 9.8 20.9 8.8 20.6 L4.4 22.4 L5.6 18.8 C3.6 17.6 2.6 16.1 2.6 14.4 C2.6 10.6 6.4 7.6 12 7.6 Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="8.2" cy="14.4" r="1.15" fill="url(#g)"/><circle cx="12" cy="14.4" r="1.15" fill="url(#g)"/><circle cx="15.8" cy="14.4" r="1.15" fill="url(#g)"/><g transform="translate(12 6.4) rotate(-10) scale(.25) translate(-50 -20)"><path d="M14 21.5 C18 25.5 26 26.6 34 26 C40 25.6 44 24.4 50 24.4 C56 24.4 60 25.6 66 26 C74 26.6 82 25.5 86 21.5 C84 25 80 29 72 30.4 C64 31.6 58 30.2 50 30.2 C42 30.2 36 31.6 28 30.4 C20 29 16 25 14 21.5 Z M33 25.6 C33.4 19 34.6 12 38 8.4 C40 6.4 43 7 45 8.6 C47.4 10.4 48.6 10.6 50 10.6 C51.4 10.6 52.6 10.4 55 8.6 C57 7 60 6.4 62 8.4 C65.4 12 66.6 19 67 25.6 C62 24.6 56 24 50 24 C44 24 38 24.6 33 25.6 Z" fill="currentColor"/><path d="M33.6 21.6 C40 20.4 60 20.4 66.4 21.6 L66.8 24.6 C60 23.4 40 23.4 33.2 24.6 Z" fill="url(#g)"/></g></svg>',
   shotsbig: '<svg width="96" height="96" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7.6 C17.6 7.6 21.4 10.6 21.4 14.4 C21.4 18.2 17.6 21 12 21 C10.9 21 9.8 20.9 8.8 20.6 L4.4 22.4 L5.6 18.8 C3.6 17.6 2.6 16.1 2.6 14.4 C2.6 10.6 6.4 7.6 12 7.6 Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="8.2" cy="14.4" r="1.15" fill="url(#g)"/><circle cx="12" cy="14.4" r="1.15" fill="url(#g)"/><circle cx="15.8" cy="14.4" r="1.15" fill="url(#g)"/><g transform="translate(12 6.4) rotate(-10) scale(.25) translate(-50 -20)"><path d="M14 21.5 C18 25.5 26 26.6 34 26 C40 25.6 44 24.4 50 24.4 C56 24.4 60 25.6 66 26 C74 26.6 82 25.5 86 21.5 C84 25 80 29 72 30.4 C64 31.6 58 30.2 50 30.2 C42 30.2 36 31.6 28 30.4 C20 29 16 25 14 21.5 Z M33 25.6 C33.4 19 34.6 12 38 8.4 C40 6.4 43 7 45 8.6 C47.4 10.4 48.6 10.6 50 10.6 C51.4 10.6 52.6 10.4 55 8.6 C57 7 60 6.4 62 8.4 C65.4 12 66.6 19 67 25.6 C62 24.6 56 24 50 24 C44 24 38 24.6 33 25.6 Z" fill="currentColor"/><path d="M33.6 21.6 C40 20.4 60 20.4 66.4 21.6 L66.8 24.6 C60 23.4 40 23.4 33.2 24.6 Z" fill="url(#g)"/></g></svg>',
+  menu: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>',
   bell: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>',
   send: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>',
   pause: '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>',
@@ -1077,7 +1109,7 @@ function renderAuth() {
 
 async function renderFeed() {
   const main = h('main');
-  $app.append(h('header', { class: 'topbar' }, h('div', { class: 'logo' }, 'Herria'), h('div', { class: 'top-actions' }, bellButton(), dmButton())), main);
+  $app.append(h('header', { class: 'topbar' }, h('div', { class: 'logo' }, 'Herria'), h('div', { class: 'top-actions' }, menuButton(), bellButton(), dmButton())), main);
 
   const stories = h('div', { class: 'stories' });
   const chips = h('div', { class: 'chips' }, ['Todo', ...CATEGORIES].map(c =>
@@ -2555,6 +2587,98 @@ function editProfile(prof) {
   close = openSheet('Editar perfil', body);
 }
 
+// ---------- Menú (☰) con todo lo que se puede hacer en Herria ----------
+function menuButton() {
+  return h('button', { class: 'iconbtn dm-btn', 'aria-label': 'Menú', onclick: () => openMenu() }, h('span', { icon: 'menu', style: 'display:flex' }));
+}
+function openMenu() {
+  document.querySelectorAll('.menu-bg').forEach(x => x.remove());
+  const guest = isGuest();
+  const close = () => { panel.classList.add('out'); setTimeout(() => bg.remove(), 180); };
+  const goTo = (fn) => () => { bg.remove(); fn(); };
+  const tile = (emoji, label, fn) => h('button', { class: 'mn-tile', type: 'button', onclick: goTo(fn) }, h('span', { class: 'mn-emo' }, emoji), h('b', {}, label));
+  const row = (emoji, label, fn, sub) => h('button', { class: 'mn-row', type: 'button', onclick: fn }, h('span', { class: 'mn-emo sm' }, emoji), h('div', {}, h('b', {}, label), sub ? h('small', {}, sub) : null));
+  const section = (emoji, title, rows) => {
+    const body = h('div', { class: 'mn-sec-body', hidden: true }, rows);
+    const head = h('button', { class: 'mn-sec-head', type: 'button', 'aria-expanded': 'false', onclick: () => { const open = body.hidden; body.hidden = !open; head.setAttribute('aria-expanded', String(open)); head.classList.toggle('open', open); } },
+      h('span', { class: 'mn-emo sm' }, emoji), h('b', {}, title), h('span', { class: 'mn-chev', 'aria-hidden': 'true' }, '⌄'));
+    return h('div', { class: 'mn-sec' }, head, body);
+  };
+  const soundRow = () => { const lab = h('small', {}, SFX.on ? 'Activados' : 'Apagados');
+    return h('button', { class: 'mn-row', type: 'button', onclick: () => { SFX.on = !SFX.on; lab.textContent = SFX.on ? 'Activados' : 'Apagados'; em.textContent = SFX.on ? '🔊' : '🔇'; if (SFX.on) SFX.play('ajua'); } },
+      (em = h('span', { class: 'mn-emo sm' }, SFX.on ? '🔊' : '🔇')), h('div', {}, h('b', {}, 'Sonidos de la app'), lab)); };
+  let em;
+  const inviteRow = row('📤', 'Invitar a Herria', async () => {
+    const url = location.origin + location.pathname;
+    const data = { title: 'Herria', text: 'Únete a Herria, la app de la vida de rancho 🤠🐎', url };
+    try { if (navigator.share) await navigator.share(data); else { await navigator.clipboard.writeText(url); toast('Enlace copiado'); } } catch (_) {}
+  }, 'Comparte la app con tu familia y amigos');
+  const help = section('❓', 'Ayuda y soporte técnico', [
+    row('📖', 'Cómo usar Herria', () => openHowTo()),
+    row('🛠️', 'Reportar un problema', () => openSheet('Reportar un problema', h('div', { class: 'sheet-body', style: 'line-height:1.5' },
+      h('p', {}, '¿Algo no funciona bien? Cuéntanos qué pasó y en qué pantalla.'),
+      h('p', {}, CONTACT ? 'Escríbenos a ' + CONTACT : 'Escríbenos por mensaje a la página de Herria en Facebook.'),
+      h('p', { style: 'color:var(--muted);font-size:14px' }, 'Si alguien te molesta, en su perfil o en el menú ⋯ de su publicación puedes reportarlo o bloquearlo.')))),
+    row('🤠', 'Acerca de Herria', () => openSheet('Acerca de Herria', h('div', { class: 'sheet-body', style: 'line-height:1.5;text-align:center' },
+      h('div', { class: 'logo', style: 'font-size:34px' }, 'Herria'),
+      h('p', {}, 'La vida de rancho, en un solo lugar: caballos, ganado, bailes, jaripeos, outfits y el día a día del rancho.'),
+      h('p', { style: 'color:var(--muted);font-size:14px' }, 'Hecha en León, Guanajuato. 🇲🇽'))))]);
+  const settings = section('⚙️', 'Configuración y privacidad', guest ? [
+    soundRow(), row('📜', 'Reglas y privacidad', () => openRules())] : [
+    row('✏️', 'Editar perfil', goTo(() => editProfile(state.me)), 'Foto, nombre, rancho'),
+    soundRow(),
+    row('🚫', 'Personas bloqueadas', () => openBlockedList()),
+    row('📜', 'Reglas y privacidad', () => openRules())]);
+  const head = guest
+    ? h('div', { class: 'mn-me' }, h('div', { class: 'mn-guest' }, '🤠'), h('div', {}, h('b', {}, 'Estás como invitado'), h('small', {}, 'Crea tu cuenta para participar')))
+    : h('button', { class: 'mn-me', type: 'button', onclick: goTo(() => go('profile', { profileId: state.me.id })) }, avatar(state.me, 52),
+      h('div', {}, h('b', {}, state.me.full_name || state.me.username || ''), h('small', {}, 'Ver tu perfil')));
+  const tiles = guest ? [
+    tile('🏠', 'Inicio', () => go('feed')), tile('🐎', 'Rides', () => go('rides')), tile('🔍', 'Explorar', () => go('explore')), tile('🔑', 'Entrar', () => { state.authMode = 'login'; go('auth'); })] : [
+    tile('🏠', 'Inicio', () => go('feed')),
+    tile('🌅', 'Crear sundown', () => { go('feed'); openSundownCreator(() => render()); }),
+    tile('📷', 'Nueva publicación', () => { state.uploadKind = 'post'; go('upload'); }),
+    tile('🐎', 'Rides', () => go('rides')),
+    tile('💬', 'Mensajes', () => go('inbox')),
+    tile('🔔', 'Notificaciones', () => go('notifs')),
+    tile('🔍', 'Explorar', () => go('explore')),
+    tile('🐴', 'Mis animales', () => go('profile', { profileId: state.me.id }))];
+  const panel = h('div', { class: 'mn-panel', role: 'dialog', 'aria-label': 'Menú' },
+    h('div', { class: 'mn-top' }, h('b', {}, 'Menú'), h('button', { class: 'iconbtn plain', 'aria-label': 'Cerrar', icon: 'close', onclick: close })),
+    h('div', { class: 'mn-scroll' },
+      head,
+      h('h3', { class: 'mn-h' }, 'Tus atajos'),
+      h('div', { class: 'mn-grid' }, tiles),
+      help, settings, inviteRow,
+      guest ? h('button', { class: 'btn', style: 'width:100%;margin-top:16px', onclick: goTo(() => { state.authMode = 'signup'; go('auth'); }) }, 'Crear mi cuenta')
+            : h('button', { class: 'btn ghost', style: 'width:100%;margin-top:16px', onclick: async () => { if (!confirm('¿Cerrar sesión?')) return; bg.remove(); await sb.auth.signOut(); } }, 'Cerrar sesión'),
+      h('p', { class: 'mn-foot' }, 'Herria · Vida de rancho')));
+  const bg = h('div', { class: 'menu-bg', onclick: (e) => { if (e.target === bg) close(); } }, panel);
+  bg._close = close;
+  document.body.append(bg);
+}
+async function openBlockedList() {
+  const body = h('div', { class: 'sheet-body' }, h('div', { class: 'spinner' }));
+  openSheet('Personas bloqueadas', body);
+  const ids = [...(state.blocked || [])];
+  if (!ids.length) return body.replaceChildren(h('p', { class: 'empty', style: 'padding:24px 8px' }, 'No has bloqueado a nadie.'));
+  const { data } = await sb.from('profiles').select(PROF_MINI).in('id', ids);
+  body.replaceChildren(...(data || []).map(p => { const b = h('button', { class: 'btn small ghost', onclick: async () => { await unblockUser(p.id, p.username); b.textContent = 'Desbloqueado'; b.disabled = true; } }, 'Desbloquear');
+    return h('div', { class: 'inbox-row' }, avatar(p, 44), h('div', { class: 'who' }, h('b', {}, p.username || ''), h('span', {}, p.full_name || '')), b); }));
+}
+function openHowTo() {
+  const it = (e, t, d) => h('div', { class: 'mn-how' }, h('span', { class: 'mn-emo sm' }, e), h('div', {}, h('b', {}, t), h('p', {}, d)));
+  openSheet('Cómo usar Herria', h('div', { class: 'sheet-body' },
+    it('📷', 'Publicar', 'Toca el + de abajo. Elige foto o video, la sección y, si quieres, una canción.'),
+    it('🌅', 'Sundowns', 'Toca "Agregar" arriba. Ponle texto, emojis y música; arrástralos con el dedo. Duran 24 horas.'),
+    it('🐎', 'Rides', 'Videos verticales en pantalla completa. Desliza hacia arriba para ver el siguiente.'),
+    it('🐴', 'Reaccionar', 'Toca el caballo para dar ¡Ajúa! o déjalo presionado para escoger otra reacción.'),
+    it('💬', 'Mensajes', 'Toca el botón de mensajes arriba. Puedes mandar fotos, videos y reaccionar dejando presionado un mensaje.'),
+    it('🔁', 'Compartir', 'Con el botón de enviar puedes compartir en tu perfil, por mensaje o por WhatsApp.'),
+    it('🐄', 'Tus animales', 'En tu perfil agrega a tus caballos, vacas y más; otros pueden seguirlos.'),
+    it('⬅️', 'Salir', 'En el inicio, el botón atrás te sube arriba; tócalo otra vez para salir.')));
+}
+
 // ---------- Notificaciones (ajúas/reacciones, comentarios y compartidos de tus publicaciones) ----------
 const NOTIF_PROF = 'profiles!user_id(id,username,full_name,avatar_url)';
 let NOTIF_CACHE = { at: 0, items: [] };
@@ -2905,7 +3029,7 @@ let ARMED = false;
 try { history.scrollRestoration = 'manual'; } catch (_) {}
 function armBack() { if (ARMED) return; try { history.pushState({ yh: 1 }, ''); ARMED = true; } catch (_) {} }
 function backNeeded() {
-  const overlay = document.querySelector('.sd-viewer,.sheet-bg,.react-pick-bg,.sdc');
+  const overlay = document.querySelector('.sd-viewer,.sheet-bg,.react-pick-bg,.sdc,.menu-bg');
   return !!overlay || state.view !== 'feed' || window.scrollY > 120;
 }
 function syncBack() { if (backNeeded()) armBack(); }
@@ -2917,6 +3041,8 @@ window.addEventListener('popstate', () => {
   ARMED = false;
   const picker = document.querySelector('.react-pick-bg');
   if (picker) { picker.remove(); return syncBack(); }
+  const menu = document.querySelector('.menu-bg');
+  if (menu && !document.querySelector('.sheet-bg')) { menu._close(); return syncBack(); }
   const sdcPane = document.querySelector('.sdc .sdc-pane .sdc-done, .sdc .sdc-sheet .sdc-done');
   if (sdcPane) { sdcPane.click(); return syncBack(); }
   const sdc = document.querySelector('.sdc');
