@@ -324,6 +324,17 @@ textarea.input{min-height:90px;resize:vertical}
 .shared-note{display:flex;align-items:center;gap:6px;padding:0 14px 8px;font-size:13px;color:var(--soft)}
 .shared-note .linkbtn{font-size:13px;font-weight:700;color:var(--text)}
 .shared-cap{margin:8px 14px 0;padding:8px 12px;border-left:3px solid #CFAE73;background:#FFFDF8;border-radius:0 10px 10px 0;font-size:14px;color:var(--soft)}
+.msg{position:relative;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.msg.has-rx{margin-bottom:14px}
+.msg-rx{position:absolute;bottom:-14px;display:inline-flex;align-items:center;gap:1px;height:24px;padding:0 6px;border-radius:12px;border:none;background:#FFFDF8;box-shadow:0 1px 4px rgba(60,25,8,.3);z-index:1}
+.msg.them .msg-rx{right:-6px}.msg.me .msg-rx{left:-6px}
+.msg-rx .r-emo.mini{box-shadow:none;background:none;font-size:14px;width:18px;height:18px}
+.msg-rx .r-horse.mini .horse{width:18px;height:18px;box-shadow:none}
+.msg-rx .rx-n{font-size:11px;font-weight:700;color:#7A5A44;margin-left:2px}
+.msg-rx-add{position:absolute;top:50%;transform:translateY(-50%);width:30px;height:30px;border-radius:50%;border:1px solid #E2CFAF;background:#FFFDF8;color:#8B4A22;font-size:17px;line-height:1;padding:0;box-shadow:0 1px 4px rgba(60,25,8,.2)}
+.msg.them .msg-rx-add{right:-40px}.msg.me .msg-rx-add{left:-40px}
+.msg.rx-pop{animation:rxpop .35s ease-out}
+@keyframes rxpop{50%{transform:scale(1.04)}}
 .msg-post{display:block;margin-top:8px;padding:8px 12px;border-radius:12px;border:1px solid rgba(0,0,0,.12);background:rgba(255,253,248,.9);color:#3B2314;font-weight:700;font-size:14px}
 /* ---------- Notificaciones ---------- */
 .top-actions{display:flex;align-items:center;gap:6px}
@@ -426,7 +437,7 @@ textarea.input{min-height:90px;resize:vertical}
 .join p{color:var(--muted);margin:0 0 16px;line-height:1.45}
 .composer .attach{width:46px;height:46px;border-radius:23px;border:1px solid var(--line);background:var(--surface);color:var(--text);display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0}
 .composer .attach svg{width:24px;height:24px}
-.msg.hasmedia{padding:4px;overflow:hidden;max-width:72%}
+.msg.hasmedia{padding:4px;overflow:visible;max-width:72%}
 .msg.hasmedia img,.msg.hasmedia video{display:block;width:100%;height:auto;max-height:340px;object-fit:cover;border-radius:16px;background:#000}
 .msg.hasmedia img{cursor:zoom-in}
 .msg.hasmedia p{margin:6px 10px 4px}
@@ -2189,6 +2200,7 @@ async function renderNotifs() {
 
 // ---------- Mensajes ----------
 let HAS_DM = true;
+let HAS_MSG_RX = true;   // reacciones en mensajes
 const PROF_MINI = 'id,username,full_name,avatar_url';
 function dmButton() {
   if (isGuest()) return h('button', { class: 'btn small', style: 'height:40px;padding:0 18px', onclick: () => { state.authMode = 'login'; go('auth'); } }, 'Entrar');
@@ -2312,6 +2324,58 @@ async function renderChat() {
 
   let msgs = [], alive = true, lastCount = -1;
   const seen = new Set();
+  const rx = new Map();   // id del mensaje -> [{ user_id, reaction }]
+  async function loadRx() {
+    if (!HAS_MSG_RX) return;
+    const ids = msgs.map(m => m.id).filter(id => typeof id === 'number');
+    if (!ids.length) return;
+    const { data, error } = await sb.from('message_reactions').select('message_id,user_id,reaction').in('message_id', ids.slice(-300));
+    if (error) { if (/message_reactions|relation|schema/i.test(error.message || '')) HAS_MSG_RX = false; return; }
+    rx.clear(); (data || []).forEach(r => { if (!rx.has(r.message_id)) rx.set(r.message_id, []); rx.get(r.message_id).push(r); });
+    if (alive) paint();
+  }
+  async function setRx(m, k) {
+    if (!HAS_MSG_RX || typeof m.id !== 'number') return;
+    const list = rx.get(m.id) || [];
+    const mineR = list.find(r => r.user_id === state.me.id);
+    const before = list.slice();
+    const removing = mineR && mineR.reaction === k;
+    const next = list.filter(r => r.user_id !== state.me.id);
+    if (!removing) next.push({ message_id: m.id, user_id: state.me.id, reaction: k });
+    rx.set(m.id, next); paint();
+    try { navigator.vibrate && navigator.vibrate(15); } catch (_) {}
+    const res = removing ? await sb.from('message_reactions').delete().eq('message_id', m.id).eq('user_id', state.me.id)
+      : await sb.from('message_reactions').upsert({ message_id: m.id, user_id: state.me.id, reaction: k }, { onConflict: 'message_id,user_id' });
+    if (res.error) { rx.set(m.id, before); paint(); toast(/message_reactions|relation|schema/i.test(res.error.message || '') ? 'Falta activar las reacciones de mensajes en Supabase' : 'No se pudo reaccionar'); }
+  }
+  function rxPill(m, el) {
+    const list = rx.get(m.id) || [];
+    let pill = el.querySelector(':scope > .msg-rx');
+    el.classList.toggle('has-rx', list.length > 0);
+    if (!list.length) { if (pill) pill.remove(); return; }
+    if (!pill) { pill = h('button', { class: 'msg-rx', type: 'button' }); el.append(pill); }
+    const mineR = list.find(r => r.user_id === state.me.id);
+    pill.setAttribute('aria-label', mineR ? 'Quitar tu reacción' : 'Reaccionar');
+    pill.onclick = (e) => { e.stopPropagation(); if (mineR) setRx(m, mineR.reaction); else openReactPicker(el, null, (k) => setRx(m, k)); };
+    const kinds = [...new Set(list.map(r => r.reaction))];
+    pill.replaceChildren(...kinds.map(k => reactIcon(k, 'mini')), list.length > 1 ? h('span', { class: 'rx-n' }, String(list.length)) : '');
+  }
+  // Dejar presionado (o doble toque) un mensaje para reaccionar
+  function armRx(el, m) {
+    if (!HAS_MSG_RX || m.pending) return;
+    let t = null, fired = false, lastTap = 0;
+    const open = () => { const cur = (rx.get(m.id) || []).find(r => r.user_id === state.me.id); openReactPicker(el, cur ? cur.reaction : null, (k) => setRx(m, k)); };
+    el.addEventListener('pointerdown', (e) => { if (e.target.closest('.msg-rx,.msg-post,video')) return; fired = false; clearTimeout(t); t = setTimeout(() => { fired = true; try { navigator.vibrate && navigator.vibrate(15); } catch (_) {} open(); }, 420); });
+    ['pointerup', 'pointerleave', 'pointercancel', 'pointermove'].forEach(ev => el.addEventListener(ev, (e) => { if (ev !== 'pointermove' || Math.abs(e.movementY) > 4) clearTimeout(t); }));
+    el.addEventListener('contextmenu', (e) => e.preventDefault());
+    el.addEventListener('click', (e) => {
+      if (fired) { fired = false; e.stopPropagation(); e.preventDefault(); return; }
+      const now = Date.now();
+      if (now - lastTap < 300) { lastTap = 0; e.stopPropagation(); e.preventDefault(); clearTimeout(el._tapT); setRx(m, 'love'); el.classList.remove('rx-pop'); void el.offsetWidth; el.classList.add('rx-pop'); return; }
+      lastTap = now;
+    }, true);
+    if (m.media_path || m.localUrl) el.append(h('button', { class: 'msg-rx-add', type: 'button', 'aria-label': 'Reaccionar a esta ' + (m.media_type === 'video' ? 'video' : 'foto'), onclick: (e) => { e.stopPropagation(); open(); } }, '☺'));
+  }
   const nodes = new Map(); // id -> elemento (para que los videos no se reinicien)
   function bubble(m) {
     const key = m.id + (m.pending ? 'p' : '');
@@ -2322,7 +2386,7 @@ async function renderChat() {
       const src = m.localUrl || (DM_SIGNED.get(m.media_path) || {}).url;
       const media = !src ? h('div', { class: 'msg-media-ph' }, 'Cargando…')
         : m.media_type === 'video' ? h('video', { src, controls: true, playsinline: true, preload: 'metadata' })
-        : h('img', { src, alt: 'Foto', loading: 'lazy', onclick: () => openMediaViewer(src, 'image') });
+        : h('img', { src, alt: 'Foto', loading: 'lazy', onclick: (e) => { const box = e.currentTarget.closest('.msg'); clearTimeout(box._tapT); box._tapT = setTimeout(() => openMediaViewer(src, 'image'), 300); } });
       el = h('div', { class: 'msg hasmedia ' + (mine ? 'me' : 'them') + (m.pending ? ' pending' : '') }, media, m.body ? h('p', {}, m.body) : null,
         m.pending ? h('span', { class: 'msg-up' }, 'Enviando…') : null);
       if (!src) return el; // sin enlace todavía: no guardar, se vuelve a intentar
@@ -2332,6 +2396,7 @@ async function renderChat() {
           h('button', { class: 'msg-post', onclick: () => openPostById(Number(pm[1])) }, '👀 Ver publicación'))
         : h('div', { class: 'msg ' + (mine ? 'me' : 'them') + (m.pending ? ' pending' : '') }, m.body);
     }
+    armRx(el, m);
     nodes.set(key, el);
     return el;
   }
@@ -2339,7 +2404,7 @@ async function renderChat() {
     const kids = []; let prev = null;
     for (const m of msgs) {
       if (!prev || new Date(m.created_at) - new Date(prev.created_at) > 15 * 60e3) kids.push(h('div', { class: 'msg-time' }, shortTime(m.created_at)));
-      kids.push(bubble(m));
+      const el = bubble(m); if (!m.pending) rxPill(m, el); kids.push(el);
       prev = m;
     }
     const lastMine = [...msgs].reverse().find(m => m.sender_id === state.me.id && !m.pending);
@@ -2359,6 +2424,7 @@ async function renderChat() {
     msgs = (data || []).concat(pend);
     msgs.forEach(m => seen.add(m.id));
     paint();
+    loadRx();
     if (msgs.some(m => m.sender_id !== state.me.id && !m.read_at)) sb.rpc('mark_read', { conv: chat.id }).then(() => {}, () => {});
   }
   function failMsg(error) {
@@ -2404,7 +2470,8 @@ async function renderChat() {
   }
   let channel = null;
   try {
-    if (sb.channel) channel = sb.channel('dm-' + chat.id).on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: 'conversation_id=eq.' + chat.id }, () => load()).subscribe();
+    if (sb.channel) channel = sb.channel('dm-' + chat.id).on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: 'conversation_id=eq.' + chat.id }, () => load())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'message_reactions' }, (pl) => { const id = (pl.new && pl.new.message_id) || (pl.old && pl.old.message_id); if (!id || seen.has(id)) loadRx(); }).subscribe();
   } catch (_) { channel = null; }
   const poll = setInterval(() => { if (!document.hidden) load(); }, channel ? 15000 : 4000);
   state.cleanup = () => { alive = false; clearInterval(poll); if (channel) try { sb.removeChannel(channel); } catch (_) {} };
