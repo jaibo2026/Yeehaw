@@ -493,6 +493,12 @@ textarea.input{min-height:90px;resize:vertical}
 .fx-mini .fx-pic{border-radius:12px;font-size:36px}.fx-mini b{font-size:14px;margin-top:4px}
 .fx-mini small{font-size:12px;color:#4D6473;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .fx-mini .fx-feat{padding:2px 6px;font-size:11px}
+/* ---------- Aviso push ---------- */
+.push-card{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:12px 16px 0;padding:12px 14px;border-radius:16px;background:#FFF6E4;border:1px solid #F3BD68}
+.push-card .push-emo{font-size:26px}
+.push-card>div:nth-child(2){flex:1;min-width:180px;display:flex;flex-direction:column;gap:2px}
+.push-card small{color:var(--muted)}
+.push-card .push-btns{display:flex;gap:8px;width:100%;justify-content:flex-end}
 /* ---------- Reacciones ---------- */
 .r-emo{display:inline-flex;align-items:center;justify-content:center;font-size:26px;line-height:1}
 .r-horse{display:inline-flex}
@@ -2870,6 +2876,16 @@ function openMenu() {
     return h('button', { class: 'mn-row', type: 'button', onclick: () => { SFX.on = !SFX.on; lab.textContent = SFX.on ? 'Activados' : 'Apagados'; em.textContent = SFX.on ? '🔊' : '🔇'; if (SFX.on) SFX.play('ajua'); } },
       (em = h('span', { class: 'mn-emo sm' }, SFX.on ? '🔊' : '🔇')), h('div', {}, h('b', {}, 'Sonidos de la app'), lab)); };
   let em;
+  function pushRow() {
+    const lab = h('small', {}, pushState() === 'no' ? 'Este teléfono no los permite' : '…');
+    const b = h('button', { class: 'mn-row', type: 'button', onclick: async () => {
+      if (pushState() === 'no') return;
+      if (await pushOnHere()) { await disablePush(); } else { await enablePush(); }
+      lab.textContent = (await pushOnHere()) ? 'Activados' : 'Apagados'; } },
+      h('span', { class: 'mn-emo sm' }, '📲'), h('div', {}, h('b', {}, 'Avisos en el teléfono'), lab));
+    if (pushState() !== 'no') pushOnHere().then(on => { lab.textContent = on ? 'Activados' : (pushState() === 'denied' ? 'Bloqueados en el navegador' : 'Apagados'); });
+    return b;
+  }
   const inviteRow = row('📤', 'Invitar a Herria', async () => {
     const url = location.origin + location.pathname;
     const data = { title: 'Herria', text: 'Únete a Herria, la app de la vida de rancho 🤠🐎', url };
@@ -2889,6 +2905,7 @@ function openMenu() {
     soundRow(), row('📜', 'Reglas y privacidad', () => openRules())] : [
     row('✏️', 'Editar perfil', goTo(() => editProfile(state.me)), 'Foto, nombre, rancho'),
     soundRow(),
+    pushRow(),
     row('🚫', 'Personas bloqueadas', () => openBlockedList()),
     row('📜', 'Reglas y privacidad', () => openRules())]);
   const head = guest
@@ -3338,6 +3355,51 @@ function dmButton() {
   refreshUnread(badge);
   return HAS_DM ? btn : h('div');
 }
+// ---------- Avisos en el teléfono (push) ----------
+const PUSH_FN = 'https://olflxehmwfxvsnzoqzrm.supabase.co/functions/v1/push-mensaje';
+const pushSupported = () => 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+const pushState = () => !pushSupported() ? 'no' : Notification.permission; // 'default' | 'granted' | 'denied' | 'no'
+function b64ToBytes(b64) { const p = '='.repeat((4 - b64.length % 4) % 4); const raw = atob((b64 + p).replace(/-/g, '+').replace(/_/g, '/')); return Uint8Array.from(raw, c => c.charCodeAt(0)); }
+async function enablePush(quiet) {
+  if (!pushSupported() || isGuest()) { if (!quiet) toast('Este teléfono no permite avisos'); return false; }
+  try {
+    if (Notification.permission !== 'granted') {
+      if (quiet) return false;
+      const r = await Notification.requestPermission();
+      if (r !== 'granted') { toast(r === 'denied' ? 'Bloqueaste los avisos. Actívalos en los ajustes del navegador.' : 'No se activaron los avisos'); return false; }
+    }
+    const reg = await navigator.serviceWorker.ready;
+    let sub = await reg.pushManager.getSubscription();
+    if (!sub) {
+      const { publicKey } = await fetch(PUSH_FN).then(r => r.json());
+      sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToBytes(publicKey) });
+    }
+    const j = sub.toJSON();
+    const { error } = await sb.from('push_subscriptions').upsert({ endpoint: j.endpoint, user_id: state.me.id, p256dh: j.keys.p256dh, auth: j.keys.auth }, { onConflict: 'endpoint' });
+    if (error) throw error;
+    if (!quiet) { toast('¡Listo! Te avisaremos de tus mensajes 🔔'); SFX.play('msg'); }
+    return true;
+  } catch (e) { if (!quiet) toast('No se pudieron activar los avisos'); return false; }
+}
+async function disablePush() {
+  try { const reg = await navigator.serviceWorker.ready; const sub = await reg.pushManager.getSubscription();
+    if (sub) { await sb.from('push_subscriptions').delete().eq('endpoint', sub.endpoint); await sub.unsubscribe(); } } catch (_) {}
+  toast('Avisos apagados en este teléfono');
+}
+async function pushOnHere() { try { if (pushState() !== 'granted') return false; const reg = await navigator.serviceWorker.ready; return !!(await reg.pushManager.getSubscription()); } catch (_) { return false; } }
+// Tarjetita para invitar a activar los avisos (en Mensajes)
+function pushCard() {
+  if (isGuest() || pushState() !== 'default') return null;
+  try { if (localStorage.getItem('herria_push_later') && Date.now() - Number(localStorage.getItem('herria_push_later')) < 3 * 864e5) return null; } catch (_) {}
+  const card = h('div', { class: 'push-card' },
+    h('span', { class: 'push-emo' }, '🔔'),
+    h('div', {}, h('b', {}, 'Que no se te pase ningún mensaje'), h('small', {}, 'Te avisamos en el teléfono aunque tengas Herria cerrada.')),
+    h('div', { class: 'push-btns' },
+      h('button', { class: 'btn small', onclick: async () => { if (await enablePush()) card.remove(); } }, 'Activar'),
+      h('button', { class: 'btn small ghost', onclick: () => { try { localStorage.setItem('herria_push_later', String(Date.now())); } catch (_) {} card.remove(); } }, 'Ahora no')));
+  return card;
+}
+
 // Sonido de mensaje nuevo (campana de rancho). No suena dos veces seguidas por el mismo aviso.
 let LAST_UNREAD = null, LAST_DING = 0, INBOX_CH = null;
 function msgDing() { const now = Date.now(); if (now - LAST_DING < 2500) return; LAST_DING = now; SFX.play('msg'); }
@@ -3381,7 +3443,7 @@ async function renderInbox() {
   const search = h('input', { class: 'input', type: 'search', placeholder: 'Buscar a alguien para escribirle…', 'aria-label': 'Buscar persona' });
   const found = h('div');
   const list = h('div', {}, h('div', { class: 'spinner' }));
-  main.append(h('div', { style: 'padding:12px 16px 4px' }, search), found, list);
+  main.append(pushCard() || '', h('div', { style: 'padding:12px 16px 4px' }, search), found, list);
 
   let timer;
   search.addEventListener('input', () => {
@@ -3674,11 +3736,17 @@ sb.auth.onAuthStateChange((_event, session) => {
   if (!changed) return;
   stopInbox();
   state.me = session ? null : GUEST; state.blocked = new Set(); state.view = 'feed'; render();
-  if (session) setTimeout(async () => { await loadMe(); listenInbox(); if (needsWelcome()) { state.view = 'welcome'; state.welcomeStep = 0; } render(); openDeepLink(); }, 0);
+  if (session) setTimeout(async () => { await loadMe(); listenInbox(); enablePush(true); if (needsWelcome()) { state.view = 'welcome'; state.welcomeStep = 0; } render(); openDeepLink(); }, 0);
   else setTimeout(openDeepLink, 300);
 });
 // Enlaces a una publicación (…/#p=123): la abre al entrar
 function openDeepLink() {
+  const u = /^#u=([0-9a-f-]{36})$/.exec(location.hash || '');
+  if (u && state.me && !isGuest()) {  // tocaste un aviso de mensaje: abre ese chat
+    history.replaceState(history.state, '', location.pathname + location.search);
+    sb.from('profiles').select(PROF_MINI).eq('id', u[1]).maybeSingle().then(({ data }) => { if (data) openChatWith(data); });
+    return;
+  }
   const m = /^#([ple])=(\d+)$/.exec(location.hash || '');
   if (!m || !state.me) return;
   history.replaceState(history.state, '', location.pathname + location.search);
