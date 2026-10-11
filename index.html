@@ -875,6 +875,9 @@ function friendlyError(e) {
   if (/Password should be/i.test(m)) return 'La contraseña debe tener al menos 6 caracteres.';
   if (/Email not confirmed/i.test(m)) return 'Falta confirmar tu correo. Revisa tu bandeja de entrada.';
   if (/Failed to fetch|NetworkError/i.test(m)) return 'Sin conexión. Revisa tu internet.';
+  if (/rate limit|too many|security purposes/i.test(m)) return 'Ya pediste varios correos. Espera unos minutos y vuelve a intentar.';
+  if (/not authorized|Email address not authorized/i.test(m)) return 'Por ahora no pudimos mandar el correo. Escríbenos a ' + (CONTACT || 'la página de Ranchfolk') + ' y te ayudamos.';
+  if (/same.*password|different from the old/i.test(m)) return 'La contraseña nueva debe ser diferente a la anterior.';
   if (/animal/i.test(m)) return 'Falta actualizar la base de datos en Supabase (el paso del SQL de animales).';
   if (/kind/i.test(m) && /column|columna/i.test(m)) return 'Falta actualizar la base de datos en Supabase (el paso del SQL de Rides y Sundowns).';
   return m;
@@ -1206,6 +1209,44 @@ function render() {
   if (state.view !== 'chat') $app.append(navBar());
 }
 
+// ---------- Olvidé mi contraseña ----------
+function openForgotPassword(prefill) {
+  const email = h('input', { class: 'input', type: 'email', placeholder: 'Tu correo', autocomplete: 'email', autocapitalize: 'off', value: prefill || '' });
+  const msg = h('p', { class: 'err', role: 'alert' });
+  const btn = h('button', { class: 'btn', style: 'width:100%' }, 'Mandarme el enlace');
+  openSheet('Recuperar contraseña', h('div', { class: 'sheet-body', style: 'line-height:1.5' },
+    h('p', {}, 'Escribe el correo con el que te registraste. Te mandaremos un enlace para crear una contraseña nueva.'),
+    email, h('div', { style: 'height:10px' }), msg, btn,
+    h('p', { style: 'color:var(--muted);font-size:13px;margin-top:12px' }, '¿No te llega? Revisa en Spam o Promociones. Si sigue sin llegar, escríbenos a ' + (CONTACT || 'la página de Ranchfolk') + '.')));
+  btn.onclick = async () => {
+    const v = email.value.trim();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)) { msg.className = 'err'; msg.textContent = 'Escribe un correo válido.'; return; }
+    btn.disabled = true; btn.textContent = 'Enviando…'; msg.textContent = '';
+    const { error } = await sb.auth.resetPasswordForEmail(v, { redirectTo: location.origin + location.pathname });
+    btn.disabled = false; btn.textContent = 'Mandarme el enlace';
+    if (error) { msg.className = 'err'; msg.textContent = friendlyError(error); return; }
+    msg.className = 'ok'; msg.textContent = '¡Listo! Si ese correo tiene cuenta, te llegará un enlace en unos minutos. Ábrelo desde este mismo teléfono.';
+  };
+}
+// Llegaste desde el enlace del correo: pon tu contraseña nueva
+function openNewPassword() {
+  const p1 = h('input', { class: 'input', type: 'password', placeholder: 'Contraseña nueva (mínimo 6)', autocomplete: 'new-password', minlength: '6' });
+  const p2 = h('input', { class: 'input', type: 'password', placeholder: 'Repítela', autocomplete: 'new-password', minlength: '6' });
+  const msg = h('p', { class: 'err', role: 'alert' });
+  const btn = h('button', { class: 'btn', style: 'width:100%' }, 'Guardar contraseña');
+  const close = openSheet('Nueva contraseña', h('div', { class: 'sheet-body' },
+    h('p', {}, 'Crea tu contraseña nueva para entrar a Ranchfolk.'), p1, h('div', { style: 'height:10px' }), p2, h('div', { style: 'height:10px' }), msg, btn));
+  btn.onclick = async () => {
+    if (p1.value.length < 6) { msg.textContent = 'La contraseña debe tener al menos 6 caracteres.'; return; }
+    if (p1.value !== p2.value) { msg.textContent = 'Las contraseñas no coinciden.'; return; }
+    btn.disabled = true; btn.textContent = 'Guardando…';
+    const { error } = await sb.auth.updateUser({ password: p1.value });
+    btn.disabled = false; btn.textContent = 'Guardar contraseña';
+    if (error) { msg.textContent = friendlyError(error); return; }
+    close(); toast('¡Contraseña cambiada! Ya puedes entrar con ella 🤠');
+  };
+}
+
 function renderAuth() {
   const isLogin = state.authMode === 'login';
   const err = h('p', { class: 'err', role: 'alert' });
@@ -1233,6 +1274,7 @@ function renderAuth() {
     !isLogin && f('Nombre de usuario', { name: 'username', required: true, autocapitalize: 'off', placeholder: 'ej. el_compa_chuy', maxlength: '30' }),
     f('Correo', { name: 'email', type: 'email', required: true, autocomplete: 'email', autocapitalize: 'off' }),
     f('Contraseña', { name: 'password', type: 'password', required: true, minlength: '6', autocomplete: isLogin ? 'current-password' : 'new-password' }),
+    isLogin && h('div', { style: 'text-align:right;margin:-4px 0 10px' }, h('button', { type: 'button', class: 'linkbtn', style: 'text-decoration:underline;font-size:14px', onclick: () => openForgotPassword(form.querySelector('[name=email]').value.trim()) }, '¿Olvidaste tu contraseña?')),
     err,
     h('button', { class: 'btn', type: 'submit' }, isLogin ? 'Entrar' : 'Crear cuenta'),
     !isLogin && h('p', { class: 'hint', style: 'margin:12px 0 0;text-align:center' }, 'Al crear tu cuenta confirmas que eres mayor de 18 años y aceptas los ',
@@ -3807,6 +3849,7 @@ window.addEventListener('popstate', () => {
   toast('Toca atrás otra vez para salir');
 });
 sb.auth.onAuthStateChange((_event, session) => {
+  if (_event === 'PASSWORD_RECOVERY') setTimeout(openNewPassword, 900);
   const changed = !started || (session && session.user.id) !== (state.session && state.session.user.id);
   started = true;
   state.session = session;
