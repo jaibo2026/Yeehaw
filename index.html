@@ -493,6 +493,8 @@ textarea.input{min-height:90px;resize:vertical}
 .fx-mini .fx-pic{border-radius:12px;font-size:36px}.fx-mini b{font-size:14px;margin-top:4px}
 .fx-mini small{font-size:12px;color:#4D6473;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .fx-mini .fx-feat{padding:2px 6px;font-size:11px}
+/* ---------- Verificada ---------- */
+.vbadge{display:inline-flex;align-items:center;justify-content:center;width:1.05em;height:1.05em;margin-left:.3em;border-radius:50%;background:#C7843B;color:#fff!important;font-size:.72em;font-weight:900;line-height:1;vertical-align:.08em;box-shadow:0 0 0 1.5px #F3BD68 inset;font-family:Inter,sans-serif}
 /* ---------- Aviso push ---------- */
 .push-card{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:12px 16px 0;padding:12px 14px;border-radius:16px;background:#FFF6E4;border:1px solid #F3BD68}
 .push-card .push-emo{font-size:26px}
@@ -909,6 +911,19 @@ async function loadMe() {
   state.blocked = new Set(bl.error ? [] : (bl.data || []).map(b => b.blocked_id));
 }
 const GUEST = { id: '__guest__', username: 'invitado', guest: true };
+// Cuentas verificadas ✓ (solo Herria las marca desde Supabase)
+let VERIFIED = new Set();
+try { VERIFIED = new Set(JSON.parse(localStorage.getItem('herria_verif') || '[]')); } catch (_) {}
+async function loadVerified() {
+  const { data, error } = await sb.from('profiles').select('id').eq('verified', true).limit(100);
+  if (error || !data) return;
+  const before = [...VERIFIED].sort().join();
+  VERIFIED = new Set(data.map(x => x.id));
+  if (before !== [...VERIFIED].sort().join() && typeof started !== 'undefined' && started && state.me) { try { render(); } catch (_) {} }
+  try { localStorage.setItem('herria_verif', JSON.stringify([...VERIFIED])); } catch (_) {}
+}
+setTimeout(loadVerified, 0);
+const vb = (id) => VERIFIED.has(id) ? h('span', { class: 'vbadge', title: 'Cuenta verificada', 'aria-label': 'Cuenta verificada' }, '✓') : null;
 function isGuest() { return !state.session || !state.me || state.me.guest; }
 // Si no tiene cuenta, invita a registrarse. Devuelve true cuando hay que detenerse.
 function needLogin(why) {
@@ -1537,7 +1552,7 @@ function postCard(p) {
     h('div', { class: 'post-head' },
       avatar(prof, 40),
       h('button', { class: 'who', onclick: () => go('profile', { profileId: p.user_id }) },
-        h('b', {}, prof.username || 'usuario'), h('small', {}, p.kind === 'ride' ? 'Ride · ' + timeAgo(p.created_at) : (prof.rancho || timeAgo(p.created_at)))),
+        h('b', {}, prof.username || 'usuario', vb(p.user_id)), h('small', {}, p.kind === 'ride' ? 'Ride · ' + timeAgo(p.created_at) : (prof.rancho || timeAgo(p.created_at)))),
       p.category && h('span', { class: 'tag' }, p.category),
       h('button', { class: 'iconbtn plain', 'aria-label': 'Más opciones', icon: 'more', onclick: () => postMenu(p, () => card.remove()) })
     ),
@@ -1595,7 +1610,7 @@ async function openComments(p) {
     body.replaceChildren();
     if (!data.length) body.append(h('p', { class: 'empty', style: 'padding:30px 10px' }, 'Sé el primero en comentar.'));
     visible(data).forEach(c => body.append(h('div', { class: 'cmt' }, avatar(c.profiles, 34),
-      h('div', {}, h('p', {}, h('b', {}, (c.profiles && c.profiles.username) || ''), ' ', c.body), h('small', {}, timeAgo(c.created_at))))));
+      h('div', {}, h('p', {}, h('b', {}, (c.profiles && c.profiles.username) || '', vb(c.user_id)), ' ', c.body), h('small', {}, timeAgo(c.created_at))))));
     body.scrollTop = body.scrollHeight;
   }
   load();
@@ -2263,7 +2278,7 @@ function rideCard(p) {
   const el = h('section', { class: 'ride', 'aria-label': 'Ride de ' + (prof.username || '') },
     video, tapLayer, burst, paused,
     h('div', { class: 'ride-info' },
-      h('button', { class: 'who', onclick: () => go('profile', { profileId: p.user_id }) }, avatar(prof, 40), h('b', {}, prof.username || 'usuario')),
+      h('button', { class: 'who', onclick: () => go('profile', { profileId: p.user_id }) }, avatar(prof, 40), h('b', {}, prof.username || 'usuario', vb(p.user_id))),
       p.animals && h('div', { style: 'margin-bottom:8px' }, animalTag(p.animals)),
       p.caption && h('p', {}, p.caption),
       p.song_url && h('div', { style: 'margin-bottom:8px' }, songChip(p.song_url, p.song_title, { dark: true, preview: p.song_preview, art: p.song_art, start: p.song_start, before: () => { if (!p.song_preview) try { video.pause(); } catch (_) {} } })),
@@ -2572,7 +2587,7 @@ async function renderProfile() {
   const hero = h('section', { class: 'pf-hero' },
     h('button', { class: 'pf-av', 'aria-label': sd ? 'Ver sundown' : 'Foto de perfil', onclick: () => { if (sd) openSundowns([sd], 0, () => render()); } },
       h('div', { class: 'ring' + (sd ? (sd.unseen ? ' new' : ' seen') : '') }, h('div', {}, avatar(prof, 96)))),
-    h('h1', {}, prof.full_name || prof.username),
+    h('h1', {}, prof.full_name || prof.username, vb(prof.id)),
     h('div', { class: 'pf-sub' }, '@' + prof.username + (prof.ubicacion ? ' · 📍 ' + prof.ubicacion : '')),
     h('div', { class: 'pf-stats' },
       stat(posts.length, posts.length === 1 ? 'Publicación' : 'Publicaciones'), stat(totalLikes, 'Ajúas'),
@@ -3064,7 +3079,7 @@ function openListing(l) {
     h('div', { class: 'fx-d-meta' }, `${LCAT_EMO[l.category] || ''} ${l.category}`, l.location ? ' · 📍 ' + l.location : '', ' · ' + timeAgo(l.created_at)),
     l.description ? h('p', { class: 'fx-d-desc' }, l.description) : null,
     h('button', { class: 'fx-seller', onclick: () => { close(); go('profile', { profileId: l.user_id }); } }, avatar(prof, 44),
-      h('div', {}, h('small', {}, mine ? 'Tu anuncio' : 'Vendedor'), h('b', {}, prof.full_name || prof.username || ''), prof.ubicacion ? h('small', {}, '📍 ' + prof.ubicacion) : null), h('span', { class: 'fx-chev' }, '›')),
+      h('div', {}, h('small', {}, mine ? 'Tu anuncio' : 'Vendedor'), h('b', {}, prof.full_name || prof.username || '', vb(l.user_id)), prof.ubicacion ? h('small', {}, '📍 ' + prof.ubicacion) : null), h('span', { class: 'fx-chev' }, '›')),
     ...actions.filter(Boolean),
     !mine ? h('p', { class: 'fx-tip' }, '🤝 Consejo: vean el animal o el producto en persona antes de pagar y no manden anticipos a desconocidos.') : null);
   const close = openSheet(l.category, body);
@@ -3198,7 +3213,7 @@ function openEvent(ev) {
       where ? h('a', { href: 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(where), target: '_blank', rel: 'noopener' }, '📍 ' + where + ' · Cómo llegar ›') : null),
     h('div', { class: 'fx-ev-go' }, b, count),
     ev.description ? h('p', { class: 'fx-d-desc' }, ev.description) : null,
-    h('button', { class: 'fx-seller', onclick: () => { close(); go('profile', { profileId: ev.user_id }); } }, avatar(prof, 40), h('div', {}, h('small', {}, 'Publicado por'), h('b', {}, prof.full_name || prof.username || '')), h('span', { class: 'fx-chev' }, '›')),
+    h('button', { class: 'fx-seller', onclick: () => { close(); go('profile', { profileId: ev.user_id }); } }, avatar(prof, 40), h('div', {}, h('small', {}, 'Publicado por'), h('b', {}, prof.full_name || prof.username || '', vb(ev.user_id))), h('span', { class: 'fx-chev' }, '›')),
     h('button', { class: 'btn ghost', style: 'margin-top:8px', onclick: share }, '📤 Invitar a alguien'),
     mine ? h('div', { style: 'display:flex;gap:8px;margin-top:8px' },
       h('button', { class: 'btn ghost', style: 'flex:1', onclick: () => { close(); eventForm(ev); } }, '✏️ Editar'),
