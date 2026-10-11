@@ -352,7 +352,7 @@ textarea.input{min-height:90px;resize:vertical}
 .sdc-emojis button:active{background:#EFE6D4;transform:scale(1.2)}
 
 /* ---------- Menú ☰ ---------- */
-.sheet-bg{z-index:36}
+.sheet-bg{z-index:41}
 .menu-bg{position:fixed;inset:0;z-index:35;background:rgba(23,37,49,.45);display:flex;justify-content:flex-end}
 .mn-panel{width:min(100%,420px);height:100%;background:#F5EFE3;color:#172531;display:flex;flex-direction:column;box-shadow:-8px 0 30px rgba(0,0,0,.3);animation:mnin .2s ease-out}
 .mn-panel.out{transform:translateX(100%);transition:transform .18s ease-in}
@@ -381,6 +381,47 @@ textarea.input{min-height:90px;resize:vertical}
 .mn-foot{text-align:center;color:#4D6473;font-size:12px;margin-top:18px}
 .mn-how{display:flex;gap:12px;align-items:flex-start;margin-bottom:14px}
 .mn-how b{font-size:15px}.mn-how p{margin:2px 0 0;color:#4D6473;font-size:14px;line-height:1.4}
+
+/* ---------- Perfil nuevo ---------- */
+.pf-hero{background:linear-gradient(180deg,#2C4657,#172531);color:#F1E4CC;text-align:center;padding:22px 14px 18px}
+.pf-av{border:none;background:none;padding:0;margin:0 auto;display:block}
+.pf-av .ring{width:112px;height:112px;margin:0 auto}
+.pf-hero h1{margin:10px 0 2px;font-size:23px;color:#fff}
+.pf-sub{color:#F3BD68;font-size:14px}
+.pf-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:14px}
+.pf-stats b{display:block;font-size:20px;color:#F3BD68}.pf-stats small{display:block;font-size:11px;color:#C9D3DA;line-height:1.2}
+.pf-btns{display:flex;gap:8px;padding:12px 14px}.pf-btns .btn{flex:1;height:44px;font-size:14px}
+.btn.pf-gold{background:linear-gradient(135deg,#F3BD68,#C7843B)!important;color:#172531!important}
+.pf-sec{padding:6px 14px 8px}.lbl{font-size:12px;font-weight:800;color:#C7843B;letter-spacing:.5px;text-transform:uppercase}
+.pf-h{font-size:18px;margin:6px 2px 10px}
+.pf-hls{display:flex;gap:14px;overflow-x:auto;padding:8px 2px 4px;scrollbar-width:none}
+.pf-hl{border:none;background:none;padding:0;display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;width:68px;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.pf-hl .c{width:64px;height:64px;border-radius:50%;border:2px solid #C7843B;padding:3px}
+.pf-hl .c.add{border-style:dashed}
+.pf-hl .c i{display:flex;width:100%;height:100%;border-radius:50%;overflow:hidden;align-items:center;justify-content:center;font-style:normal;font-size:24px;background:linear-gradient(160deg,#E9A06A,#3A2A3E)}
+.pf-hl .c.add i{background:#EFE6D4;color:#172531}
+.pf-hl .c img,.pf-hl .c video{width:100%;height:100%;object-fit:cover}
+.pf-hl small{font-size:12px;font-weight:600;color:var(--text);max-width:68px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pf-card{margin:8px 14px;padding:12px 14px;background:#fff;border:1px solid #D9CBB0;border-radius:16px}
+.pf-card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.pf-dato{display:flex;align-items:center;gap:14px;padding:7px 0;font-size:15px}
+.pf-dato i{font-style:normal;font-size:20px;width:26px;text-align:center}.pf-dato small{display:block;color:#4D6473;font-size:12px}
+.pf-fill{width:100%;margin:6px 0;padding:12px;border-radius:12px;border:1.5px dashed #C7843B;background:#FFF6E4;color:#172531;font-weight:700;font-size:14px}
+.pf-badges{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.pf-badge{display:inline-flex;align-items:center;padding:6px 10px;border-radius:12px;background:#FFF6E4;border:1px solid #F3BD68;font-size:12px;font-weight:700}
+.pf-arow{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;scrollbar-width:none}
+.pf-acard{width:150px;flex-shrink:0;padding:0;background:#fff;border:1px solid #D9CBB0;border-radius:14px;overflow:hidden;text-align:left}
+.pf-acard.add{border-style:dashed}
+.pf-apic{height:100px;background:#EFE6D4;display:flex;align-items:center;justify-content:center;font-size:44px}
+.pf-apic img{width:100%;height:100%;object-fit:cover}
+.pf-atxt{padding:8px 10px}.pf-atxt b{display:block;font-size:15px}.pf-atxt small{color:#4D6473;font-size:12px}
+.pf-tabs{display:flex;gap:8px;padding:10px 14px}
+.pf-agrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 14px 20px}.pf-agrid .pf-acard{width:auto}
+.pf-pick{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;max-height:46vh;overflow-y:auto}
+.pf-pick-it{position:relative;aspect-ratio:9/16;border:none;padding:0;border-radius:8px;overflow:hidden;background:#000}
+.pf-pick-it img,.pf-pick-it video{width:100%;height:100%;object-fit:cover;opacity:.85}
+.pf-pick-it .ck{position:absolute;right:6px;top:6px;width:24px;height:24px;border-radius:50%;border:2px solid #fff;color:transparent;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px}
+.pf-pick-it.on .ck{background:#C7843B;color:#fff}.pf-pick-it.on img,.pf-pick-it.on video{opacity:1}
 /* ---------- Reacciones ---------- */
 .r-emo{display:inline-flex;align-items:center;justify-content:center;font-size:26px;line-height:1}
 .r-horse{display:inline-flex}
@@ -2000,6 +2041,7 @@ function openSundowns(groups, gi, onClose) {
       h('div', { class: 'sp' }),
       muteBtn,
       pauseBtn,
+      it.user_id === state.me.id && h('button', { class: 'iconbtn plain', style: 'color:#fff;font-size:20px', 'aria-label': 'Guardar en destacados', onclick: () => { setPaused(true, 'button'); addToHighlight(it.id); } }, '⭐'),
       it.user_id === state.me.id && h('button', { class: 'iconbtn plain', style: 'color:#fff', 'aria-label': 'Agregar otro sundown', icon: 'plus', onclick: () => { close(); openSundownCreator(() => render()); } }),
       it.user_id === state.me.id && h('button', { class: 'iconbtn plain', style: 'color:#fff', 'aria-label': 'Borrar sundown', icon: 'trash', onclick: async () => {
         setPaused(true, 'button');
@@ -2388,54 +2430,190 @@ function renderUpload() {
   main.append(form);
 }
 
+// ---------- Perfil (encabezado marino + ficha del ranchero + destacados) ----------
+let HAS_HL = true;
+async function fetchHighlights(userId) {
+  if (!HAS_HL) return [];
+  const { data, error } = await sb.from('highlights').select('id,title,post_ids,created_at').eq('user_id', userId).order('created_at', { ascending: true });
+  if (error) { if (/highlights|relation|schema/i.test(error.message || '')) HAS_HL = false; return []; }
+  return data || [];
+}
+async function postsByIds(ids) {
+  if (!ids.length) return [];
+  for (let i = 0; i < 6; i++) {
+    const { data, error } = await sb.from('posts').select(postSelect()).in('id', ids.slice(0, 300));
+    if (!error) return data || [];
+    if (!fixMissing(error.message || '')) return [];
+  }
+  return [];
+}
+function badgesFor(prof, posts, animals, totalLikes, hadSundown) {
+  const b = [];
+  if (hadSundown) b.push('🌅 Primer sundown');
+  if (posts.some(p => p.kind === 'ride')) b.push('🐎 Jinete de Rides');
+  if (animals.length) b.push(`🐴 ${animals.length} ${animals.length === 1 ? 'animal' : 'animales'}`);
+  if (posts.length >= 10) b.push('📷 10 publicaciones');
+  if (totalLikes >= 100) b.push('💯 100 ajúas'); else if (totalLikes >= 10) b.push('⭐ 10 ajúas');
+  if (prof.created_at && new Date(prof.created_at) < new Date('2027-01-01')) b.push('🤠 Ranchero fundador');
+  return b;
+}
+const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+
 async function renderProfile() {
   const id = state.profileId || state.me.id;
   const isMe = id === state.me.id;
   const main = h('main');
   const top = h('header', { class: 'topbar' },
     !isMe ? h('button', { class: 'iconbtn plain', 'aria-label': 'Regresar', icon: 'back', onclick: () => go('feed') }) : h('div', { class: 'logo', style: 'font-size:24px' }, 'Perfil'),
-    h('div'));
+    isMe ? h('div', { class: 'top-actions' }, menuButton(), bellButton(), dmButton()) : h('div'));
   $app.append(top, main);
   main.append(h('div', { class: 'spinner' }));
 
-  const [{ data: prof }, posts, sdGroups, animals] = await Promise.all([
+  const [{ data: prof }, posts, sdGroups, animals, hls, sdCount] = await Promise.all([
     sb.from('profiles').select('*').eq('id', id).maybeSingle(),
     fetchPosts({ userId: id }).catch(() => []),
     fetchSundownGroups(id),
-    fetchAnimals({ ownerId: id }).catch(() => [])
+    fetchAnimals({ ownerId: id }).catch(() => []),
+    fetchHighlights(id),
+    HAS_KIND ? sb.from('posts').select('id', { count: 'exact', head: true }).eq('user_id', id).eq('kind', 'sundown').then(r => r.count || 0, () => 0) : Promise.resolve(0)
   ]);
   const sd = sdGroups[0];
   if (!prof) return main.replaceChildren(h('div', { class: 'empty' }, 'No encontramos este perfil.'));
   const totalLikes = posts.reduce((s, p) => s + (p.likes || []).length, 0);
+  const animalFans = animals.reduce((s, a) => s + (a.animal_follows || []).length, 0);
   if (!isMe) top.children[1].replaceWith(h('b', { style: 'font-size:17px' }, prof.username), h('div', { style: 'width:44px' }));
+  const blocked = state.blocked && state.blocked.has(id);
 
-  const showAnimals = HAS_ANIMALS && (animals.length || isMe);
-  main.replaceChildren(...[
-    h('div', { class: 'prof-head' }, h('button', { style: 'border:none;background:none;padding:0', 'aria-label': sd ? 'Ver sundown' : 'Foto de perfil', onclick: () => { if (sd) openSundowns([sd], 0, () => render()); } },
-        h('div', { class: 'ring' + (sd ? (sd.unseen ? ' new' : ' seen') : ''), style: 'width:92px;height:92px' }, h('div', {}, avatar(prof, 80)))),
-      h('div', { class: 'stats' },
-        h('div', {}, h('b', {}, posts.length), h('span', {}, posts.length === 1 ? 'Publicación' : 'Publicaciones')),
-        h('div', {}, h('b', {}, totalLikes.toLocaleString('es-MX')), h('span', {}, 'Ajúas')))),
-    h('div', { class: 'prof-info' }, h('b', {}, prof.full_name || prof.username), h('div', {}, '@' + prof.username + (prof.rancho ? ' · ' + prof.rancho : ''))),
-    isMe && h('div', { class: 'prof-btns' },
-      h('button', { class: 'btn ghost', onclick: () => editProfile(prof) }, 'Editar perfil'),
-      h('button', { class: 'btn ghost', onclick: async () => { await sb.auth.signOut(); } }, 'Cerrar sesión')),
-    !isMe && h('div', { class: 'prof-btns' }, !(state.blocked && state.blocked.has(id)) && (HAS_DM || isGuest()) && h('button', { class: 'btn small', style: 'flex:1', onclick: () => { if (!needLogin('Crea tu cuenta para mandar mensajes')) openChatWith(prof); } }, 'Mensaje'), (state.blocked && state.blocked.has(id))
-      ? h('button', { class: 'btn ghost', onclick: () => unblockUser(id, prof.username) }, 'Desbloquear')
-      : h('button', { class: 'btn ghost', onclick: async () => { if (needLogin('Crea tu cuenta para bloquear')) return; if (await blockUser(id, prof.username)) go('feed'); } }, 'Bloquear')),
-    showAnimals && h('section', { class: 'herd' },
-      h('h3', {}, h('span', { icon: 'horseshoe' }), isMe ? 'Mis animales' : 'Sus animales'),
-      h('div', { class: 'herd-row' },
-        ...animals.map(a => h('button', { class: 'herd-card', onclick: () => go('animal', { animalId: a.id }) },
-          animalPic(a, 64), h('b', {}, a.name), h('small', {}, a.species))),
-        isMe && h('button', { class: 'herd-card add', onclick: () => editAnimal(null) },
-          h('div', { class: 'herd-plus' }, '+'), h('b', {}, 'Agregar'), h('small', {}, 'caballo, vaca…')))),
-    gridOf(posts, isMe ? 'Aún no subes nada. Toca el botón + para tu primera publicación.' : 'Todavía no ha subido nada.'),
-    isMe && h('div', { style: 'text-align:center;padding:22px 0 8px;display:flex;flex-direction:column;align-items:center;gap:14px' },
-      (() => { const b = h('button', { class: 'chip', style: 'display:inline-flex;align-items:center;gap:6px' }); const paint = () => { b.textContent = SFX.on ? '🔊 Sonidos activados' : '🔇 Sonidos apagados'; };
-        b.addEventListener('click', () => { SFX.on = !SFX.on; paint(); if (SFX.on) SFX.play('ajua'); }); paint(); return b; })(),
-      h('button', { class: 'linkbtn', style: 'font-size:14px;text-decoration:underline', onclick: openRules }, 'Reglas y privacidad'))
-  ].filter(Boolean));
+  // Encabezado marino
+  const stat = (n, label) => h('div', {}, h('b', {}, Number(n).toLocaleString('es-MX')), h('small', {}, label));
+  const hero = h('section', { class: 'pf-hero' },
+    h('button', { class: 'pf-av', 'aria-label': sd ? 'Ver sundown' : 'Foto de perfil', onclick: () => { if (sd) openSundowns([sd], 0, () => render()); } },
+      h('div', { class: 'ring' + (sd ? (sd.unseen ? ' new' : ' seen') : '') }, h('div', {}, avatar(prof, 96)))),
+    h('h1', {}, prof.full_name || prof.username),
+    h('div', { class: 'pf-sub' }, '@' + prof.username + (prof.ubicacion ? ' · 📍 ' + prof.ubicacion : '')),
+    h('div', { class: 'pf-stats' },
+      stat(posts.length, posts.length === 1 ? 'Publicación' : 'Publicaciones'), stat(totalLikes, 'Ajúas'),
+      stat(animals.length, animals.length === 1 ? 'Animal' : 'Animales'), stat(animalFans, 'Siguen a sus animales')));
+
+  // Botones
+  const btns = isMe
+    ? h('div', { class: 'pf-btns' },
+        h('button', { class: 'btn pf-gold', onclick: () => openSundownCreator(() => render()) }, '🌅 Agregar a sundown'),
+        h('button', { class: 'btn ghost', onclick: () => editProfile(prof) }, '✏️ Editar perfil'))
+    : h('div', { class: 'pf-btns' },
+        !blocked && (HAS_DM || isGuest()) && h('button', { class: 'btn pf-gold', onclick: () => { if (!needLogin('Crea tu cuenta para mandar mensajes')) openChatWith(prof); } }, '💬 Mensaje'),
+        blocked ? h('button', { class: 'btn ghost', onclick: () => unblockUser(id, prof.username) }, 'Desbloquear')
+          : h('button', { class: 'btn ghost', style: 'flex:0 0 52px', 'aria-label': 'Más opciones', onclick: () => {
+              const close = openSheet('@' + prof.username, h('div', { class: 'sheet-body' },
+                h('button', { class: 'mn-row', onclick: async () => { close(); const url = location.origin + location.pathname; try { if (navigator.share) await navigator.share({ title: 'Herria', text: 'Mira el perfil de @' + prof.username + ' en Herria', url }); } catch (_) {} } }, h('span', { class: 'mn-emo sm' }, '📤'), h('div', {}, h('b', {}, 'Compartir perfil'))),
+                h('button', { class: 'mn-row', onclick: async () => { close(); if (needLogin('Crea tu cuenta para bloquear')) return; if (await blockUser(id, prof.username)) go('feed'); } }, h('span', { class: 'mn-emo sm' }, '🚫'), h('div', {}, h('b', {}, 'Bloquear'), h('small', {}, 'No verás sus publicaciones ni te podrá escribir')))));
+            } }, '⋯'));
+
+  // Destacados
+  let hlSec = null;
+  if (HAS_HL && (hls.length || isMe)) {
+    const allIds = [...new Set(hls.flatMap(x => x.post_ids || []))];
+    const hlPosts = await postsByIds(allIds);
+    const byId = Object.fromEntries(hlPosts.map(p => [p.id, p]));
+    const bubble = (x) => {
+      const items = (x.post_ids || []).map(pid => byId[pid]).filter(Boolean);
+      const cover = items[items.length - 1];
+      const pic = cover ? (cover.media_type === 'video' ? h('video', { src: cover.media_url + '#t=0.5', muted: true, playsInline: true, preload: 'metadata' }) : h('img', { src: cover.media_url, alt: '' })) : h('span', {}, '🌅');
+      const b = h('button', { class: 'pf-hl', onclick: () => { if (!items.length) return toast('Este destacado está vacío'); openSundowns([{ user: prof, items, unseen: false }], 0, () => {}); } },
+        h('div', { class: 'c' }, h('i', {}, pic)), h('small', {}, x.title));
+      if (isMe) { let t; b.addEventListener('pointerdown', () => { t = setTimeout(() => manageHighlight(x, items), 550); }); ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => b.addEventListener(ev, () => clearTimeout(t))); b.addEventListener('contextmenu', e => e.preventDefault()); }
+      return b;
+    };
+    hlSec = h('section', { class: 'pf-sec' }, h('div', { class: 'lbl' }, 'Destacados'),
+      h('div', { class: 'pf-hls' }, ...hls.map(bubble),
+        isMe && h('button', { class: 'pf-hl', onclick: () => newHighlight() }, h('div', { class: 'c add' }, h('i', {}, '＋')), h('small', {}, 'Nuevo'))),
+      isMe && hls.length ? h('small', { class: 'hint', style: 'display:block;margin:6px 2px 0' }, 'Deja presionado un destacado para cambiarle el nombre o borrarlo.') : null);
+  }
+
+  // Ficha del ranchero
+  const desde = prof.created_at ? new Date(prof.created_at) : null;
+  const dato = (e, txt, sub) => txt ? h('div', { class: 'pf-dato' }, h('i', {}, e), h('div', {}, txt, sub ? h('small', {}, sub) : null)) : null;
+  const badges = badgesFor(prof, posts, animals, totalLikes, sdCount > 0);
+  const filled = prof.rancho || prof.dedica || prof.fierro || prof.ubicacion;
+  const ficha = h('section', { class: 'pf-card' },
+    h('div', { class: 'pf-card-head' }, h('div', { class: 'lbl' }, 'Ficha del ranchero'), isMe && h('button', { class: 'linkbtn', onclick: () => editProfile(prof) }, '✏️')),
+    dato('🏡', prof.rancho, 'Su rancho'), dato('🐄', prof.dedica, 'A qué se dedica'), dato('🔥', prof.fierro, 'Fierro o marca del rancho'), dato('📍', prof.ubicacion),
+    desde && dato('📅', `En Herria desde ${MESES[desde.getMonth()]} ${desde.getFullYear()}`),
+    !filled && isMe && h('button', { class: 'pf-fill', onclick: () => editProfile(prof) }, '＋ Llena tu ficha: tu rancho, a qué te dedicas y tu fierro'),
+    badges.length ? h('div', { class: 'pf-badges' }, badges.map(t => h('span', { class: 'pf-badge' }, t))) : null);
+
+  // Animales en tarjetas
+  const card = (a) => h('button', { class: 'pf-acard', onclick: () => go('animal', { animalId: a.id }) },
+    h('div', { class: 'pf-apic' }, a.photo_url ? h('img', { src: a.photo_url, alt: '' }) : h('span', {}, SPECIES_EMO[a.species] || '🐾')),
+    h('div', { class: 'pf-atxt' }, h('b', {}, a.name), h('small', {}, [a.breed || a.species, (a.animal_follows || []).length ? (a.animal_follows || []).length + ' seguidores' : ''].filter(Boolean).join(' · '))));
+  const animalsSec = HAS_ANIMALS && (animals.length || isMe) ? h('section', { class: 'pf-sec' },
+    h('h3', { class: 'pf-h' }, isMe ? 'Los animales de mi rancho' : 'Los animales de su rancho'),
+    h('div', { class: 'pf-arow' }, ...animals.map(card),
+      isMe && h('button', { class: 'pf-acard add', onclick: () => editAnimal(null) }, h('div', { class: 'pf-apic' }, h('span', {}, '＋')), h('div', { class: 'pf-atxt' }, h('b', {}, 'Agregar'), h('small', {}, 'caballo, vaca…'))))) : null;
+
+  // Pestañas
+  const box = h('div');
+  let tab = 'post';
+  const tabsEl = h('div', { class: 'pf-tabs' });
+  const paintTabs = () => {
+    tabsEl.replaceChildren(...[['post', 'Publicaciones'], ['ride', 'Rides'], ['animals', 'Animales']].filter(([k]) => k !== 'animals' || HAS_ANIMALS).map(([k, l]) =>
+      h('button', { class: 'chip' + (tab === k ? ' on' : ''), onclick: () => { tab = k; paintTabs(); } }, l)));
+    if (tab === 'animals') box.replaceChildren(animals.length ? h('div', { class: 'pf-agrid' }, animals.map(card)) : h('div', { class: 'empty' }, isMe ? 'Agrega a tus animales con el botón de arriba.' : 'Todavía no tiene animales.'));
+    else box.replaceChildren(gridOf(posts.filter(p => (p.kind || 'post') === tab), tab === 'ride'
+      ? (isMe ? 'Aún no subes Rides. Toca el + y elige "Ride".' : 'Todavía no tiene Rides.')
+      : (isMe ? 'Aún no subes nada. Toca el botón + para tu primera publicación.' : 'Todavía no ha subido nada.')));
+  };
+  paintTabs();
+
+  main.replaceChildren(...[hero, btns, hlSec, ficha, animalsSec, tabsEl, box].filter(Boolean));
+}
+const SPECIES_EMO = { Caballo: '🐎', Yegua: '🐎', Toro: '🐂', Vaca: '🐄', Becerro: '🐄', Burro: '🫏', Perro: '🐕', Otro: '🐾' };
+
+// ---- Destacados: crear, administrar y agregar desde un sundown ----
+async function myAllSundowns() {
+  const { data } = await sb.from('posts').select('id,media_url,media_type,created_at').eq('user_id', state.me.id).eq('kind', 'sundown').order('created_at', { ascending: false }).limit(60);
+  return data || [];
+}
+async function newHighlight(preselect) {
+  if (!HAS_HL) return toast('Falta activar los destacados en Supabase');
+  const body = h('div', { class: 'sheet-body' }, h('div', { class: 'spinner' }));
+  const close = openSheet('Nuevo destacado', body);
+  const list = await myAllSundowns();
+  if (!list.length) return body.replaceChildren(h('p', { class: 'empty', style: 'padding:24px 8px' }, 'Primero sube un sundown; luego podrás guardarlo aquí para siempre.'));
+  const chosen = new Set(preselect ? [preselect] : []);
+  const title = h('input', { class: 'input', maxlength: '30', placeholder: 'Nombre, ej. Jaripeos', 'aria-label': 'Nombre del destacado' });
+  const grid = h('div', { class: 'pf-pick' }, list.map(p => {
+    const t = h('button', { type: 'button', class: 'pf-pick-it' + (chosen.has(p.id) ? ' on' : ''), onclick: () => { chosen.has(p.id) ? chosen.delete(p.id) : chosen.add(p.id); t.classList.toggle('on', chosen.has(p.id)); } },
+      p.media_type === 'video' ? h('video', { src: p.media_url + '#t=0.5', muted: true, playsInline: true, preload: 'metadata' }) : h('img', { src: p.media_url, alt: '', loading: 'lazy' }), h('span', { class: 'ck' }, '✓'));
+    return t;
+  }));
+  const save = h('button', { class: 'btn', style: 'width:100%;margin-top:12px' }, 'Guardar destacado');
+  save.addEventListener('click', async () => {
+    const tt = title.value.trim(); if (!tt) return title.focus();
+    if (!chosen.size) return toast('Escoge al menos un sundown');
+    save.disabled = true;
+    const ids = list.filter(p => chosen.has(p.id)).map(p => p.id).reverse();
+    const { error } = await sb.from('highlights').insert({ user_id: state.me.id, title: tt, post_ids: ids });
+    if (error) { save.disabled = false; return toast(/highlights|relation/i.test(error.message || '') ? 'Falta activar los destacados en Supabase' : 'No se pudo guardar'); }
+    close(); toast('¡Destacado guardado!'); if (state.view === 'profile') render();
+  });
+  body.replaceChildren(h('div', { class: 'field' }, h('label', {}, 'Nombre'), title), h('small', { class: 'hint', style: 'display:block;margin:4px 0 8px' }, 'Escoge los sundowns que quieres guardar:'), grid, save);
+}
+function manageHighlight(x) {
+  const close = openSheet(x.title, h('div', { class: 'sheet-body' },
+    h('button', { class: 'mn-row', onclick: async () => { const t = prompt('Nuevo nombre', x.title); if (!t || !t.trim()) return; const { error } = await sb.from('highlights').update({ title: t.trim().slice(0, 30) }).eq('id', x.id); close(); if (error) return toast('No se pudo cambiar'); toast('Listo'); render(); } }, h('span', { class: 'mn-emo sm' }, '✏️'), h('div', {}, h('b', {}, 'Cambiar nombre'))),
+    h('button', { class: 'mn-row', onclick: async () => { if (!confirm('¿Borrar el destacado "' + x.title + '"? Tus sundowns no se borran.')) return; const { error } = await sb.from('highlights').delete().eq('id', x.id); close(); if (error) return toast('No se pudo borrar'); toast('Destacado borrado'); render(); } }, h('span', { class: 'mn-emo sm' }, '🗑️'), h('div', {}, h('b', {}, 'Borrar destacado')))));
+}
+async function addToHighlight(postId) {
+  if (!HAS_HL) return toast('Falta activar los destacados en Supabase');
+  const hls = await fetchHighlights(state.me.id);
+  const close = openSheet('Agregar a destacados', h('div', { class: 'sheet-body' },
+    ...hls.map(x => h('button', { class: 'mn-row', onclick: async () => {
+      const ids = (x.post_ids || []).filter(i => i !== postId).concat(postId).slice(-50);
+      const { error } = await sb.from('highlights').update({ post_ids: ids }).eq('id', x.id);
+      close(); toast(error ? 'No se pudo guardar' : 'Guardado en "' + x.title + '"');
+    } }, h('span', { class: 'mn-emo sm' }, '⭐'), h('div', {}, h('b', {}, x.title), h('small', {}, (x.post_ids || []).length + ' sundowns')))),
+    h('button', { class: 'mn-row', onclick: () => { close(); newHighlight(postId); } }, h('span', { class: 'mn-emo sm' }, '＋'), h('div', {}, h('b', {}, 'Nuevo destacado')))));
 }
 
 // ---------- Perfiles de animales ----------
@@ -2559,14 +2737,17 @@ function editProfile(prof) {
     prev.replaceChildren(a);
   });
   const name = h('input', { class: 'input', id: 'pn', value: prof.full_name || '', maxlength: '60' });
-  const rancho = h('input', { class: 'input', id: 'pr', value: prof.rancho || '', maxlength: '60', placeholder: 'ej. Rancho Los Álamos, Jalisco' });
+  const rancho = h('input', { class: 'input', id: 'pr', value: prof.rancho || '', maxlength: '60', placeholder: 'ej. Rancho El Mezquite' });
+  const ubic = h('input', { class: 'input', id: 'pu', value: prof.ubicacion || '', maxlength: '60', placeholder: 'ej. León, Guanajuato' });
+  const dedica = h('input', { class: 'input', id: 'pd', value: prof.dedica || '', maxlength: '60', placeholder: 'ej. Ganado lechero, caballos de rienda' });
+  const fierro = h('input', { class: 'input', id: 'pf', value: prof.fierro || '', maxlength: '80', placeholder: 'ej. "M" con media luna' });
   const err = h('p', { class: 'err', role: 'alert' });
   const save = h('button', { class: 'btn', type: 'submit' }, 'Guardar');
   let close;
   const body = h('form', { class: 'sheet-body', onsubmit: async (e) => {
     e.preventDefault(); save.disabled = true; err.textContent = '';
     try {
-      const patch = { full_name: name.value.trim() || null, rancho: rancho.value.trim() || null };
+      const patch = { full_name: name.value.trim() || null, rancho: rancho.value.trim() || null, ubicacion: ubic.value.trim() || null, dedica: dedica.value.trim() || null, fierro: fierro.value.trim() || null };
       if (newAvatar) {
         const blob = await compressImage(newAvatar, 480);
         const path = `${state.me.id}/avatar-${Date.now()}.jpg`;
@@ -2574,7 +2755,8 @@ function editProfile(prof) {
         if (up.error) throw up.error;
         patch.avatar_url = sb.storage.from('media').getPublicUrl(path).data.publicUrl;
       }
-      const { error } = await sb.from('profiles').update(patch).eq('id', state.me.id);
+      let { error } = await sb.from('profiles').update(patch).eq('id', state.me.id);
+      if (error && /ubicacion|dedica|fierro/i.test(error.message || '')) { delete patch.ubicacion; delete patch.dedica; delete patch.fierro; ({ error } = await sb.from('profiles').update(patch).eq('id', state.me.id)); if (!error) toast('Falta activar la ficha del ranchero en Supabase'); }
       if (error) throw error;
       await loadMe(); close(); toast('Perfil actualizado'); render();
     } catch (ex) { err.textContent = friendlyError(ex); save.disabled = false; }
@@ -2582,7 +2764,10 @@ function editProfile(prof) {
     h('div', { style: 'display:flex;align-items:center;gap:16px;margin-bottom:18px' }, prev,
       fileIn, h('label', { for: 'av', class: 'btn ghost small', style: 'display:inline-flex;align-items:center;cursor:pointer' }, 'Cambiar foto')),
     h('div', { class: 'field' }, h('label', { for: 'pn' }, 'Nombre'), name),
-    h('div', { class: 'field' }, h('label', { for: 'pr' }, 'Rancho o lugar'), rancho),
+    h('div', { class: 'field' }, h('label', { for: 'pr' }, '🏡 Tu rancho'), rancho),
+    h('div', { class: 'field' }, h('label', { for: 'pu' }, '📍 Ubicación'), ubic),
+    h('div', { class: 'field' }, h('label', { for: 'pd' }, '🐄 ¿A qué te dedicas?'), dedica),
+    h('div', { class: 'field' }, h('label', { for: 'pf' }, '🔥 Fierro o marca del rancho'), fierro),
     err, save);
   close = openSheet('Editar perfil', body);
 }
