@@ -422,6 +422,77 @@ textarea.input{min-height:90px;resize:vertical}
 .pf-pick-it img,.pf-pick-it video{width:100%;height:100%;object-fit:cover;opacity:.85}
 .pf-pick-it .ck{position:absolute;right:6px;top:6px;width:24px;height:24px;border-radius:50%;border:2px solid #fff;color:transparent;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px}
 .pf-pick-it.on .ck{background:#C7843B;color:#fff}.pf-pick-it.on img,.pf-pick-it.on video{opacity:1}
+
+/* ---------- La Feria ---------- */
+.fx{padding-bottom:110px}
+.fx-seg{display:flex;gap:6px;margin:12px 14px;padding:4px;border-radius:16px;background:#EFE6D4}
+.fx-seg button{flex:1;height:42px;border:none;border-radius:12px;background:none;font-weight:800;font-size:15px;color:#4D6473}
+.fx-seg button.on{background:linear-gradient(180deg,#2C4657,#172531);color:#F3BD68;box-shadow:0 2px 8px rgba(23,37,49,.25)}
+.fx-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 14px}
+.fx-card{display:flex;flex-direction:column;padding:0;border:1px solid #D9CBB0;border-radius:14px;background:#fff;overflow:hidden;text-align:left;box-shadow:0 2px 8px rgba(23,37,49,.06)}
+.fx-card.sold{opacity:.65}
+.fx-pic{position:relative;aspect-ratio:1;background:#EFE6D4;display:flex;align-items:center;justify-content:center;font-size:46px;overflow:hidden}
+.fx-pic img{width:100%;height:100%;object-fit:cover}
+.fx-feat{position:absolute;left:8px;top:8px;padding:4px 8px;border-radius:10px;background:linear-gradient(135deg,#F3BD68,#C7843B);color:#172531;font-size:11px;font-weight:800;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+.fx-sold{position:absolute;right:-30px;top:16px;transform:rotate(35deg);background:#C2183A;color:#fff;font-size:11px;font-weight:800;padding:4px 36px}
+.fx-info{padding:8px 10px 10px;display:flex;flex-direction:column;gap:2px}
+.fx-price{font-size:17px;color:#172531}.fx-title{font-size:14px;font-weight:600;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.fx-info small{color:#4D6473;font-size:12px}
+.fx-fab{position:fixed;right:16px;bottom:calc(96px + env(safe-area-inset-bottom));z-index:6;height:50px;padding:0 20px;border:none;border-radius:25px;background:linear-gradient(135deg,#F3BD68,#C7843B);color:#172531;font-weight:800;font-size:15px;box-shadow:0 6px 18px rgba(23,37,49,.35)}
+.fx-empty{grid-column:1/-1;text-align:center;padding:40px 20px;color:#4D6473;display:flex;flex-direction:column;gap:6px;align-items:center}
+.fx-empty b{color:#172531;font-size:17px}.fx-empty-emo{font-size:52px}
+.fx-detail{padding-top:0}
+.fx-car-wrap{position:relative;margin:0 -16px}
+.fx-car{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;aspect-ratio:1;background:#000}
+.fx-car img{flex:0 0 100%;width:100%;height:100%;object-fit:contain;scroll-snap-align:center}
+.fx-car-ph{flex:0 0 100%;display:flex;align-items:center;justify-content:center;font-size:90px;background:#EFE6D4}
+.fx-dots{position:absolute;left:0;right:0;bottom:10px;display:flex;gap:6px;justify-content:center}
+.fx-dots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.5)}.fx-dots i.on{background:#fff}
+.fx-d-price{font-size:26px;font-weight:800;margin-top:12px;color:#172531}
+.fx-d-title{font-size:19px;margin:2px 0 4px}
+.fx-d-meta{color:#4D6473;font-size:13px}
+.fx-d-desc{white-space:pre-wrap;line-height:1.45;font-size:15px;margin:12px 0}
+.fx-seller{width:100%;display:flex;align-items:center;gap:12px;margin:12px 0;padding:10px 12px;border:1px solid #D9CBB0;border-radius:14px;background:#FFFDF8;text-align:left}
+.fx-seller>div:not(.avatar){flex:1}.fx-seller>.avatar{flex:none!important}.fx-seller b{display:block;font-size:15px}.fx-seller small{color:#4D6473;font-size:12px;display:block}
+.fx-chev{font-size:24px;color:#4D6473}
+.btn.fx-gold{background:linear-gradient(135deg,#F3BD68,#C7843B)!important;color:#172531!important;width:100%}
+.fx-tip{font-size:12px;color:#4D6473;background:#FFF6E4;border-radius:10px;padding:8px 10px;margin-top:12px;line-height:1.4}
+.fx-ph-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px}
+.fx-ph{position:relative;aspect-ratio:1;border-radius:12px;overflow:hidden;background:#EFE6D4;border:1px solid #D9CBB0}
+.fx-ph img{width:100%;height:100%;object-fit:cover}
+.fx-ph button{position:absolute;right:4px;top:4px;width:26px;height:26px;border-radius:50%;border:none;background:rgba(0,0,0,.6);color:#fff;font-size:13px}
+.fx-ph.add{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:1.5px dashed #C7843B;background:#FFF6E4;color:#172531}
+.fx-ph.add span{font-size:26px}.fx-ph.add small{font-size:12px;font-weight:700}
+.fx-check{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:14px;font-weight:600}
+.fx-check input{width:20px;height:20px;accent-color:#2C4657}
+.fx-evlist{padding:0 14px}
+.fx-day{font-size:15px;margin:16px 4px 8px;color:#4D6473;text-transform:capitalize}
+.fx-ev{display:flex;align-items:center;gap:12px;padding:10px;margin-bottom:8px;border:1px solid #D9CBB0;border-radius:16px;background:#fff;cursor:pointer}
+.fx-ev.feat{border-color:#F3BD68;background:#FFF9EC}
+.fx-date{width:54px;flex-shrink:0;text-align:center;border-radius:12px;background:linear-gradient(180deg,#2C4657,#172531);color:#F1E4CC;padding:6px 0}
+.fx-date b{display:block;font-size:22px;color:#F3BD68;line-height:1.1}.fx-date small{display:block;font-size:11px;text-transform:uppercase}
+.fx-ev-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.fx-ev-txt b{font-size:15px;line-height:1.25}.fx-ev-txt small{color:#4D6473;font-size:12px}
+.fx-going{height:38px;padding:0 14px;border-radius:19px;border:1.5px solid #2C4657;background:#fff;color:#172531;font-weight:800;font-size:14px;flex-shrink:0}
+.fx-going.on{background:linear-gradient(180deg,#2C4657,#172531);color:#F3BD68;border-color:#172531}
+.fx-going.sm{height:34px;padding:0 12px;font-size:13px}
+.fx-gcount{color:#C7843B!important;font-weight:700}
+.fx-ev-photo{width:calc(100% + 32px);margin:0 -16px;max-height:320px;object-fit:cover;display:block}
+.fx-ev-banner{margin:0 -16px;height:150px;display:flex;align-items:center;justify-content:center;font-size:80px;background:linear-gradient(160deg,#E9A06A,#3A2A3E)}
+.fx-ev-when{display:flex;flex-direction:column;gap:6px;margin:10px 0;font-size:15px}
+.fx-ev-when a{color:#2C4657;font-weight:700;text-decoration:none}
+.fx-ev-go{display:flex;align-items:center;gap:12px;margin:8px 0}
+.fx-show{margin:4px 14px 10px;padding:12px;border:1px solid #D9CBB0;border-radius:18px;background:#fff;box-shadow:0 2px 8px rgba(23,37,49,.06)}
+.fx-show-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.fx-show-head b{font-size:16px}.fx-show-head .linkbtn{color:#C7843B!important;font-weight:700;font-size:14px}
+.fx-next{width:100%;display:flex;align-items:center;gap:10px;padding:8px 10px;margin-bottom:10px;border:none;border-radius:12px;background:linear-gradient(180deg,#2C4657,#172531);color:#F1E4CC;text-align:left}
+.fx-next div{flex:1;min-width:0}.fx-next small{display:block;font-size:12px;color:#F3BD68}.fx-next b{display:block;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fx-next-emo{font-size:26px}.fx-next .fx-chev{color:#F1E4CC}
+.fx-show-row{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none}
+.fx-mini{width:112px;flex-shrink:0;padding:0;border:none;background:none;text-align:left;display:flex;flex-direction:column;gap:2px}
+.fx-mini .fx-pic{border-radius:12px;font-size:36px}.fx-mini b{font-size:14px;margin-top:4px}
+.fx-mini small{font-size:12px;color:#4D6473;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fx-mini .fx-feat{padding:2px 6px;font-size:11px}
 /* ---------- Reacciones ---------- */
 .r-emo{display:inline-flex;align-items:center;justify-content:center;font-size:26px;line-height:1}
 .r-horse{display:inline-flex}
@@ -730,6 +801,7 @@ const ICONS = {
   horse: '<i class="horse" aria-hidden="true"></i>',
   shots: '<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7.6 C17.6 7.6 21.4 10.6 21.4 14.4 C21.4 18.2 17.6 21 12 21 C10.9 21 9.8 20.9 8.8 20.6 L4.4 22.4 L5.6 18.8 C3.6 17.6 2.6 16.1 2.6 14.4 C2.6 10.6 6.4 7.6 12 7.6 Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="8.2" cy="14.4" r="1.15" fill="url(#g)"/><circle cx="12" cy="14.4" r="1.15" fill="url(#g)"/><circle cx="15.8" cy="14.4" r="1.15" fill="url(#g)"/><g transform="translate(12 6.4) rotate(-10) scale(.25) translate(-50 -20)"><path d="M14 21.5 C18 25.5 26 26.6 34 26 C40 25.6 44 24.4 50 24.4 C56 24.4 60 25.6 66 26 C74 26.6 82 25.5 86 21.5 C84 25 80 29 72 30.4 C64 31.6 58 30.2 50 30.2 C42 30.2 36 31.6 28 30.4 C20 29 16 25 14 21.5 Z M33 25.6 C33.4 19 34.6 12 38 8.4 C40 6.4 43 7 45 8.6 C47.4 10.4 48.6 10.6 50 10.6 C51.4 10.6 52.6 10.4 55 8.6 C57 7 60 6.4 62 8.4 C65.4 12 66.6 19 67 25.6 C62 24.6 56 24 50 24 C44 24 38 24.6 33 25.6 Z" fill="currentColor"/><path d="M33.6 21.6 C40 20.4 60 20.4 66.4 21.6 L66.8 24.6 C60 23.4 40 23.4 33.2 24.6 Z" fill="url(#g)"/></g></svg>',
   shotsbig: '<svg width="96" height="96" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7.6 C17.6 7.6 21.4 10.6 21.4 14.4 C21.4 18.2 17.6 21 12 21 C10.9 21 9.8 20.9 8.8 20.6 L4.4 22.4 L5.6 18.8 C3.6 17.6 2.6 16.1 2.6 14.4 C2.6 10.6 6.4 7.6 12 7.6 Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="8.2" cy="14.4" r="1.15" fill="url(#g)"/><circle cx="12" cy="14.4" r="1.15" fill="url(#g)"/><circle cx="15.8" cy="14.4" r="1.15" fill="url(#g)"/><g transform="translate(12 6.4) rotate(-10) scale(.25) translate(-50 -20)"><path d="M14 21.5 C18 25.5 26 26.6 34 26 C40 25.6 44 24.4 50 24.4 C56 24.4 60 25.6 66 26 C74 26.6 82 25.5 86 21.5 C84 25 80 29 72 30.4 C64 31.6 58 30.2 50 30.2 C42 30.2 36 31.6 28 30.4 C20 29 16 25 14 21.5 Z M33 25.6 C33.4 19 34.6 12 38 8.4 C40 6.4 43 7 45 8.6 C47.4 10.4 48.6 10.6 50 10.6 C51.4 10.6 52.6 10.4 55 8.6 C57 7 60 6.4 62 8.4 C65.4 12 66.6 19 67 25.6 C62 24.6 56 24 50 24 C44 24 38 24.6 33 25.6 Z" fill="currentColor"/><path d="M33.6 21.6 C40 20.4 60 20.4 66.4 21.6 L66.8 24.6 C60 23.4 40 23.4 33.2 24.6 Z" fill="url(#g)"/></g></svg>',
+  feria: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9 5 4h14l2 5"/><path d="M3 9a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0"/><path d="M5 12v8h14v-8"/><path d="M10 20v-5h4v5"/></svg>',
   menu: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>',
   bell: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>',
   send: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>',
@@ -1087,7 +1159,7 @@ function navBar() {
     b('feed', 'home', 'Inicio', state.view === 'feed'),
     b('rides', 'horseshoe', 'Rides', state.view === 'rides'),
     h('button', { class: 'plus', 'aria-label': 'Subir', onclick: () => { if (needLogin('Crea tu cuenta para subir tus fotos y videos')) return; state.uploadKind = state.view === 'rides' ? 'ride' : 'post'; go('upload'); }, icon: 'plus' }),
-    b('explore', 'search', 'Explorar', state.view === 'explore'),
+    b('feria', 'feria', 'Feria', state.view === 'feria'),
     b('profile', 'user', 'Perfil', ownProfile)
   ));
 }
@@ -1101,7 +1173,7 @@ function render() {
   if (!state.me) { $app.append(h('div', { class: 'spinner' })); return; }
   if (isGuest() && !['feed', 'rides', 'explore', 'profile', 'animal'].includes(state.view)) state.view = 'feed';
   if (state.view === 'welcome') return renderWelcome();
-  const views = { feed: renderFeed, rides: renderRides, explore: renderExplore, upload: renderUpload, profile: renderProfile, animal: renderAnimal, inbox: renderInbox, chat: renderChat, notifs: renderNotifs };
+  const views = { feed: renderFeed, rides: renderRides, explore: renderExplore, upload: renderUpload, profile: renderProfile, animal: renderAnimal, inbox: renderInbox, chat: renderChat, notifs: renderNotifs, feria: renderFeria };
   (views[state.view] || renderFeed)();
   if (state.view !== 'chat') $app.append(navBar());
 }
@@ -1156,7 +1228,7 @@ async function renderFeed() {
   const chips = h('div', { class: 'chips' }, ['Todo', ...CATEGORIES].map(c =>
     h('button', { class: 'chip' + (state.category === c ? ' on' : ''), onclick: () => { state.category = c; render(); } }, c)));
   const list = h('div', {}, h('div', { class: 'spinner' }));
-  main.append(...[stories, welcomeCard(), chips, list].filter(Boolean));
+  main.append(...[stories, feriaShowcase(), welcomeCard(), chips, list].filter(Boolean));
 
   // Sundowns: lo que subieron en las últimas 24 horas
   const paintSundowns = async () => {
@@ -2819,13 +2891,15 @@ function openMenu() {
     : h('button', { class: 'mn-me', type: 'button', onclick: goTo(() => go('profile', { profileId: state.me.id })) }, avatar(state.me, 52),
       h('div', {}, h('b', {}, state.me.full_name || state.me.username || ''), h('small', {}, 'Ver tu perfil')));
   const tiles = guest ? [
-    tile('🏠', 'Inicio', () => go('feed')), tile('🐎', 'Rides', () => go('rides')), tile('🔍', 'Explorar', () => go('explore')), tile('🔑', 'Entrar', () => { state.authMode = 'login'; go('auth'); })] : [
+    tile('🏠', 'Inicio', () => go('feed')), tile('🐎', 'Rides', () => go('rides')), tile('🎪', 'La Feria', () => go('feria')), tile('🔍', 'Explorar', () => go('explore')), tile('🔑', 'Entrar', () => { state.authMode = 'login'; go('auth'); })] : [
     tile('🏠', 'Inicio', () => go('feed')),
     tile('🌅', 'Crear sundown', () => { go('feed'); openSundownCreator(() => render()); }),
     tile('📷', 'Nueva publicación', () => { state.uploadKind = 'post'; go('upload'); }),
     tile('🐎', 'Rides', () => go('rides')),
     tile('💬', 'Mensajes', () => go('inbox')),
     tile('🔔', 'Notificaciones', () => go('notifs')),
+    tile('🎪', 'La Feria', () => { state.feriaTab = 'mercado'; go('feria'); }),
+    tile('📅', 'Eventos', () => { state.feriaTab = 'eventos'; go('feria'); }),
     tile('🔍', 'Explorar', () => go('explore')),
     tile('🐴', 'Mis animales', () => go('profile', { profileId: state.me.id }))];
   const panel = h('div', { class: 'mn-panel', role: 'dialog', 'aria-label': 'Menú' },
@@ -2862,6 +2936,332 @@ function openHowTo() {
     it('🔁', 'Compartir', 'Con el botón de enviar puedes compartir en tu perfil, por mensaje o por WhatsApp.'),
     it('🐄', 'Tus animales', 'En tu perfil agrega a tus caballos, vacas y más; otros pueden seguirlos.'),
     it('⬅️', 'Salir', 'En el inicio, el botón atrás te sube arriba; tócalo otra vez para salir.')));
+}
+
+// ---------- La Feria: Mercado (compra-venta) y Eventos ----------
+let HAS_FERIA = true;
+const LCATS = [['Caballos', '🐎'], ['Ganado', '🐄'], ['Monturas y equipo', '🏇'], ['Pastura y alimento', '🌾'], ['Vehículos', '🛻'], ['Servicios', '🧰'], ['Otros', '📦']];
+const LCAT_EMO = Object.fromEntries(LCATS);
+const EKINDS = [['Jaripeo', '🐂'], ['Charreada', '🤠'], ['Cabalgata', '🐎'], ['Baile', '💃'], ['Feria', '🎡'], ['Rodeo', '🏇'], ['Coleadero', '🐃'], ['Carreras', '🏁'], ['Otro', '🎉']];
+const EKIND_EMO = Object.fromEntries(EKINDS);
+const LIST_SEL = 'id,user_id,title,category,price,location,description,photos,status,featured_until,created_at,profiles!user_id(id,username,full_name,avatar_url,ubicacion)';
+const EVT_SEL = 'id,user_id,title,kind,starts_at,place,city,description,photo_url,featured_until,created_at,profiles!user_id(id,username,full_name,avatar_url),event_going(user_id)';
+const money = (n) => n == null ? 'Precio a tratar' : '$' + Number(n).toLocaleString('es-MX', { maximumFractionDigits: 0 });
+const isFeat = (x) => !!(x && x.featured_until && new Date(x.featured_until) > new Date());
+const feriaMissing = (e) => /listings|events|event_going|relation|schema/i.test((e && e.message) || '');
+const DIAS = ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'];
+const MES3 = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+function dayLabel(d) {
+  const t = new Date(); t.setHours(0, 0, 0, 0); const x = new Date(d); x.setHours(0, 0, 0, 0);
+  const diff = Math.round((x - t) / 864e5);
+  if (diff === 0) return 'Hoy'; if (diff === 1) return 'Mañana';
+  return `${DIAS[x.getDay()]} ${x.getDate()} de ${MESES[x.getMonth()]}`;
+}
+const hourLabel = (d) => new Date(d).toLocaleTimeString('es-MX', { hour: 'numeric', minute: '2-digit' });
+async function fetchListings({ cat, q, userId, limit = 80 } = {}) {
+  if (!HAS_FERIA) return [];
+  let qq = sb.from('listings').select(LIST_SEL).order('created_at', { ascending: false }).limit(limit);
+  if (cat) qq = qq.eq('category', cat);
+  if (userId) qq = qq.eq('user_id', userId);
+  if (q) qq = qq.ilike('title', `%${q.replace(/[%,()]/g, '')}%`);
+  const { data, error } = await qq;
+  if (error) { if (feriaMissing(error)) HAS_FERIA = false; return []; }
+  const b = state.blocked || new Set(), weekAgo = Date.now() - 7 * 864e5;
+  return (data || []).filter(l => !b.has(l.user_id) && (l.status !== 'vendido' || new Date(l.created_at) > weekAgo))
+    .sort((a, c) => (isFeat(c) - isFeat(a)) || ((a.status === 'vendido') - (c.status === 'vendido')));
+}
+async function fetchEvents({ limit = 60 } = {}) {
+  if (!HAS_FERIA) return [];
+  const { data, error } = await sb.from('events').select(EVT_SEL).gte('starts_at', new Date(Date.now() - 6 * 36e5).toISOString()).order('starts_at', { ascending: true }).limit(limit);
+  if (error) { if (feriaMissing(error)) HAS_FERIA = false; return []; }
+  const b = state.blocked || new Set();
+  return (data || []).filter(e => !b.has(e.user_id));
+}
+
+// ---- pantalla La Feria ----
+async function renderFeria() {
+  const main = h('main', { class: 'fx' });
+  $app.append(h('header', { class: 'topbar' }, h('div', { class: 'logo' }, 'La Feria'), h('div', { class: 'top-actions' }, menuButton(), bellButton(), dmButton())), main);
+  const tab = state.feriaTab || 'mercado';
+  const seg = h('div', { class: 'fx-seg' },
+    h('button', { class: tab === 'mercado' ? 'on' : '', onclick: () => { state.feriaTab = 'mercado'; render(); } }, '🛒 Mercado'),
+    h('button', { class: tab === 'eventos' ? 'on' : '', onclick: () => { state.feriaTab = 'eventos'; render(); } }, '📅 Eventos'));
+  main.append(seg);
+  if (tab === 'mercado') return renderMercado(main);
+  return renderEventos(main);
+}
+function renderMercado(main) {
+  const search = h('input', { class: 'input fx-search', type: 'search', placeholder: 'Buscar caballos, monturas, pastura…', value: state.feriaQ || '', enterkeyhint: 'search' });
+  const chips = h('div', { class: 'chips', style: 'padding:0 14px 10px' }, [['', 'Todo'], ...LCATS.map(([c, e]) => [c, e + ' ' + c])].map(([c, l]) =>
+    h('button', { class: 'chip' + ((state.feriaCat || '') === c ? ' on' : ''), onclick: () => { state.feriaCat = c; render(); } }, l)));
+  const grid = h('div', { class: 'fx-grid' }, h('div', { class: 'spinner', style: 'grid-column:1/-1' }));
+  const fab = h('button', { class: 'fx-fab', onclick: () => { if (!needLogin('Crea tu cuenta para vender')) listingForm(null); } }, '＋ Vender algo');
+  main.append(h('div', { style: 'padding:0 14px 10px' }, search), chips, grid, fab);
+  let t; search.addEventListener('input', () => { clearTimeout(t); t = setTimeout(() => { state.feriaQ = search.value.trim(); load(); }, 400); });
+  const load = async () => {
+    const list = await fetchListings({ cat: state.feriaCat || '', q: state.feriaQ || '' });
+    if (!HAS_FERIA) return grid.replaceChildren(h('div', { class: 'empty', style: 'grid-column:1/-1' }, 'La Feria se está preparando. Vuelve en un ratito.'));
+    if (!list.length) return grid.replaceChildren(h('div', { class: 'fx-empty' }, h('div', { class: 'fx-empty-emo' }, '🛒'),
+      h('b', {}, state.feriaQ || state.feriaCat ? 'No encontramos nada con eso' : 'Todavía no hay nada a la venta'),
+      h('span', {}, 'Sé el primero: vende un caballo, una montura, pastura o tus servicios.')));
+    grid.replaceChildren(...list.map(listingCard));
+  };
+  load();
+}
+function listingCard(l) {
+  const pic = l.photos && l.photos[0];
+  return h('button', { class: 'fx-card' + (l.status === 'vendido' ? ' sold' : ''), onclick: () => openListing(l) },
+    h('div', { class: 'fx-pic' }, pic ? h('img', { src: pic, alt: '', loading: 'lazy' }) : h('span', {}, LCAT_EMO[l.category] || '📦'),
+      isFeat(l) ? h('span', { class: 'fx-feat' }, '⭐ Destacado') : null,
+      l.status === 'vendido' ? h('span', { class: 'fx-sold' }, 'VENDIDO') : null),
+    h('div', { class: 'fx-info' }, h('b', { class: 'fx-price' }, money(l.price)), h('span', { class: 'fx-title' }, l.title),
+      h('small', {}, [l.location ? '📍 ' + l.location : '', timeAgo(l.created_at)].filter(Boolean).join(' · '))));
+}
+function openListing(l) {
+  const mine = l.user_id === state.me.id;
+  const prof = l.profiles || {};
+  const photos = (l.photos || []).filter(Boolean);
+  const dots = h('div', { class: 'fx-dots' }, photos.length > 1 ? photos.map((_, i) => h('i', { class: i ? '' : 'on' })) : []);
+  const car = h('div', { class: 'fx-car' }, photos.length ? photos.map(u => h('img', { src: u, alt: '' })) : h('div', { class: 'fx-car-ph' }, LCAT_EMO[l.category] || '📦'));
+  car.addEventListener('scroll', () => { const i = Math.round(car.scrollLeft / car.clientWidth); [...dots.children].forEach((d, k) => d.classList.toggle('on', k === i)); }, { passive: true });
+  car.addEventListener('click', (e) => { if (e.target.tagName === 'IMG') openMediaViewer(e.target.src, 'image'); });
+  const link = location.origin + location.pathname + '#l=' + l.id;
+  const share = async () => { try { if (navigator.share) await navigator.share({ title: l.title, text: `${l.title} · ${money(l.price)} en La Feria de Herria`, url: link }); else { await navigator.clipboard.writeText(link); toast('Enlace copiado'); } } catch (_) {} };
+  const actions = mine ? [
+    h('button', { class: 'btn', onclick: async () => { const st = l.status === 'vendido' ? 'activo' : 'vendido'; const { error } = await sb.from('listings').update({ status: st }).eq('id', l.id); if (error) return toast('No se pudo guardar'); close(); toast(st === 'vendido' ? '¡Felicidades por la venta! 🎉' : 'Anuncio activo otra vez'); if (st === 'vendido') SFX.play('ajua'); if (state.view === 'feria') render(); } }, l.status === 'vendido' ? 'Volver a poner a la venta' : '✅ Marcar como vendido'),
+    h('div', { style: 'display:flex;gap:8px;margin-top:8px' },
+      h('button', { class: 'btn ghost', style: 'flex:1', onclick: () => { close(); listingForm(l); } }, '✏️ Editar'),
+      h('button', { class: 'btn ghost', style: 'flex:1', onclick: share }, '📤 Compartir'),
+      h('button', { class: 'btn ghost', style: 'flex:1;color:#C2183A', onclick: async () => { if (!confirm('¿Borrar este anuncio?')) return; const { error } = await sb.from('listings').delete().eq('id', l.id); if (error) return toast('No se pudo borrar'); const paths = photos.map(u => u.split('/media/')[1]).filter(Boolean).map(decodeURIComponent); if (paths.length) sb.storage.from('media').remove(paths); close(); toast('Anuncio borrado'); if (state.view === 'feria') render(); } }, '🗑️'))] : [
+    l.status !== 'vendido' && h('button', { class: 'btn fx-gold', onclick: () => interested(l) }, '💬 Me interesa'),
+    h('button', { class: 'btn ghost', style: 'margin-top:8px', onclick: share }, '📤 Compartir anuncio')];
+  const body = h('div', { class: 'sheet-body fx-detail' },
+    h('div', { class: 'fx-car-wrap' }, car, dots, isFeat(l) ? h('span', { class: 'fx-feat' }, '⭐ Destacado') : null, l.status === 'vendido' ? h('span', { class: 'fx-sold' }, 'VENDIDO') : null),
+    h('div', { class: 'fx-d-price' }, money(l.price)),
+    h('h2', { class: 'fx-d-title' }, l.title),
+    h('div', { class: 'fx-d-meta' }, `${LCAT_EMO[l.category] || ''} ${l.category}`, l.location ? ' · 📍 ' + l.location : '', ' · ' + timeAgo(l.created_at)),
+    l.description ? h('p', { class: 'fx-d-desc' }, l.description) : null,
+    h('button', { class: 'fx-seller', onclick: () => { close(); go('profile', { profileId: l.user_id }); } }, avatar(prof, 44),
+      h('div', {}, h('small', {}, mine ? 'Tu anuncio' : 'Vendedor'), h('b', {}, prof.full_name || prof.username || ''), prof.ubicacion ? h('small', {}, '📍 ' + prof.ubicacion) : null), h('span', { class: 'fx-chev' }, '›')),
+    ...actions.filter(Boolean),
+    !mine ? h('p', { class: 'fx-tip' }, '🤝 Consejo: vean el animal o el producto en persona antes de pagar y no manden anticipos a desconocidos.') : null);
+  const close = openSheet(l.category, body);
+}
+async function interested(l) {
+  if (needLogin('Crea tu cuenta para escribirle al vendedor')) return;
+  const prof = l.profiles || { id: l.user_id };
+  const { data: cid, error } = await sb.rpc('open_conversation', { other: l.user_id });
+  if (error) return toast('No se pudo abrir el chat');
+  const link = location.origin + location.pathname + '#l=' + l.id;
+  await sb.from('messages').insert({ conversation_id: cid, sender_id: state.me.id, body: `🛒 ¡Hola! Me interesa tu anuncio: “${l.title}” (${money(l.price)}). ¿Sigue disponible?\n${link}` });
+  document.querySelectorAll('.sheet-bg').forEach(x => x.remove());
+  state.chat = { id: cid, other: prof }; go('chat');
+}
+function listingForm(l) {
+  const isNew = !l;
+  const kept = [...((l && l.photos) || [])];
+  const files = [];
+  let cat = (l && l.category) || state.feriaCat || 'Caballos';
+  const photosBox = h('div', { class: 'fx-ph-grid' });
+  const picker = h('input', { type: 'file', accept: 'image/*', multiple: true, hidden: true });
+  const paintPhotos = () => {
+    const tiles = [...kept.map((u, i) => ({ src: u, rm: () => { kept.splice(i, 1); paintPhotos(); } })), ...files.map((f, i) => ({ src: f._url, rm: () => { files.splice(i, 1); paintPhotos(); } }))];
+    photosBox.replaceChildren(...tiles.map(t => h('div', { class: 'fx-ph' }, h('img', { src: t.src, alt: '' }), h('button', { type: 'button', 'aria-label': 'Quitar foto', onclick: t.rm }, '✕'))),
+      tiles.length < 6 ? h('button', { type: 'button', class: 'fx-ph add', onclick: () => picker.click() }, h('span', {}, '📷'), h('small', {}, tiles.length ? 'Agregar' : 'Fotos (hasta 6)')) : null);
+  };
+  picker.addEventListener('change', () => { [...picker.files].slice(0, 6 - kept.length - files.length).forEach(f => { f._url = URL.createObjectURL(f); files.push(f); }); picker.value = ''; paintPhotos(); });
+  paintPhotos();
+  const title = h('input', { class: 'input', maxlength: '80', placeholder: 'ej. Yegua cuarto de milla, 5 años', value: (l && l.title) || '' });
+  const catChips = h('div', { class: 'chips', style: 'padding:0 0 12px;flex-wrap:wrap' });
+  const paintCats = () => catChips.replaceChildren(...LCATS.map(([c, e]) => h('button', { type: 'button', class: 'chip' + (c === cat ? ' on' : ''), onclick: () => { cat = c; paintCats(); } }, e + ' ' + c)));
+  paintCats();
+  const price = h('input', { class: 'input', inputmode: 'numeric', placeholder: 'ej. 45000', value: l && l.price != null ? String(Math.round(l.price)) : '' });
+  const nego = h('input', { type: 'checkbox' }); nego.checked = !!(l && l.price == null);
+  const loc = h('input', { class: 'input', maxlength: '60', placeholder: 'ej. León, Gto.', value: (l && l.location) || (state.me && state.me.ubicacion) || '' });
+  const desc = h('textarea', { class: 'input', maxlength: '1000', placeholder: 'Edad, raza, medidas, estado, si se entrega, forma de pago…' }); desc.value = (l && l.description) || '';
+  const err = h('p', { class: 'err', role: 'alert' });
+  const save = h('button', { class: 'btn', type: 'submit', style: 'width:100%' }, isNew ? 'Publicar anuncio' : 'Guardar cambios');
+  let close;
+  const body = h('form', { class: 'sheet-body', onsubmit: async (e) => {
+    e.preventDefault(); err.textContent = '';
+    const tt = title.value.trim(); if (tt.length < 3) return (err.textContent = 'Ponle un título (qué vendes).');
+    const p = nego.checked ? null : Number(String(price.value).replace(/[^0-9.]/g, ''));
+    if (!nego.checked && !(p >= 0 && price.value.trim())) return (err.textContent = 'Pon el precio o marca "Precio a tratar".');
+    save.disabled = true; save.textContent = 'Subiendo…';
+    const endTrot = SFX.startUpload();
+    try {
+      const urls = [...kept];
+      for (const f of files) {
+        const blob = await compressImage(f, 1280);
+        const path = `${state.me.id}/feria-${Date.now()}-${Math.random().toString(36).slice(2, 7)}.jpg`;
+        const up = await sb.storage.from('media').upload(path, blob, { contentType: 'image/jpeg', cacheControl: '31536000' });
+        if (up.error) throw up.error;
+        urls.push(sb.storage.from('media').getPublicUrl(path).data.publicUrl);
+      }
+      const row = { title: tt, category: cat, price: p, location: loc.value.trim() || null, description: desc.value.trim() || null, photos: urls.slice(0, 6) };
+      const res = isNew ? await sb.from('listings').insert({ ...row, user_id: state.me.id }).select(LIST_SEL).single()
+                        : await sb.from('listings').update(row).eq('id', l.id).select(LIST_SEL).single();
+      if (res.error) throw res.error;
+      endTrot(true); close(); toast(isNew ? '¡Tu anuncio ya está en La Feria!' : 'Anuncio actualizado');
+      state.feriaTab = 'mercado'; if (state.view === 'feria') render(); else go('feria');
+      if (res.data) setTimeout(() => openListing(res.data), 400);
+    } catch (ex) { endTrot(false); save.disabled = false; save.textContent = isNew ? 'Publicar anuncio' : 'Guardar cambios'; err.textContent = feriaMissing(ex) ? 'La Feria todavía no está activada.' : friendlyError(ex); }
+  } },
+    picker, photosBox,
+    h('div', { class: 'field' }, h('label', {}, '¿Qué vendes?'), title),
+    h('div', { class: 'field' }, h('label', {}, 'Categoría')), catChips,
+    h('div', { class: 'field' }, h('label', {}, 'Precio (pesos)'), price, h('label', { class: 'fx-check' }, nego, ' Precio a tratar')),
+    h('div', { class: 'field' }, h('label', {}, '📍 ¿Dónde está?'), loc),
+    h('div', { class: 'field' }, h('label', {}, 'Descripción'), desc),
+    err, save);
+  close = openSheet(isNew ? 'Vender en La Feria' : 'Editar anuncio', body);
+}
+
+// ---- Eventos ----
+function renderEventos(main) {
+  const list = h('div', { class: 'fx-evlist' }, h('div', { class: 'spinner' }));
+  const fab = h('button', { class: 'fx-fab', onclick: () => { if (!needLogin('Crea tu cuenta para publicar eventos')) eventForm(null); } }, '＋ Publicar evento');
+  main.append(list, fab);
+  (async () => {
+    const evs = await fetchEvents();
+    if (!HAS_FERIA) return list.replaceChildren(h('div', { class: 'empty' }, 'La Feria se está preparando. Vuelve en un ratito.'));
+    if (!evs.length) return list.replaceChildren(h('div', { class: 'fx-empty' }, h('div', { class: 'fx-empty-emo' }, '📅'), h('b', {}, 'No hay eventos próximos'),
+      h('span', {}, '¿Sabes de un jaripeo, charreada, cabalgata o baile? Publícalo para que vaya la raza.')));
+    const feat = evs.filter(isFeat), kids = [];
+    if (feat.length) { kids.push(h('h3', { class: 'fx-day' }, '⭐ Promocionados')); feat.forEach(e => kids.push(eventCard(e, true))); }
+    let last = '';
+    evs.filter(e => !isFeat(e)).forEach(e => { const d = dayLabel(e.starts_at); if (d !== last) { kids.push(h('h3', { class: 'fx-day' }, d)); last = d; } kids.push(eventCard(e)); });
+    list.replaceChildren(...kids);
+  })();
+}
+function goingBtn(ev, small) {
+  let going = (ev.event_going || []).some(g => g.user_id === state.me.id);
+  let n = (ev.event_going || []).length;
+  const b = h('button', { class: 'fx-going' + (small ? ' sm' : '') });
+  const paint = () => { b.classList.toggle('on', going); b.textContent = going ? '✓ Voy' : '🤠 Voy'; };
+  const count = h('small', { class: 'fx-gcount' });
+  const paintN = () => { count.textContent = n ? `${n} ${n === 1 ? 'va' : 'van'}` : 'Sé el primero'; };
+  b.addEventListener('click', async (e) => {
+    e.stopPropagation(); if (needLogin('Crea tu cuenta para decir que vas')) return;
+    going = !going; n += going ? 1 : -1; paint(); paintN(); if (going) SFX.play('ajua');
+    const r = going ? await sb.from('event_going').insert({ event_id: ev.id, user_id: state.me.id }) : await sb.from('event_going').delete().eq('event_id', ev.id).eq('user_id', state.me.id);
+    if (r.error) { going = !going; n += going ? 1 : -1; paint(); paintN(); toast('No se pudo guardar'); }
+    else { ev.event_going = going ? [...(ev.event_going || []), { user_id: state.me.id }] : (ev.event_going || []).filter(g => g.user_id !== state.me.id); }
+  });
+  paint(); paintN();
+  return { b, count };
+}
+function eventCard(ev, feat) {
+  const d = new Date(ev.starts_at);
+  const { b, count } = goingBtn(ev, true);
+  return h('div', { class: 'fx-ev' + (feat ? ' feat' : ''), role: 'button', tabindex: '0', onclick: () => openEvent(ev) },
+    h('div', { class: 'fx-date' }, h('small', {}, MES3[d.getMonth()]), h('b', {}, d.getDate()), h('small', {}, DIAS[d.getDay()])),
+    h('div', { class: 'fx-ev-txt' }, h('b', {}, (EKIND_EMO[ev.kind] || '🎉') + ' ' + ev.title),
+      h('small', {}, '⏰ ' + hourLabel(ev.starts_at) + (ev.place || ev.city ? ' · 📍 ' + [ev.place, ev.city].filter(Boolean).join(', ') : '')), count),
+    b);
+}
+function openEvent(ev) {
+  const mine = ev.user_id === state.me.id;
+  const prof = ev.profiles || {};
+  const d = new Date(ev.starts_at);
+  const { b, count } = goingBtn(ev);
+  const where = [ev.place, ev.city].filter(Boolean).join(', ');
+  const link = location.origin + location.pathname + '#e=' + ev.id;
+  const share = async () => { try { if (navigator.share) await navigator.share({ title: ev.title, text: `${EKIND_EMO[ev.kind] || '🎉'} ${ev.title} · ${dayLabel(ev.starts_at)} ${hourLabel(ev.starts_at)}${where ? ' · ' + where : ''}`, url: link }); else { await navigator.clipboard.writeText(link); toast('Enlace copiado'); } } catch (_) {} };
+  const body = h('div', { class: 'sheet-body fx-detail' },
+    ev.photo_url ? h('img', { class: 'fx-ev-photo', src: ev.photo_url, alt: '', onclick: () => openMediaViewer(ev.photo_url, 'image') }) : h('div', { class: 'fx-ev-banner' }, EKIND_EMO[ev.kind] || '🎉'),
+    h('div', { class: 'fx-d-meta', style: 'margin-top:12px' }, (EKIND_EMO[ev.kind] || '') + ' ' + ev.kind, isFeat(ev) ? ' · ⭐ Promocionado' : ''),
+    h('h2', { class: 'fx-d-title' }, ev.title),
+    h('div', { class: 'fx-ev-when' }, h('div', {}, '📅 ', h('b', {}, dayLabel(ev.starts_at)), ` · ${d.getDate()} ${MES3[d.getMonth()]} ${d.getFullYear()}`), h('div', {}, '⏰ ' + hourLabel(ev.starts_at)),
+      where ? h('a', { href: 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(where), target: '_blank', rel: 'noopener' }, '📍 ' + where + ' · Cómo llegar ›') : null),
+    h('div', { class: 'fx-ev-go' }, b, count),
+    ev.description ? h('p', { class: 'fx-d-desc' }, ev.description) : null,
+    h('button', { class: 'fx-seller', onclick: () => { close(); go('profile', { profileId: ev.user_id }); } }, avatar(prof, 40), h('div', {}, h('small', {}, 'Publicado por'), h('b', {}, prof.full_name || prof.username || '')), h('span', { class: 'fx-chev' }, '›')),
+    h('button', { class: 'btn ghost', style: 'margin-top:8px', onclick: share }, '📤 Invitar a alguien'),
+    mine ? h('div', { style: 'display:flex;gap:8px;margin-top:8px' },
+      h('button', { class: 'btn ghost', style: 'flex:1', onclick: () => { close(); eventForm(ev); } }, '✏️ Editar'),
+      h('button', { class: 'btn ghost', style: 'flex:1;color:#C2183A', onclick: async () => { if (!confirm('¿Borrar este evento?')) return; const { error } = await sb.from('events').delete().eq('id', ev.id); if (error) return toast('No se pudo borrar'); close(); toast('Evento borrado'); if (state.view === 'feria') render(); } }, '🗑️ Borrar')) : null);
+  const close = openSheet('Evento', body);
+}
+function eventForm(ev) {
+  const isNew = !ev;
+  let kind = (ev && ev.kind) || 'Jaripeo';
+  let photo = null;
+  const pad = (n) => String(n).padStart(2, '0');
+  const toLocal = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  const title = h('input', { class: 'input', maxlength: '80', placeholder: 'ej. Gran Jaripeo de Feria', value: (ev && ev.title) || '' });
+  const kinds = h('div', { class: 'chips', style: 'padding:0 0 12px;flex-wrap:wrap' });
+  const paintK = () => kinds.replaceChildren(...EKINDS.map(([k, e]) => h('button', { type: 'button', class: 'chip' + (k === kind ? ' on' : ''), onclick: () => { kind = k; paintK(); } }, e + ' ' + k)));
+  paintK();
+  const when = h('input', { class: 'input', type: 'datetime-local', value: ev ? toLocal(new Date(ev.starts_at)) : '', min: toLocal(new Date()) });
+  const place = h('input', { class: 'input', maxlength: '80', placeholder: 'ej. Lienzo Charro El Herradero', value: (ev && ev.place) || '' });
+  const city = h('input', { class: 'input', maxlength: '60', placeholder: 'ej. León, Gto.', value: (ev && ev.city) || (state.me && state.me.ubicacion) || '' });
+  const desc = h('textarea', { class: 'input', maxlength: '1000', placeholder: 'Quién toca, toros, precio de la entrada, horarios…' }); desc.value = (ev && ev.description) || '';
+  const prev = h('div', { class: 'fx-ph-grid' });
+  const picker = h('input', { type: 'file', accept: 'image/*', hidden: true });
+  const paintP = () => prev.replaceChildren(photo || (ev && ev.photo_url) ? h('div', { class: 'fx-ph', style: 'width:100%;aspect-ratio:16/9' }, h('img', { src: photo ? photo._url : ev.photo_url, alt: '' })) : h('button', { type: 'button', class: 'fx-ph add', style: 'width:100%;aspect-ratio:16/9', onclick: () => picker.click() }, h('span', {}, '🖼️'), h('small', {}, 'Póster o foto (opcional)')));
+  picker.addEventListener('change', () => { photo = picker.files[0] || null; if (photo) photo._url = URL.createObjectURL(photo); paintP(); });
+  paintP();
+  const err = h('p', { class: 'err', role: 'alert' });
+  const save = h('button', { class: 'btn', type: 'submit', style: 'width:100%' }, isNew ? 'Publicar evento' : 'Guardar cambios');
+  let close;
+  const body = h('form', { class: 'sheet-body', onsubmit: async (e) => {
+    e.preventDefault(); err.textContent = '';
+    if (title.value.trim().length < 3) return (err.textContent = 'Ponle nombre al evento.');
+    if (!when.value) return (err.textContent = 'Pon la fecha y la hora.');
+    save.disabled = true; save.textContent = 'Guardando…';
+    try {
+      const row = { title: title.value.trim(), kind, starts_at: new Date(when.value).toISOString(), place: place.value.trim() || null, city: city.value.trim() || null, description: desc.value.trim() || null };
+      if (photo) {
+        const blob = await compressImage(photo, 1280);
+        const path = `${state.me.id}/evento-${Date.now()}.jpg`;
+        const up = await sb.storage.from('media').upload(path, blob, { contentType: 'image/jpeg', cacheControl: '31536000' });
+        if (up.error) throw up.error;
+        row.photo_url = sb.storage.from('media').getPublicUrl(path).data.publicUrl;
+      }
+      const res = isNew ? await sb.from('events').insert({ ...row, user_id: state.me.id }) : await sb.from('events').update(row).eq('id', ev.id);
+      if (res.error) throw res.error;
+      close(); toast(isNew ? '¡Evento publicado! 🎉' : 'Evento actualizado'); SFX.play('ajua');
+      state.feriaTab = 'eventos'; if (state.view === 'feria') render(); else go('feria');
+    } catch (ex) { save.disabled = false; save.textContent = isNew ? 'Publicar evento' : 'Guardar cambios'; err.textContent = feriaMissing(ex) ? 'La Feria todavía no está activada.' : friendlyError(ex); }
+  } },
+    h('div', { class: 'field' }, h('label', {}, 'Nombre del evento'), title),
+    h('div', { class: 'field' }, h('label', {}, '¿Qué es?')), kinds,
+    h('div', { class: 'field' }, h('label', {}, '📅 Fecha y hora'), when),
+    h('div', { class: 'field' }, h('label', {}, '📍 Lugar'), place),
+    h('div', { class: 'field' }, h('label', {}, 'Ciudad o pueblo'), city),
+    h('div', { class: 'field' }, h('label', {}, 'Detalles'), desc),
+    picker, prev, err, save);
+  close = openSheet(isNew ? 'Publicar evento' : 'Editar evento', body);
+}
+async function openListingById(id) {
+  const { data } = await sb.from('listings').select(LIST_SEL).eq('id', id).maybeSingle();
+  if (!data) return toast('Ese anuncio ya no está disponible');
+  openListing(data);
+}
+async function openEventById(id) {
+  const { data } = await sb.from('events').select(EVT_SEL).eq('id', id).maybeSingle();
+  if (!data) return toast('Ese evento ya no está disponible');
+  openEvent(data);
+}
+// Vitrina de La Feria en el inicio
+function feriaShowcase() {
+  const box = h('section', { class: 'fx-show', hidden: true });
+  (async () => {
+    const [ls, evs] = await Promise.all([fetchListings({ limit: 12 }), fetchEvents({ limit: 3 })]);
+    const act = ls.filter(l => l.status !== 'vendido').slice(0, 8);
+    if (!act.length && !evs.length) return;
+    const goF = (t) => () => { state.feriaTab = t; go('feria'); };
+    box.replaceChildren(
+      h('div', { class: 'fx-show-head' }, h('b', {}, '🎪 En La Feria'), h('button', { class: 'linkbtn', onclick: goF('mercado') }, 'Ver todo ›')),
+      evs[0] ? h('button', { class: 'fx-next', onclick: () => openEvent(evs[0]) }, h('span', { class: 'fx-next-emo' }, EKIND_EMO[evs[0].kind] || '🎉'),
+        h('div', {}, h('small', {}, 'Próximo evento · ' + dayLabel(evs[0].starts_at) + ' ' + hourLabel(evs[0].starts_at)), h('b', {}, evs[0].title)), h('span', { class: 'fx-chev' }, '›')) : null,
+      act.length ? h('div', { class: 'fx-show-row' }, act.map(l => h('button', { class: 'fx-mini', onclick: () => openListing(l) },
+        h('div', { class: 'fx-pic' }, l.photos && l.photos[0] ? h('img', { src: l.photos[0], alt: '', loading: 'lazy' }) : h('span', {}, LCAT_EMO[l.category] || '📦'), isFeat(l) ? h('span', { class: 'fx-feat' }, '⭐') : null),
+        h('b', {}, money(l.price)), h('small', {}, l.title)))) : null);
+    box.hidden = false;
+  })();
+  return box;
 }
 
 // ---------- Notificaciones (ajúas/reacciones, comentarios y compartidos de tus publicaciones) ----------
@@ -3002,7 +3402,7 @@ async function renderInbox() {
     h('b', {}, '¡Salud! Aquí van tus mensajes'), 'Busca a alguien arriba o entra a su perfil y toca "Mensaje".'));
   list.replaceChildren(...rows.map(({ c, other, m, n }) => h('button', { class: 'inbox-row' + (n ? ' unread' : ''), onclick: () => { state.chat = { id: c.id, other }; go('chat'); } },
     avatar(other, 52),
-    h('div', { class: 'who' }, h('b', {}, other.username), h('span', {}, (m.sender_id === state.me.id ? 'Tú: ' : '') + ((m.body || '').replace(/\s*https?:\S+#p=\d+/, '') || (m.media_type === 'video' ? '🎥 Video' : '📷 Foto')))),
+    h('div', { class: 'who' }, h('b', {}, other.username), h('span', {}, (m.sender_id === state.me.id ? 'Tú: ' : '') + ((m.body || '').replace(/\s*https?:\S+#[ple]=\d+/, '') || (m.media_type === 'video' ? '🎥 Video' : '📷 Foto')))),
     h('small', {}, shortTime(m.created_at)), n ? h('span', { class: 'inbox-dot', 'aria-label': n + ' sin leer' }) : null)));
 }
 const DM_SIGNED = new Map(); // ruta -> { url, exp }
@@ -3116,9 +3516,10 @@ async function renderChat() {
         m.pending ? h('span', { class: 'msg-up' }, 'Enviando…') : null);
       if (!src) return el; // sin enlace todavía: no guardar, se vuelve a intentar
     } else {
-      const pm = /#p=(\d+)/.exec(m.body || '');
-      el = pm ? h('div', { class: 'msg ' + (mine ? 'me' : 'them') + (m.pending ? ' pending' : '') }, m.body.replace(/\s*https?:\S+#p=\d+/, ''),
-          h('button', { class: 'msg-post', onclick: () => openPostById(Number(pm[1])) }, '👀 Ver publicación'))
+      const pm = /#([ple])=(\d+)/.exec(m.body || '');
+      const openers = { p: [openPostById, '👀 Ver publicación'], l: [openListingById, '🛒 Ver anuncio'], e: [openEventById, '📅 Ver evento'] };
+      el = pm ? h('div', { class: 'msg ' + (mine ? 'me' : 'them') + (m.pending ? ' pending' : '') }, m.body.replace(/\s*https?:\S+#[ple]=\d+/, ''),
+          h('button', { class: 'msg-post', onclick: () => openers[pm[1]][0](Number(pm[2])) }, openers[pm[1]][1]))
         : h('div', { class: 'msg ' + (mine ? 'me' : 'them') + (m.pending ? ' pending' : '') }, m.body);
     }
     armRx(el, m);
@@ -3255,10 +3656,13 @@ sb.auth.onAuthStateChange((_event, session) => {
 });
 // Enlaces a una publicación (…/#p=123): la abre al entrar
 function openDeepLink() {
-  const m = /^#p=(\d+)$/.exec(location.hash || '');
+  const m = /^#([ple])=(\d+)$/.exec(location.hash || '');
   if (!m || !state.me) return;
   history.replaceState(history.state, '', location.pathname + location.search);
-  openPostById(Number(m[1]));
+  const id = Number(m[2]);
+  if (m[1] === 'l') { state.feriaTab = 'mercado'; if (state.view !== 'feria') go('feria'); return openListingById(id); }
+  if (m[1] === 'e') { state.feriaTab = 'eventos'; if (state.view !== 'feria') go('feria'); return openEventById(id); }
+  openPostById(id);
 }
 window.addEventListener('hashchange', openDeepLink);
 </script>
