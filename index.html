@@ -1297,6 +1297,10 @@ const SFX = (() => {
   }
   const hoof = (t, hi, v = 1) => { noise(t, 0.07, hi ? 1500 : 1000, 4, 0.9 * v); tone(t, 0.06, hi ? 520 : 380, hi ? 300 : 220, 'triangle', 0.35 * v); };
   const neigh = (t, v = 1) => { tone(t, 0.75, 1100, 520, 'sawtooth', 0.22 * v, 140, 22, { type: 'bandpass', f1: 1400, f2: 900, q: 2 }); noise(t, 0.6, 2500, 1, 0.08 * v, 1200); };
+  const bell = (t0, f, vol, dur) => [[1, 1], [2.76, 0.45], [5.4, 0.2]].forEach(([m, a]) => {
+    const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sine'; o.frequency.value = f * m;
+    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol * a, t0 + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g); g.connect(master); o.start(t0); o.stop(t0 + dur + 0.02); });
   // Los que escogiste
   const SOUNDS = {
     ajua(t) { hoof(t, 0); hoof(t + 0.1, 1); hoof(t + 0.28, 0); hoof(t + 0.38, 1);           // cascos y grito
@@ -1306,7 +1310,8 @@ const SFX = (() => {
     wow(t) { tone(t, 0.9, 115, 175, 'sawtooth', 0.55, 3, 5, { f1: 250, fm: 900, f2: 500, q: 4 }); }, // vaca sorprendida
     sad(t) { tone(t, 0.26, 440, 400, 'triangle', 0.5, 4); tone(t + 0.28, 0.5, 392, 262, 'triangle', 0.5, 6); }, // wa-waa
     fire(t) { noise(t, 0.04, 2800, 3, 0.9); noise(t + 0.25, 0.04, 2800, 3, 0.9); },            // chasquido de dedos
-    subidaFin(t) { neigh(t); }                                                                // relincho al terminar
+    subidaFin(t) { neigh(t); },
+    msg(t) { bell(t, 523, 0.35, 1.2); bell(t + 0.22, 523, 0.25, 1); }                       // campana de rancho: mensaje nuevo                                                                // relincho al terminar
   };
   let loopTimer = null;
   return {
@@ -3328,16 +3333,33 @@ let HAS_MSG_RX = true;   // reacciones en mensajes
 const PROF_MINI = 'id,username,full_name,avatar_url';
 function dmButton() {
   if (isGuest()) return h('button', { class: 'btn small', style: 'height:40px;padding:0 18px', onclick: () => { state.authMode = 'login'; go('auth'); } }, 'Entrar');
-  const badge = h('span', { class: 'dm-badge', hidden: true });
+  const badge = h('span', { class: 'dm-badge msg-count', hidden: true });
   const btn = h('button', { class: 'iconbtn dm-btn', 'aria-label': 'Mensajes', onclick: () => go('inbox') }, h('span', { icon: 'shots', style: 'display:flex' }), badge);
   refreshUnread(badge);
   return HAS_DM ? btn : h('div');
 }
+// Sonido de mensaje nuevo (campana de rancho). No suena dos veces seguidas por el mismo aviso.
+let LAST_UNREAD = null, LAST_DING = 0, INBOX_CH = null;
+function msgDing() { const now = Date.now(); if (now - LAST_DING < 2500) return; LAST_DING = now; SFX.play('msg'); }
+// Escucha en vivo los mensajes que te llegan (en cualquier pantalla de la app)
+function listenInbox() {
+  if (INBOX_CH || !sb.channel || isGuest() || !HAS_DM) return;
+  try {
+    INBOX_CH = sb.channel('inbox-' + state.me.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (pl) => {
+      const m = pl.new || {}; if (!state.me || m.sender_id === state.me.id) return;
+      msgDing(); LAST_UNREAD = (LAST_UNREAD || 0) + 1;
+      const b = document.querySelector('.msg-count'); if (b) refreshUnread(b);
+    }).subscribe();
+  } catch (_) { INBOX_CH = null; }
+}
+function stopInbox() { if (INBOX_CH) { try { sb.removeChannel(INBOX_CH); } catch (_) {} INBOX_CH = null; } LAST_UNREAD = null; }
 async function refreshUnread(badge) {
   if (!HAS_DM || isGuest()) return;
   const { count, error } = await sb.from('messages').select('id', { count: 'exact', head: true }).is('read_at', null).neq('sender_id', state.me.id);
   if (error) { if (/messages|relation|schema/i.test(error.message || '')) HAS_DM = false; return; }
   const n = count || 0;
+  if (LAST_UNREAD !== null && n > LAST_UNREAD) msgDing();
+  LAST_UNREAD = n;
   if (badge) { badge.hidden = !n; badge.textContent = n > 9 ? '9+' : String(n); }
 }
 async function openChatWith(prof) {
@@ -3619,7 +3641,7 @@ function backNeeded() {
   return !!overlay || state.view !== 'feed' || window.scrollY > 120;
 }
 function syncBack() { if (backNeeded()) armBack(); }
-setInterval(() => { const b = document.querySelector('.dm-badge'); if (b && !document.hidden) refreshUnread(b); }, 30000);
+setInterval(() => { const b = document.querySelector('.msg-count'); if (b && !document.hidden) refreshUnread(b); }, 20000);
 window.addEventListener('scroll', () => { if (!ARMED && window.scrollY > 120) armBack(); }, { passive: true });
 // Cada vez que cambia la pantalla o se abre algo, el "atrás" queda listo para regresar
 new MutationObserver(() => syncBack()).observe(document.body, { childList: true });
@@ -3650,8 +3672,9 @@ sb.auth.onAuthStateChange((_event, session) => {
   started = true;
   state.session = session;
   if (!changed) return;
+  stopInbox();
   state.me = session ? null : GUEST; state.blocked = new Set(); state.view = 'feed'; render();
-  if (session) setTimeout(async () => { await loadMe(); if (needsWelcome()) { state.view = 'welcome'; state.welcomeStep = 0; } render(); openDeepLink(); }, 0);
+  if (session) setTimeout(async () => { await loadMe(); listenInbox(); if (needsWelcome()) { state.view = 'welcome'; state.welcomeStep = 0; } render(); openDeepLink(); }, 0);
   else setTimeout(openDeepLink, 300);
 });
 // Enlaces a una publicación (…/#p=123): la abre al entrar
