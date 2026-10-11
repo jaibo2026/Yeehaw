@@ -164,7 +164,7 @@ textarea.input{min-height:90px;resize:vertical}
 .sd-bar i{display:block;height:100%;width:0;background:var(--grad)}
 .sd-head{display:flex;align-items:center;gap:10px}
 .sd-head b{font-size:15px}
-.sd-head small{color:rgba(255,255,255,.75);font-size:13px}
+.sd-head small{color:rgba(255,255,255,.75);font-size:13px;white-space:nowrap}
 .sd-head .sp{flex:1}
 .sd-zone{position:absolute;top:80px;bottom:90px;z-index:2;border:none;background:none;padding:0}
 .sd-zone.prev{left:0;width:33%}
@@ -177,6 +177,29 @@ textarea.input{min-height:90px;resize:vertical}
 .sd-paused{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:3;display:none;align-items:center;gap:8px;padding:10px 16px;border-radius:22px;background:rgba(0,0,0,.55);color:#fff;font-weight:700;font-size:14px;pointer-events:none}
 .sd-paused svg{width:18px;height:18px}
 .sd-zone{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
+.sd-bg{position:absolute;inset:-40px;background-size:cover;background-position:center;filter:blur(30px) brightness(.55) saturate(1.1);transform:scale(1.1)}
+.sd-stage img,.sd-stage video{position:relative}
+.sd-music{position:absolute;left:50%;bottom:24%;transform:translateX(-50%);z-index:3;display:flex;align-items:center;gap:10px;max-width:82%;padding:8px 16px 8px 8px;border-radius:16px;background:rgba(251,240,216,.96);color:#3B2314;box-shadow:0 8px 24px rgba(0,0,0,.35);pointer-events:none;animation:sdpop .35s ease-out}
+.sd-music img,.sd-music .ph{width:46px;height:46px;border-radius:10px;object-fit:cover;flex-shrink:0;background:linear-gradient(135deg,#FA5C6E,#D21E3C);display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px}
+.sd-music .t{display:flex;flex-direction:column;min-width:0}
+.sd-music b,.sd-music small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sd-music b{font-size:14px}.sd-music small{font-size:12px;color:#7A5A44}
+.sd-music .eq{display:flex;align-items:flex-end;gap:2px;height:16px;margin-left:4px}
+.sd-music .eq i{width:3px;height:40%;background:#8B4A22;border-radius:1px;animation:eq .9s ease-in-out infinite}
+.sd-music .eq i:nth-child(2){animation-delay:.2s}.sd-music .eq i:nth-child(3){animation-delay:.4s}
+.sd-viewer.is-paused .sd-music .eq i,.sd-viewer.sd-muted .sd-music .eq i{animation-play-state:paused}
+@keyframes sdpop{from{transform:translateX(-50%) scale(.85);opacity:0}}
+.sd-reply{position:absolute;left:0;right:0;bottom:0;z-index:4;display:flex;align-items:center;gap:8px;padding:10px 12px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(transparent,rgba(0,0,0,.55))}
+.sd-reply input{flex:1;min-width:0;height:42px;padding:0 16px;border-radius:22px;border:1.5px solid rgba(255,255,255,.75);background:rgba(0,0,0,.25);color:#fff;font:inherit;font-size:15px;outline:none}
+.sd-reply input::placeholder{color:rgba(255,255,255,.8)}
+.sd-reply .emo{width:40px;height:40px;border:none;border-radius:50%;background:none;font-size:26px;line-height:1;padding:0;flex-shrink:0}
+.sd-reply .emo:active{transform:scale(1.25)}
+.sd-reply .sendbtn{display:none;width:42px;height:42px;border:none;border-radius:50%;background:var(--grad);color:#3B2314;align-items:center;justify-content:center;flex-shrink:0}
+.sd-reply.typing .emo{display:none}.sd-reply.typing .sendbtn{display:flex}
+.sd-viewer.has-reply .sd-cap{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+.sd-viewer.has-reply .sd-zone{bottom:120px}
+.sd-float{position:absolute;bottom:80px;z-index:6;font-size:34px;pointer-events:none;animation:sdfloat 1.6s ease-out forwards}
+@keyframes sdfloat{0%{transform:translateY(0) scale(.6);opacity:0}15%{opacity:1;transform:translateY(-30px) scale(1.15)}100%{transform:translateY(-320px) scale(1);opacity:0}}
 /* ---- Rides ---- */
 .rides{color:#fff;position:fixed;top:0;bottom:0;left:0;right:0;max-width:520px;margin:0 auto;overflow-y:auto;scroll-snap-type:y mandatory;background:#000;scrollbar-width:none;z-index:1}
 .rides::-webkit-scrollbar{display:none}
@@ -338,9 +361,11 @@ textarea.input{min-height:90px;resize:vertical}
 .yt-btn .yt-logo{display:inline-flex;align-items:center;justify-content:center;width:26px;height:18px;border-radius:5px;background:#FF0000;color:#fff;font-size:10px}
 .song-row img.yt{width:64px;height:46px}
 .yt-prev{width:100%;aspect-ratio:16/9;border:0;border-radius:12px;background:#000;display:block;margin-top:10px}
-.sd-yt{position:absolute;right:10px;top:calc(76px + env(safe-area-inset-top));width:200px;height:200px;z-index:4;border-radius:14px;overflow:hidden;background:#000;box-shadow:0 6px 18px rgba(0,0,0,.5);border:2px solid rgba(251,240,216,.85)}
-.sd-yt iframe{width:100%;height:100%;border:0;display:block}
-.sd-viewer.is-held .sd-yt{opacity:.35}
+.sd-yt{position:absolute;left:0;top:0;width:200px;z-index:4;border-radius:12px;overflow:hidden;background:#000;box-shadow:0 6px 18px rgba(0,0,0,.5);transition:transform .25s ease;will-change:transform}
+.sd-yt.dragging{transition:none;box-shadow:0 10px 28px rgba(0,0,0,.6)}
+.sd-yt iframe{width:200px;height:200px;border:0;display:block}
+.sd-yt-grip{height:22px;display:flex;align-items:center;justify-content:center;gap:6px;background:rgba(30,16,8,.92);color:#FBF0D8;font-size:11px;font-weight:600;cursor:grab;touch-action:none;-webkit-user-select:none;user-select:none}
+.sd-yt-grip i{width:28px;height:4px;border-radius:2px;background:rgba(251,240,216,.7)}
 .sd-song{display:inline-flex;align-items:center;gap:6px;max-width:100%;padding:5px 12px;border-radius:20px;background:rgba(0,0,0,.45);font-size:13px;font-weight:600}
 .sd-song span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .join{text-align:center;padding:10px 20px 22px}
@@ -423,7 +448,7 @@ html,body{background:#F7F0E3 url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQAB
 const SUPABASE_URL = 'https://olflxehmwfxvsnzoqzrm.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_-GRf3to9PdSARsBT_PXAnw_K2Kqgwtp';
 // Clave de YouTube (Google Cloud → YouTube Data API v3). Vacía = no aparece la búsqueda en YouTube.
-const YT_KEY = 'AIzaSyApaZWvwWPFezWXS1n_DHPlSmyBnPCAwn4';
+const YT_KEY = '';
 // =====================================================================
 
 const CATEGORIES = ['Bailes', 'Outfits', 'Caballos', 'Jaripeo', 'Ganado', 'Comida'];
@@ -615,6 +640,42 @@ async function ytDuration(id) {
 function ytFrame(id, start, cls) {
   const src = `https://www.youtube-nocookie.com/embed/${id}?` + new URLSearchParams({ autoplay: '1', playsinline: '1', rel: '0', start: String(Math.max(0, Math.floor(start || 0))), enablejsapi: '1', origin: location.origin });
   return h('iframe', { src, class: cls || '', allow: 'autoplay; encrypted-media; picture-in-picture', title: 'Canción de YouTube' });
+}
+// Reproductor chiquito que se arrastra y se acomoda en la esquina más cercana
+function ytMini(id, start, host) {
+  const KEY = 'herria_yt_corner';
+  const grip = h('div', { class: 'sd-yt-grip', 'aria-label': 'Arrastra el video a otra esquina' }, h('i'), 'mover', h('i'));
+  const box = h('div', { class: 'sd-yt' }, grip, ytFrame(id, start));
+  host.append(box);
+  const W = 200, H = 222, M = 10;
+  const spots = () => {
+    const r = host.getBoundingClientRect();
+    const bar = host.querySelector('.sd-top'), cap = host.querySelector('.sd-cap');
+    const top = (bar ? bar.offsetHeight - 8 : 76), bottom = Math.max(top, r.height - H - (cap && cap.style.display !== 'none' ? cap.offsetHeight : 20));
+    return { tl: [M, top], tr: [r.width - W - M, top], bl: [M, bottom], br: [r.width - W - M, bottom] };
+  };
+  let corner = 'tr'; try { corner = localStorage.getItem(KEY) || 'tr'; } catch (_) {}
+  let x = 0, y = 0;
+  const place = (c) => { const sp = spots(); [x, y] = sp[c] || sp.tr; box.style.transform = `translate(${x}px,${y}px)`; };
+  place(corner);
+  let sx, sy, ox, oy, moving = false;
+  grip.addEventListener('pointerdown', (e) => { e.stopPropagation(); moving = true; sx = e.clientX; sy = e.clientY; ox = x; oy = y; box.classList.add('dragging'); grip.setPointerCapture(e.pointerId); });
+  grip.addEventListener('pointermove', (e) => {
+    if (!moving) return; e.stopPropagation();
+    const r = host.getBoundingClientRect();
+    x = Math.max(0, Math.min(r.width - W, ox + e.clientX - sx)); y = Math.max(0, Math.min(r.height - H, oy + e.clientY - sy));
+    box.style.transform = `translate(${x}px,${y}px)`;
+  });
+  const end = (e) => {
+    if (!moving) return; moving = false; e.stopPropagation(); box.classList.remove('dragging');
+    const sp = spots(); let best = 'tr', bd = Infinity;
+    for (const k in sp) { const d = Math.hypot(sp[k][0] - x, sp[k][1] - y); if (d < bd) { bd = d; best = k; } }
+    corner = best; try { localStorage.setItem(KEY, best); } catch (_) {}
+    place(best);
+  };
+  grip.addEventListener('pointerup', end); grip.addEventListener('pointercancel', end);
+  grip.addEventListener('click', (e) => e.stopPropagation());
+  return box;
 }
 function ytCmd(frame, func) { try { frame.contentWindow.postMessage(JSON.stringify({ event: 'command', func, args: [] }), '*'); } catch (_) {} }
 function stopSong() {
@@ -1197,15 +1258,24 @@ function openRules() {
 }
 
 // ---------- Sundowns (desaparecen en 24 horas) ----------
+let SD_MUTED = false;
+function ytIdOf(it) { if (it.song_preview || !it.song_url) return null; const sg = parseSong(it.song_url); return sg && sg.type === 'yt' ? sg.id : null; }
+async function replySundown(owner, body) {
+  const { data: cid, error } = await sb.rpc('open_conversation', { other: owner.id });
+  if (error) return toast('No se pudo enviar');
+  const r = await sb.from('messages').insert({ conversation_id: cid, sender_id: state.me.id, body: body.slice(0, 2000) });
+  toast(r.error ? 'No se pudo enviar' : 'Enviado a ' + (owner.username || ''));
+}
 function openSundowns(groups, gi, onClose) {
   if (!groups.length) return;
   const IMG_MS = 8000;   // fotos: 8 s (15 s si llevan canción)
   let curMs = IMG_MS;
   let ii = 0, video = null, raf = 0, elapsed = 0, lastT = 0, paused = false, userPaused = false, safety = null, fill = null, isImg = false;
-  let holdTimer = null, held = false, suppressClick = false, ytBox = null;
+  let holdTimer = null, held = false, suppressClick = false, ytBox = null, replyBar = null;
   const bars = h('div', { class: 'sd-bars' });
   const head = h('div', { class: 'sd-head' });
-  const stage = h('div', { style: 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center' });
+  const stage = h('div', { class: 'sd-stage', style: 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden' });
+  const music = h('div', { class: 'sd-music', style: 'display:none' });
   const cap = h('div', { class: 'sd-cap' });
   const pausedBadge = h('div', { class: 'sd-paused', 'aria-hidden': 'true' }, h('span', { icon: 'pause' }), 'En pausa');
   const zone = (cls, label, fn) => {
@@ -1221,7 +1291,7 @@ function openSundowns(groups, gi, onClose) {
     h('div', { class: 'sd-top' }, bars, head),
     zone('prev', 'Anterior', () => prev()),
     zone('next', 'Siguiente', () => next()),
-    pausedBadge, cap);
+    music, pausedBadge, cap);
   const viewer = h('div', { class: 'sd-viewer', role: 'dialog', 'aria-label': 'Sundowns' }, inner);
   let pauseBtn = null;
   function paintPause() {
@@ -1235,7 +1305,7 @@ function openSundowns(groups, gi, onClose) {
     paused = p || userPaused;
     if (video) { if (paused) video.pause(); else video.play().catch(() => {}); }
     if (SONG.audio) { if (paused) SONG.audio.pause(); else SONG.audio.play().catch(() => {}); }
-    if (ytBox) ytCmd(ytBox.firstChild, paused ? 'pauseVideo' : 'playVideo');
+    if (ytBox) ytCmd(ytBox.querySelector('iframe'), paused ? 'pauseVideo' : 'playVideo');
     lastT = performance.now();
     paintPause();
   }
@@ -1247,7 +1317,7 @@ function openSundowns(groups, gi, onClose) {
     if (elapsed >= curMs) return next();
     raf = requestAnimationFrame(tick);
   }
-  const stop = () => { cancelAnimationFrame(raf); clearTimeout(safety); if (video) { video.pause(); video = null; } if (ytBox) { ytBox.remove(); ytBox = null; } };
+  const stop = () => { if (replyBar) { replyBar.remove(); replyBar = null; } viewer.classList.remove('has-reply'); cancelAnimationFrame(raf); clearTimeout(safety); if (video) { video.pause(); video = null; } if (ytBox) { ytBox.remove(); ytBox = null; } };
   const close = () => { stop(); stopSong(); viewer.remove(); document.removeEventListener('keydown', onKey); if (onClose) onClose(); };
   const onKey = (e) => { if (e.key === 'Escape') close(); if (e.key === 'ArrowRight') next(); if (e.key === 'ArrowLeft') prev(); if (e.key === ' ') { e.preventDefault(); setPaused(!userPaused, 'button'); } };
   document.addEventListener('keydown', onKey);
@@ -1259,9 +1329,17 @@ function openSundowns(groups, gi, onClose) {
     bars.replaceChildren(...g.items.map((_, k) => h('div', { class: 'sd-bar' }, h('i', { style: `width:${k < ii ? 100 : 0}%` }))));
     fill = bars.children[ii].firstChild;
     pauseBtn = h('button', { class: 'iconbtn plain', style: 'color:#fff', 'aria-label': 'Pausar', icon: 'pause', onclick: () => setPaused(!userPaused, 'button') });
+    const hasSound = !!it.song_preview || it.media_type === 'video';
+    const muteBtn = hasSound ? h('button', { class: 'iconbtn plain', style: 'color:#fff', 'aria-label': SD_MUTED ? 'Activar sonido' : 'Silenciar', icon: SD_MUTED ? 'mute' : 'sound', onclick: () => {
+      SD_MUTED = !SD_MUTED; muteBtn.innerHTML = ICONS[SD_MUTED ? 'mute' : 'sound']; muteBtn.setAttribute('aria-label', SD_MUTED ? 'Activar sonido' : 'Silenciar');
+      if (SONG.audio) SONG.audio.muted = SD_MUTED; if (video) video.muted = SD_MUTED || !!it.song_preview || !!ytIdOf(it);
+      viewer.classList.toggle('sd-muted', SD_MUTED);
+    } }) : null;
+    viewer.classList.toggle('sd-muted', SD_MUTED && hasSound);
     head.replaceChildren(...[avatar(g.user, 36),
       h('div', {}, h('b', {}, g.user.username || ''), h('br'), h('small', {}, timeAgo(it.created_at))),
       h('div', { class: 'sp' }),
+      muteBtn,
       pauseBtn,
       it.user_id === state.me.id && h('button', { class: 'iconbtn plain', style: 'color:#fff', 'aria-label': 'Agregar otro sundown', icon: 'plus', onclick: () => { close(); state.uploadKind = 'sundown'; go('upload'); } }),
       it.user_id === state.me.id && h('button', { class: 'iconbtn plain', style: 'color:#fff', 'aria-label': 'Borrar sundown', icon: 'trash', onclick: async () => {
@@ -1274,24 +1352,43 @@ function openSundowns(groups, gi, onClose) {
     const ytId = ytSong && ytSong.type === 'yt' ? ytSong.id : null;
     cap.replaceChildren(...[it.caption ? h('div', {}, it.caption) : null,
       ytId ? h('div', { style: 'margin-top:' + (it.caption ? '10px' : '0') }, h('div', { class: 'sd-song' }, '🎵', h('span', {}, it.song_title || 'Canción de YouTube'))) :
-      it.song_url ? h('div', { style: 'margin-top:' + (it.caption ? '10px' : '0') }, songChip(it.song_url, it.song_title, { dark: true, preview: it.song_preview, art: it.song_art, start: it.song_start, before: () => { if (!it.song_preview) setPaused(true, 'button'); } })) : null].filter(Boolean));
-    cap.style.display = (it.caption || it.song_url) ? 'block' : 'none';
+      it.song_url && !it.song_preview ? h('div', { style: 'margin-top:' + (it.caption ? '10px' : '0') }, songChip(it.song_url, it.song_title, { dark: true, before: () => setPaused(true, 'button') })) : null].filter(Boolean));
+    cap.style.display = (it.caption || (it.song_url && !it.song_preview)) ? 'block' : 'none';
+    if (it.song_preview) {
+      const [tn, ar] = String(it.song_title || 'Canción').split(' · ');
+      music.replaceChildren(it.song_art ? h('img', { src: it.song_art, alt: '' }) : h('span', { class: 'ph' }, '♫'),
+        h('div', { class: 't' }, h('b', {}, tn), ar ? h('small', {}, ar) : null), h('span', { class: 'eq', 'aria-hidden': 'true' }, h('i'), h('i'), h('i')));
+      music.style.display = 'flex';
+    } else music.style.display = 'none';
+    if (it.user_id !== (state.me && state.me.id)) {
+      const inp = h('input', { type: 'text', maxlength: '500', placeholder: 'Responder a ' + (g.user.username || '') + '…', enterkeyhint: 'send', 'aria-label': 'Responder' });
+      const fly = (e) => { for (let k = 0; k < 5; k++) { const f = h('span', { class: 'sd-float', style: `left:${20 + Math.random() * 60}%;animation-delay:${k * .12}s` }, e); inner.append(f); setTimeout(() => f.remove(), 2200); } };
+      const emo = (e) => h('button', { type: 'button', class: 'emo', 'aria-label': 'Reaccionar ' + e, onclick: (ev) => { ev.stopPropagation(); if (needLogin('Crea tu cuenta para reaccionar')) return; fly(e); replySundown(g.user, e + ' Reaccionó a tu sundown'); } }, e);
+      const send = async () => { const t = inp.value.trim(); if (!t) return; if (needLogin('Crea tu cuenta para responder')) return; inp.value = ''; replyBar.classList.remove('typing'); inp.blur(); await replySundown(g.user, '↩️ Respondió a tu sundown: ' + t); };
+      replyBar = h('div', { class: 'sd-reply' }, inp, emo('❤️'), emo('😂'), emo('🔥'),
+        h('button', { type: 'button', class: 'sendbtn', 'aria-label': 'Enviar', icon: 'send', onclick: send }));
+      inp.addEventListener('focus', () => setPaused(true, 'button'));
+      inp.addEventListener('blur', () => { if (!inp.value.trim()) setPaused(false, 'button'); });
+      inp.addEventListener('input', () => replyBar.classList.toggle('typing', !!inp.value.trim()));
+      inp.addEventListener('keydown', (e) => { e.stopPropagation(); if (e.key === 'Enter') { e.preventDefault(); send(); } });
+      inner.append(replyBar); viewer.classList.add('has-reply');
+    }
     curMs = it.song_preview ? 15000 : ytId ? 30000 : IMG_MS;
-    if (ytId) { stopSong(); ytBox = h('div', { class: 'sd-yt' }, ytFrame(ytId, it.song_start || 0)); inner.append(ytBox); }
-    else if (it.song_preview) { playSong(it.song_preview, cap.querySelector('.song-chip'), it.song_start || 0); if (paused && SONG.audio) SONG.audio.pause(); } else stopSong();
+    if (ytId) { stopSong(); ytBox = ytMini(ytId, it.song_start || 0, inner); }
+    else if (it.song_preview) { stopSong(); playSong(it.song_preview, null, it.song_start || 0); if (SONG.audio) SONG.audio.muted = SD_MUTED; if (paused && SONG.audio) SONG.audio.pause(); } else stopSong();
     paintPause();
     if (it.media_type === 'video') {
       isImg = false;
-      video = h('video', { src: it.media_url, playsInline: true, autoplay: true, muted: !!ytId });
-      if (ytId) video.muted = true;
+      video = h('video', { src: it.media_url, playsInline: true, autoplay: true });
+      video.muted = SD_MUTED || !!ytId || !!it.song_preview;
       video.addEventListener('timeupdate', () => { if (video && video.duration && fill) fill.style.width = (video.currentTime / video.duration * 100) + '%'; });
       video.addEventListener('ended', () => next());
       video.addEventListener('error', () => { safety = setTimeout(next, 3000); });
       video.play().catch(() => { if (video) { video.muted = true; video.play().catch(() => {}); } });
-      stage.replaceChildren(video);
+      stage.replaceChildren(h('div', { class: 'sd-bg', style: `background-image:url("${(it.thumb_url || '').replace(/"/g, '')}")` }), video);
     } else {
       isImg = true;
-      stage.replaceChildren(h('img', { src: it.media_url, alt: it.caption || 'Sundown de ' + (g.user.username || '') }));
+      stage.replaceChildren(h('div', { class: 'sd-bg', style: `background-image:url("${String(it.media_url).replace(/"/g, '')}")` }), h('img', { src: it.media_url, alt: it.caption || 'Sundown de ' + (g.user.username || '') }));
       lastT = performance.now();
       raf = requestAnimationFrame(tick);
     }
