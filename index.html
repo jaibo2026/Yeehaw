@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#6A3415">
+<meta name="theme-color" content="#172531">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -501,6 +501,63 @@ html,body{background:#F7F0E3 url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQAB
 .inbox-dot{background:linear-gradient(135deg,#FBF0D8 0%,#EBD3A6 55%,#CFAE73 100%)}
 .stats b{background:none;color:#6A3415}
 
+
+/* La barra de arriba (mensajes y campanita) siempre visible al bajar */
+.topbar{position:sticky!important;top:0!important;z-index:30!important}
+/* ---------- Tema 1B: Crema con marino y oro ---------- */
+:root{--bg:#F5EFE3;--surface:#FFFDF8;--surface2:#FFFDF8;--text:#172531;--soft:#172531;--muted:#4D6473;--line:#D9CBB0;--ink:#172531;--grad:linear-gradient(135deg,#F3BD68 0%,#E0A050 55%,#C7843B 100%);--ring:repeating-conic-gradient(from 0deg,#F3BD68 0deg 12deg,#C7843B 12deg 24deg);--stitch:1.5px dashed rgba(243,189,104,.6)}
+html,body{background:#F5EFE3!important;background-image:none!important;color:#172531}
+#app,main{background:transparent}
+.topbar{background:linear-gradient(180deg,#2C4657,#172531)!important;border-bottom:none!important;outline-color:rgba(243,189,104,.6)}
+.topbar::after{background:repeating-linear-gradient(90deg,rgba(243,189,104,.6) 0 7px,transparent 7px 12px)!important}
+.topbar .logo{background:linear-gradient(180deg,#F3BD68,#C7843B)!important;-webkit-background-clip:text!important;background-clip:text!important;color:transparent!important}
+.topbar b,.topbar .iconbtn,.topbar .iconbtn.plain,.topbar .who{color:#F1E4CC!important}
+.topbar .iconbtn{background:rgba(255,255,255,.1)!important;border-color:rgba(243,189,104,.6)!important}
+.nav-in{background:linear-gradient(180deg,#2C4657,#172531)!important;border-color:#172531!important}
+.nav-in::after{border-color:rgba(243,189,104,.6)!important}
+.nav button{color:#F1E4CC!important;opacity:.75}
+.nav button.on{color:#F3BD68!important;opacity:1}
+.nav button.on svg{stroke:#F3BD68!important}
+.nav button.on::after{background:#F3BD68!important;box-shadow:0 0 8px #F3BD68!important}
+.nav .plus{background:linear-gradient(135deg,#F3BD68 0%,#E0A050 55%,#C7843B 100%)!important;color:#172531!important;opacity:1!important}
+.nav .plus svg{stroke:#172531!important}
+.post,.welcome-card,.sheet,.auth form{background:#FFFDF8!important;border-color:#D9CBB0!important;box-shadow:0 4px 14px rgba(0,0,0,.08)!important}
+.post-head{background:#2C4657!important;border-bottom:1.5px dashed rgba(243,189,104,.6)!important}
+.post-head .who b,.post-head .iconbtn{color:#F3BD68!important}
+.post-head .who small{color:#F3BD68!important;opacity:.75}
+.caption,.caption b,.meta,.count,.react-count,.actions .iconbtn,.shared-note{color:#172531!important}
+.story span,.story small,.story b,.stories *:not(.avatar){color:#172531!important}
+.meta,.linkbtn{color:#4D6473!important}
+.btn{background:linear-gradient(180deg,#2C4657,#172531)!important;color:#F3BD68!important;box-shadow:0 3px 0 rgba(0,0,0,.35)!important;outline-color:rgba(243,189,104,.6)!important}
+.chip{background:#FFFDF8!important;border-color:#D9CBB0!important;color:#172531!important}
+.chip.on{background:linear-gradient(180deg,#2C4657,#172531)!important;color:#F3BD68!important}
+.tag,.avatar{background:linear-gradient(135deg,#F3BD68 0%,#E0A050 55%,#C7843B 100%)!important;color:#172531!important}
+.song-chip{background:#FFFDF8!important;border-color:#D9CBB0!important;color:#172531!important}
+.stats b{background:none!important;color:#C7843B!important}
+.dm-badge{background:#C7843B!important;color:#172531!important;border-color:#172531!important}
+.input{background:#FFFDF8!important;color:#172531!important;border-color:#D9CBB0!important}
+.shared-cap{background:#F5EFE3!important;color:#172531!important}
+
+/* resto de pantallas */
+.msg.me{background:linear-gradient(180deg,#2C4657,#172531)!important;color:#FFF6E6!important}
+.msg.them{background:#FFFFFF!important;color:#172531!important;border:1px solid #D9CBB0!important}
+.msg-time,.msg-seen{color:#4D6473!important}
+.composer{background:#F5EFE3!important;border-top:1px solid #D9CBB0!important}
+.composer .send{background:linear-gradient(135deg,#F3BD68,#C7843B)!important;color:#172531!important}
+.sheet-head{border-bottom:1px solid #D9CBB0!important}
+.inbox-row:active,.notif:active{background:#EFE6D4!important}
+.notif.new{background:#FBF1DF!important}
+.chat-head .who span{color:#F1E4CC!important}
+.dm-btn,.topbar .dm-btn{color:#F1E4CC!important}
+.empty,.dm-empty{color:#4D6473!important}
+.share-opt .so-ico{background:#FFFDF8!important;border-color:#D9CBB0!important}
+.song-cut,.song-row{background:#FFFDF8!important;border-color:#D9CBB0!important}
+.song-range{accent-color:#2C4657!important}
+.shared-cap{border-left-color:#C7843B!important}
+.react-pick{background:#FFFDF8!important;border-color:#D9CBB0!important}
+.sd-reply .sendbtn{color:#172531!important}
+.btn.ghost{background:#FFFDF8!important;color:#172531!important;border:1.5px solid #2C4657!important;box-shadow:none!important}
+.auth::before{background:radial-gradient(60% 40% at 50% 0%,rgba(243,189,104,.35),transparent 70%)!important}
 </style>
 </head>
 <body>
@@ -886,8 +943,9 @@ function go(view, extra) {
   state.view = view;
   if (extra && 'profileId' in extra) state.profileId = extra.profileId;
   if (extra && 'animalId' in extra) state.animalId = extra.animalId;
-  window.scrollTo(0, 0);
+  window.scrollTo({ top: 0, behavior: 'instant' });
   render();
+  if (typeof syncBack === 'function') syncBack();
 }
 function navBar() {
   const b = (v, icon, label, isOn) => h('button', { class: isOn ? 'on' : '', 'aria-label': label, onclick: () => { if (v === 'profile' && needLogin('Crea tu cuenta para tener tu perfil')) return; go(v, v === 'profile' ? { profileId: state.me.id } : undefined); } },
@@ -999,6 +1057,79 @@ async function renderFeed() {
   } catch (e) { list.replaceChildren(h('div', { class: 'empty' }, friendlyError(e))); }
 }
 
+// ---------- Sonidos de Herria (hechos desde cero con el teléfono, sin grabaciones) ----------
+const SFX = (() => {
+  let ctx = null, master = null, nbuf = null;
+  const KEY = 'herria_sonidos';
+  let on = true; try { on = localStorage.getItem(KEY) !== '0'; } catch (_) {}
+  const ac = () => {
+    if (!ctx) {
+      const C = window.AudioContext || window.webkitAudioContext; if (!C) return null;
+      ctx = new C(); master = ctx.createGain(); master.gain.value = 0.32; master.connect(ctx.destination);
+    }
+    if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+    return ctx;
+  };
+  function tone(t0, dur, f1, f2, type = 'sine', vol = 0.6, vib = 0, vibRate = 7, filt) {
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type; o.frequency.setValueAtTime(f1, t0);
+    if (f2 && f2 !== f1) o.frequency.exponentialRampToValueAtTime(f2, t0 + dur);
+    if (vib) { const l = ctx.createOscillator(), lg = ctx.createGain(); l.frequency.value = vibRate; lg.gain.value = vib; l.connect(lg); lg.connect(o.frequency); l.start(t0); l.stop(t0 + dur); }
+    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + 0.02);
+    g.gain.setValueAtTime(vol, t0 + dur * 0.7); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    let out = o;
+    if (filt) { const f = ctx.createBiquadFilter(); f.type = filt.type || 'lowpass'; f.Q.value = filt.q || 1; f.frequency.setValueAtTime(filt.f1, t0);
+      if (filt.fm) f.frequency.linearRampToValueAtTime(filt.fm, t0 + dur * 0.4); if (filt.f2) f.frequency.linearRampToValueAtTime(filt.f2, t0 + dur); o.connect(f); out = f; }
+    out.connect(g); g.connect(master); o.start(t0); o.stop(t0 + dur + 0.02);
+  }
+  function noise(t0, dur, freq, q = 1, vol = 0.5, freq2, type = 'bandpass') {
+    if (!nbuf) { nbuf = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate); const d = nbuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; }
+    const s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
+    s.buffer = nbuf; f.type = type; f.Q.value = q; f.frequency.setValueAtTime(freq, t0);
+    if (freq2) f.frequency.exponentialRampToValueAtTime(freq2, t0 + dur);
+    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + 0.005);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    s.connect(f); f.connect(g); g.connect(master); s.start(t0, Math.random() * 0.5); s.stop(t0 + dur + 0.02);
+  }
+  const hoof = (t, hi, v = 1) => { noise(t, 0.07, hi ? 1500 : 1000, 4, 0.9 * v); tone(t, 0.06, hi ? 520 : 380, hi ? 300 : 220, 'triangle', 0.35 * v); };
+  const neigh = (t, v = 1) => { tone(t, 0.75, 1100, 520, 'sawtooth', 0.22 * v, 140, 22, { type: 'bandpass', f1: 1400, f2: 900, q: 2 }); noise(t, 0.6, 2500, 1, 0.08 * v, 1200); };
+  // Los que escogiste
+  const SOUNDS = {
+    ajua(t) { hoof(t, 0); hoof(t + 0.1, 1); hoof(t + 0.28, 0); hoof(t + 0.38, 1);           // cascos y grito
+      tone(t + 0.5, 0.16, 520, 700, 'sawtooth', 0.16, 6); tone(t + 0.66, 0.34, 760, 1180, 'sawtooth', 0.16, 14); tone(t + 0.66, 0.34, 1520, 2360, 'sine', 0.05); },
+    love(t) { noise(t, 0.05, 1800, 2, 0.6); tone(t + 0.02, 0.12, 700, 350, 'sine', 0.5); },  // besito "muak"
+    haha(t) { [0, 0.12, 0.24].forEach((d, i) => tone(t + d, 0.1, 760 - i * 70, 600 - i * 70, 'triangle', 0.55)); tone(t + 0.36, 0.16, 560, 820, 'triangle', 0.45); }, // ja-ja-ja
+    wow(t) { tone(t, 0.9, 115, 175, 'sawtooth', 0.55, 3, 5, { f1: 250, fm: 900, f2: 500, q: 4 }); }, // vaca sorprendida
+    sad(t) { tone(t, 0.26, 440, 400, 'triangle', 0.5, 4); tone(t + 0.28, 0.5, 392, 262, 'triangle', 0.5, 6); }, // wa-waa
+    fire(t) { noise(t, 0.04, 2800, 3, 0.9); noise(t + 0.25, 0.04, 2800, 3, 0.9); },            // chasquido de dedos
+    subidaFin(t) { neigh(t); }                                                                // relincho al terminar
+  };
+  let loopTimer = null;
+  return {
+    play(k) {
+      if (!on || !SOUNDS[k]) return;
+      try { if (!ac()) return; SOUNDS[k](ctx.currentTime + 0.01); } catch (_) {}
+    },
+    // Trote mientras se sube; devuelve una función para pararlo (con relincho si salió bien)
+    startUpload() {
+      this.stopUpload(false);
+      if (!on) return () => {};
+      try { if (!ac()) return () => {}; } catch (_) { return () => {}; }
+      let next = ctx.currentTime + 0.05;
+      const tick = () => { while (next < ctx.currentTime + 0.3) { try { hoof(next, 0, 0.7); hoof(next + 0.12, 1, 0.6); hoof(next + 0.3, 0, 0.7); hoof(next + 0.42, 1, 0.6); } catch (_) {} next += 0.6; } };
+      tick(); loopTimer = setInterval(tick, 100);
+      return (ok = true) => this.stopUpload(ok);
+    },
+    stopUpload(ok) {
+      if (!loopTimer) return;
+      clearInterval(loopTimer); loopTimer = null;
+      if (ok) setTimeout(() => this.play('subidaFin'), 350);
+    },
+    get on() { return on; },
+    set on(v) { on = !!v; try { localStorage.setItem(KEY, on ? '1' : '0'); } catch (_) {} if (!on) this.stopUpload(false); }
+  };
+})();
+
 const REACTS = [
   { k: 'ajua', l: '¡Ajúa!', e: null }, { k: 'love', l: 'Me encanta', e: '❤️' }, { k: 'haha', l: 'Me divierte', e: '😂' },
   { k: 'wow', l: 'Me asombra', e: '😮' }, { k: 'sad', l: 'Me entristece', e: '😢' }, { k: 'fire', l: '¡Qué chulo!', e: '🔥' }];
@@ -1043,13 +1174,14 @@ function likeControls(p, short) {
     if (needLogin('Crea tu cuenta para reaccionar')) return;
     if (busy) return;
     kind = HAS_REACT ? (kind || 'ajua') : 'ajua';
-    if (want && liked && kind === myReact) { rear(); return; }
+    if (want && liked && kind === myReact) { rear(); SFX.play(kind); return; }
     if (!want && !liked) return;
     const before = { liked, myReact, likeCount, tally: { ...tally } };
     busy = true;
     if (liked) tally[myReact]--;
     if (want) { tally[kind] = (tally[kind] || 0) + 1; if (!liked) likeCount++; } else likeCount--;
     const wasLiked = liked; liked = want; if (want) myReact = kind; paint();
+    if (want) SFX.play(kind);
     likeBtn.classList.remove('rear'); if (want) rear();
     let res;
     if (!want) res = await sb.from('likes').delete().eq('post_id', p.id).eq('user_id', myId);
@@ -1581,7 +1713,7 @@ function openSundowns(groups, gi, onClose) {
     if (it.user_id !== (state.me && state.me.id)) {
       const inp = h('input', { type: 'text', maxlength: '500', placeholder: 'Responder a ' + (g.user.username || '') + '…', enterkeyhint: 'send', 'aria-label': 'Responder' });
       const fly = (e) => { for (let k = 0; k < 5; k++) { const f = h('span', { class: 'sd-float', style: `left:${20 + Math.random() * 60}%;animation-delay:${k * .12}s` }, e); inner.append(f); setTimeout(() => f.remove(), 2200); } };
-      const emo = (e) => h('button', { type: 'button', class: 'emo', 'aria-label': 'Reaccionar ' + e, onclick: (ev) => { ev.stopPropagation(); if (needLogin('Crea tu cuenta para reaccionar')) return; fly(e); replySundown(g.user, e + ' Reaccionó a tu sundown'); } }, e);
+      const emo = (e) => h('button', { type: 'button', class: 'emo', 'aria-label': 'Reaccionar ' + e, onclick: (ev) => { ev.stopPropagation(); if (needLogin('Crea tu cuenta para reaccionar')) return; fly(e); SFX.play({ '❤️': 'love', '😂': 'haha', '🔥': 'fire' }[e]); replySundown(g.user, e + ' Reaccionó a tu sundown'); } }, e);
       const send = async () => { const t = inp.value.trim(); if (!t) return; if (needLogin('Crea tu cuenta para responder')) return; inp.value = ''; replyBar.classList.remove('typing'); inp.blur(); await replySundown(g.user, '↩️ Respondió a tu sundown: ' + t); };
       replyBar = h('div', { class: 'sd-reply' }, inp, emo('❤️'), emo('😂'), emo('🔥'),
         h('button', { type: 'button', class: 'sendbtn', 'aria-label': 'Enviar', icon: 'send', onclick: send }));
@@ -1912,6 +2044,7 @@ function renderUpload() {
     e.preventDefault(); err.textContent = '';
     if (!file) return (err.textContent = 'Primero elige una foto o video.');
     btn.disabled = true; btn.textContent = 'Subiendo…';
+    stopSong(); const endTrot = SFX.startUpload();
     try {
       const isVideo = file.type.startsWith('video/');
       const blob = isVideo ? file : await compressImage(file);
@@ -1929,9 +2062,10 @@ function renderUpload() {
       stopSong();
       const ins = await sb.from('posts').insert(row);
       if (ins.error) { sb.storage.from('media').remove([path]); throw ins.error; }
+      endTrot(true);
       toast(kind === 'sundown' ? 'Sundown publicado. Se va con el sol en 24 h' : kind === 'ride' ? '¡Ride publicado! ¡Ajúa!' : '¡Publicado! ¡Ajúa!');
       state.category = 'Todo'; state.uploadKind = 'post'; go(kind === 'ride' ? 'rides' : 'feed');
-    } catch (ex) { err.textContent = friendlyError(ex); btn.disabled = false; paintKind(); }
+    } catch (ex) { endTrot(false); err.textContent = friendlyError(ex); btn.disabled = false; paintKind(); }
   } },
     kindBar, hint, fileInput, picker,
     catField,
@@ -1987,7 +2121,10 @@ async function renderProfile() {
         isMe && h('button', { class: 'herd-card add', onclick: () => editAnimal(null) },
           h('div', { class: 'herd-plus' }, '+'), h('b', {}, 'Agregar'), h('small', {}, 'caballo, vaca…')))),
     gridOf(posts, isMe ? 'Aún no subes nada. Toca el botón + para tu primera publicación.' : 'Todavía no ha subido nada.'),
-    isMe && h('div', { style: 'text-align:center;padding:22px 0 8px' }, h('button', { class: 'linkbtn', style: 'font-size:14px;text-decoration:underline', onclick: openRules }, 'Reglas y privacidad'))
+    isMe && h('div', { style: 'text-align:center;padding:22px 0 8px;display:flex;flex-direction:column;align-items:center;gap:14px' },
+      (() => { const b = h('button', { class: 'chip', style: 'display:inline-flex;align-items:center;gap:6px' }); const paint = () => { b.textContent = SFX.on ? '🔊 Sonidos activados' : '🔇 Sonidos apagados'; };
+        b.addEventListener('click', () => { SFX.on = !SFX.on; paint(); if (SFX.on) SFX.play('ajua'); }); paint(); return b; })(),
+      h('button', { class: 'linkbtn', style: 'font-size:14px;text-decoration:underline', onclick: openRules }, 'Reglas y privacidad'))
   ].filter(Boolean));
 }
 
@@ -2343,6 +2480,7 @@ async function renderChat() {
     const next = list.filter(r => r.user_id !== state.me.id);
     if (!removing) next.push({ message_id: m.id, user_id: state.me.id, reaction: k });
     rx.set(m.id, next); paint();
+    if (!removing) SFX.play(k);
     try { navigator.vibrate && navigator.vibrate(15); } catch (_) {}
     const res = removing ? await sb.from('message_reactions').delete().eq('message_id', m.id).eq('user_id', state.me.id)
       : await sb.from('message_reactions').upsert({ message_id: m.id, user_id: state.me.id, reaction: k }, { onConflict: 'message_id,user_id' });
@@ -2483,22 +2621,35 @@ async function renderChat() {
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 let started = false;
 // Botón "atrás" del teléfono: cierra lo que esté abierto, regresa al inicio, y en el inicio actualiza.
-function armBack() { try { history.pushState({ yh: 1 }, ''); } catch (_) {} }
+// Botón "atrás" del teléfono: cierra lo que esté abierto y regresa al inicio.
+// En el inicio: si estás abajo, te sube hasta arriba; si ya estás arriba, el siguiente "atrás" cierra la app.
+let ARMED = false;
+try { history.scrollRestoration = 'manual'; } catch (_) {}
+function armBack() { if (ARMED) return; try { history.pushState({ yh: 1 }, ''); ARMED = true; } catch (_) {} }
+function backNeeded() {
+  const overlay = document.querySelector('.sd-viewer,.sheet-bg,.react-pick-bg');
+  return !!overlay || state.view !== 'feed' || window.scrollY > 120;
+}
+function syncBack() { if (backNeeded()) armBack(); }
 setInterval(() => { const b = document.querySelector('.dm-badge'); if (b && !document.hidden) refreshUnread(b); }, 30000);
-armBack();
+window.addEventListener('scroll', () => { if (!ARMED && window.scrollY > 120) armBack(); }, { passive: true });
+// Cada vez que cambia la pantalla o se abre algo, el "atrás" queda listo para regresar
+new MutationObserver(() => syncBack()).observe(document.body, { childList: true });
 window.addEventListener('popstate', () => {
-  armBack();
+  ARMED = false;
+  const picker = document.querySelector('.react-pick-bg');
+  if (picker) { picker.remove(); return syncBack(); }
   const viewerClose = document.querySelector('.sd-viewer [aria-label="Cerrar"]');
-  if (viewerClose) return viewerClose.click();
+  if (viewerClose) { viewerClose.click(); return syncBack(); }
   const sheets = document.querySelectorAll('.sheet-bg');
-  if (sheets.length) { const c = sheets[sheets.length - 1].querySelector('.sheet-head [aria-label="Cerrar"]'); return c ? c.click() : sheets[sheets.length - 1].remove(); }
-  if (state.view === 'auth') return go('feed');
-  if (!state.me || state.view === 'welcome') return;
-  if (state.view === 'chat') return go('inbox');
-  if (state.view !== 'feed') return go('feed');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-  render();
-  toast('Actualizado');
+  if (sheets.length) { const c = sheets[sheets.length - 1].querySelector('.sheet-head [aria-label="Cerrar"]'); c ? c.click() : sheets[sheets.length - 1].remove(); return syncBack(); }
+  if (state.view === 'auth') { go('feed'); return syncBack(); }
+  if (!state.me || state.view === 'welcome') return syncBack();
+  if (state.view === 'chat') { go('inbox'); return syncBack(); }
+  if (state.view !== 'feed') { go('feed'); return syncBack(); }
+  // En el inicio y abajo: sube hasta arriba y avisa; el siguiente "atrás" ya cierra la app
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  toast('Toca atrás otra vez para salir');
 });
 sb.auth.onAuthStateChange((_event, session) => {
   const changed = !started || (session && session.user.id) !== (state.session && state.session.user.id);
