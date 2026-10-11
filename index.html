@@ -654,7 +654,7 @@ let HAS_SONG = true;
 let HAS_REACT = true;   // reacciones (me encanta, me divierte…)
 let HAS_SHARE = true;   // compartir publicaciones
 let HAS_VIEWS = true;   // "Visto por" en Sundowns
-const SHARE_EMBED = ',shared_id,orig:posts!posts_shared_id_fkey(id,user_id,caption,media_type,created_at,profiles!user_id(id,username,full_name,avatar_url))';
+const SHARE_EMBED = ',shared_id,orig:shared_id(id,user_id,caption,media_type,created_at,profiles!user_id(id,username,full_name,avatar_url))';
 function postSelect() {
   return POST_SELECT.replace('likes(user_id)', HAS_REACT ? 'likes(user_id,reaction)' : 'likes(user_id)') + (HAS_KIND ? ',kind' : '') + (HAS_SONG ? ',song_url,song_title,song_preview,song_art,song_start' : '') + (HAS_ANIMALS ? ANIMAL_EMBED : '') + (HAS_SHARE ? SHARE_EMBED : '');
 }
@@ -2141,7 +2141,7 @@ async function fetchNotifs(force) {
   const [lk, cm, sh] = await Promise.all([
     sb.from('likes').select('created_at,user_id,post_id' + (HAS_REACT ? ',reaction' : '') + ',' + NOTIF_PROF + ',' + POSTJ).eq('posts.user_id', me).neq('user_id', me).order('created_at', { ascending: false }).limit(40),
     sb.from('comments').select('id,body,created_at,user_id,post_id,' + NOTIF_PROF + ',' + POSTJ).eq('posts.user_id', me).neq('user_id', me).order('created_at', { ascending: false }).limit(40),
-    HAS_SHARE ? sb.from('posts').select('id,created_at,user_id,caption,' + NOTIF_PROF + ',orig:posts!posts_shared_id_fkey!inner(id,user_id,media_url,media_type)').eq('orig.user_id', me).neq('user_id', me).order('created_at', { ascending: false }).limit(30) : Promise.resolve({ data: [] })]);
+    HAS_SHARE ? sb.from('posts').select('id,created_at,user_id,caption,' + NOTIF_PROF + ',orig:shared_id!inner(id,user_id,media_url,media_type)').eq('orig.user_id', me).neq('user_id', me).order('created_at', { ascending: false }).limit(30) : Promise.resolve({ data: [] })]);
   const b = state.blocked || new Set();
   const items = [];
   (lk.data || []).forEach(x => items.push({ t: 'react', at: x.created_at, who: x.profiles, uid: x.user_id, post: x.posts, react: x.reaction || 'ajua' }));
