@@ -493,6 +493,7 @@ textarea.input{min-height:90px;resize:vertical}
 .fx-mini .fx-pic{border-radius:12px;font-size:36px}.fx-mini b{font-size:14px;margin-top:4px}
 .fx-mini small{font-size:12px;color:#4D6473;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .fx-mini .fx-feat{padding:2px 6px;font-size:11px}
+.fx-sell-cta{display:block;width:100%;margin-top:10px;padding:11px 12px;border:1.5px dashed #C7843B;border-radius:12px;background:#FFF6E4;color:#172531;font-weight:700;font-size:14px;text-align:left}
 /* ---------- Verificada ---------- */
 .vbadge{display:inline-flex;align-items:center;justify-content:center;width:1.05em;height:1.05em;margin-left:.3em;border-radius:50%;background:#C7843B;color:#fff!important;font-size:.72em;font-weight:900;line-height:1;vertical-align:.08em;box-shadow:0 0 0 1.5px #F3BD68 inset;font-family:Inter,sans-serif}
 /* ---------- Aviso push ---------- */
@@ -3289,13 +3290,13 @@ function feriaShowcase() {
     const act = ls.filter(l => l.status !== 'vendido').slice(0, 8);
     if (!act.length && !evs.length) return;
     const goF = (t) => () => { state.feriaTab = t; go('feria'); };
-    box.replaceChildren(
+    box.replaceChildren(...[
       h('div', { class: 'fx-show-head' }, h('b', {}, '🎪 En La Feria'), h('button', { class: 'linkbtn', onclick: goF('mercado') }, 'Ver todo ›')),
       evs[0] ? h('button', { class: 'fx-next', onclick: () => openEvent(evs[0]) }, h('span', { class: 'fx-next-emo' }, EKIND_EMO[evs[0].kind] || '🎉'),
         h('div', {}, h('small', {}, 'Próximo evento · ' + dayLabel(evs[0].starts_at) + ' ' + hourLabel(evs[0].starts_at)), h('b', {}, evs[0].title)), h('span', { class: 'fx-chev' }, '›')) : null,
       act.length ? h('div', { class: 'fx-show-row' }, act.map(l => h('button', { class: 'fx-mini', onclick: () => openListing(l) },
         h('div', { class: 'fx-pic' }, l.photos && l.photos[0] ? h('img', { src: l.photos[0], alt: '', loading: 'lazy' }) : h('span', {}, LCAT_EMO[l.category] || '📦'), isFeat(l) ? h('span', { class: 'fx-feat' }, '⭐') : null),
-        h('b', {}, money(l.price)), h('small', {}, l.title)))) : null);
+        h('b', {}, money(l.price)), h('small', {}, l.title)))) : h('button', { class: 'fx-sell-cta', onclick: goF('mercado') }, '🐎 ¿Vendes algo del rancho? Publícalo gratis ›')].filter(Boolean));
     box.hidden = false;
   })();
   return box;
