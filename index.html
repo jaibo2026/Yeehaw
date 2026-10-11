@@ -7,8 +7,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Herria">
-<title>Herria</title>
+<meta name="apple-mobile-web-app-title" content="Ranchfolk">
+<title>Ranchfolk</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -494,6 +494,7 @@ textarea.input{min-height:90px;resize:vertical}
 .fx-mini small{font-size:12px;color:#4D6473;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .fx-mini .fx-feat{padding:2px 6px;font-size:11px}
 .fx-sell-cta{display:block;width:100%;margin-top:10px;padding:11px 12px;border:1.5px dashed #C7843B;border-radius:12px;background:#FFF6E4;color:#172531;font-weight:700;font-size:14px;text-align:left}
+@media (max-width:350px){.topbar .logo{font-size:24px!important}}
 /* ---------- Verificada ---------- */
 .vbadge{display:inline-flex;align-items:center;justify-content:center;width:1.05em;height:1.05em;margin-left:.3em;border-radius:50%;background:#C7843B;color:#fff!important;font-size:.72em;font-weight:900;line-height:1;vertical-align:.08em;box-shadow:0 0 0 1.5px #F3BD68 inset;font-family:Inter,sans-serif}
 /* ---------- Aviso push ---------- */
@@ -888,7 +889,7 @@ async function compressImage(file, max = 1440) {
 
 // ---------- estado ----------
 if (SUPABASE_URL.startsWith('PEGA') || !window.supabase) {
-  $app.append(h('div', { class: 'empty' }, h('span', { class: 'logo' }, 'Herria'),
+  $app.append(h('div', { class: 'empty' }, h('span', { class: 'logo' }, 'Ranchfolk'),
     window.supabase ? 'Falta poner los datos de Supabase en el archivo.' : 'No se pudo cargar. Revisa tu conexión y recarga.'));
   throw new Error('config');
 }
@@ -912,7 +913,7 @@ async function loadMe() {
   state.blocked = new Set(bl.error ? [] : (bl.data || []).map(b => b.blocked_id));
 }
 const GUEST = { id: '__guest__', username: 'invitado', guest: true };
-// Cuentas verificadas ✓ (solo Herria las marca desde Supabase)
+// Cuentas verificadas ✓ (solo Ranchfolk las marca desde Supabase)
 let VERIFIED = new Set();
 try { VERIFIED = new Set(JSON.parse(localStorage.getItem('herria_verif') || '[]')); } catch (_) {}
 async function loadVerified() {
@@ -929,7 +930,7 @@ function isGuest() { return !state.session || !state.me || state.me.guest; }
 // Si no tiene cuenta, invita a registrarse. Devuelve true cuando hay que detenerse.
 function needLogin(why) {
   if (!isGuest()) return false;
-  const close = openSheet('Únete a Herria', h('div', { class: 'sheet-body join' },
+  const close = openSheet('Únete a Ranchfolk', h('div', { class: 'sheet-body join' },
     h('div', { class: 'join-ico', icon: 'shotsbig' }),
     h('b', {}, why || 'Crea tu cuenta para participar'),
     h('p', {}, 'Es gratis y toma un minuto. Así puedes dar ajúas, comentar, subir tus fotos y mandar mensajes.'),
@@ -1230,10 +1231,10 @@ function renderAuth() {
     err,
     h('button', { class: 'btn', type: 'submit' }, isLogin ? 'Entrar' : 'Crear cuenta'),
     !isLogin && h('p', { class: 'hint', style: 'margin:12px 0 0;text-align:center' }, 'Al crear tu cuenta aceptas las ',
-      h('button', { type: 'button', class: 'linkbtn', style: 'text-decoration:underline;font-size:13px', onclick: openRules }, 'reglas y privacidad'), ' de Herria.')
+      h('button', { type: 'button', class: 'linkbtn', style: 'text-decoration:underline;font-size:13px', onclick: openRules }, 'reglas y privacidad'), ' de Ranchfolk.')
   );
   $app.append(h('div', { class: 'auth' },
-    h('div', { class: 'logo' }, 'Herria'),
+    h('div', { class: 'logo' }, 'Ranchfolk'),
     h('p', { class: 'lead' }, 'La vida de rancho, en un solo lugar'),
     form,
     h('button', { type: 'button', class: 'linkbtn', style: 'margin-top:18px;text-decoration:underline;font-size:14px', onclick: () => go('feed') }, 'Seguir viendo sin cuenta'),
@@ -1244,7 +1245,7 @@ function renderAuth() {
 
 async function renderFeed() {
   const main = h('main');
-  $app.append(h('header', { class: 'topbar' }, h('div', { class: 'logo' }, 'Herria'), h('div', { class: 'top-actions' }, menuButton(), bellButton(), dmButton())), main);
+  $app.append(h('header', { class: 'topbar' }, h('div', { class: 'logo' }, 'Ranchfolk'), h('div', { class: 'top-actions' }, menuButton(), bellButton(), dmButton())), main);
 
   const stories = h('div', { class: 'stories' });
   const chips = h('div', { class: 'chips' }, ['Todo', ...CATEGORIES].map(c =>
@@ -1283,7 +1284,7 @@ async function renderFeed() {
   } catch (e) { list.replaceChildren(h('div', { class: 'empty' }, friendlyError(e))); }
 }
 
-// ---------- Sonidos de Herria (hechos desde cero con el teléfono, sin grabaciones) ----------
+// ---------- Sonidos de Ranchfolk (hechos desde cero con el teléfono, sin grabaciones) ----------
 const SFX = (() => {
   let ctx = null, master = null, nbuf = null;
   const KEY = 'herria_sonidos';
@@ -1356,6 +1357,11 @@ const SFX = (() => {
       clearInterval(loopTimer); loopTimer = null;
       if (ok) setTimeout(() => this.play('subidaFin'), 350);
     },
+    // Android/Chrome no deja sonar nada hasta que la persona toca la pantalla: al primer toque se "despierta" el audio
+    unlock() {
+      try { const c = ac(); if (!c) return; const b = c.createBuffer(1, 1, 22050), s = c.createBufferSource(); s.buffer = b; s.connect(c.destination); s.start(0); } catch (_) {}
+    },
+    get ready() { return !!ctx && ctx.state === 'running'; },
     get on() { return on; },
     set on(v) { on = !!v; try { localStorage.setItem(KEY, on ? '1' : '0'); } catch (_) {} if (!on) this.stopUpload(false); }
   };
@@ -1460,7 +1466,7 @@ async function sharePost(p) {
   const owner = (p.shared_id && p.orig && p.orig.profiles) || p.profiles || {};
   const outside = async () => {
     const url = postLink(origId);
-    const data = { title: 'Herria', text: (p.caption || 'Mira esto en Herria') + '\n', url };
+    const data = { title: 'Ranchfolk', text: (p.caption || 'Mira esto en Ranchfolk') + '\n', url };
     try { if (navigator.share) await navigator.share(data); else { await navigator.clipboard.writeText(url); toast('Enlace copiado'); } } catch (_) {}
   };
   const opt = (icon, title, sub, fn) => h('button', { class: 'share-opt', onclick: fn }, h('span', { class: 'so-ico' }, icon), h('div', {}, h('b', {}, title), h('small', {}, sub)));
@@ -1468,7 +1474,7 @@ async function sharePost(p) {
   const close = openSheet('Compartir', body);
   const home = () => body.replaceChildren(...[
     HAS_SHARE ? opt('🔁', 'Compartir en mi perfil', 'Sale en tu perfil y en el inicio', () => { if (needLogin('Crea tu cuenta para compartir')) return; toProfile(); }) : null,
-    opt('💬', 'Enviar por mensaje', 'A alguien de Herria', () => { if (needLogin('Crea tu cuenta para mandar mensajes')) return; toChat(); }),
+    opt('💬', 'Enviar por mensaje', 'A alguien de Ranchfolk', () => { if (needLogin('Crea tu cuenta para mandar mensajes')) return; toChat(); }),
     opt('📤', 'Más opciones', 'WhatsApp, Facebook, copiar enlace…', () => { close(); outside(); })].filter(Boolean));
   const toProfile = () => {
     const ta = h('textarea', { class: 'input', maxlength: '1000', placeholder: 'Di algo sobre esto… (opcional)', style: 'min-height:80px' });
@@ -1639,14 +1645,14 @@ function finishWelcome() { setFlag('welcomed'); state.view = 'feed'; render(); }
 
 function welcomeCard() {
   if (isGuest()) return h('section', { class: 'welcome-card', 'aria-label': 'Únete' },
-    h('div', { class: 'wc-kicker' }, 'Estás viendo'), h('div', { class: 'logo', style: 'font-size:26px' }, 'Herria'),
+    h('div', { class: 'wc-kicker' }, 'Estás viendo'), h('div', { class: 'logo', style: 'font-size:26px' }, 'Ranchfolk'),
     h('p', { class: 'wc-lead' }, 'La vida de rancho, en un solo lugar: bailes, caballos, outfits y el día a día del rancho. Mira todo lo que quieras; para dar ajúa, comentar y subir lo tuyo, crea tu cuenta gratis.'),
     h('button', { class: 'btn', style: 'margin-top:6px', onclick: () => { state.authMode = 'signup'; go('auth'); } }, 'Crear mi cuenta'));
   if (getFlag('card_closed')) return null;
   const card = h('section', { class: 'welcome-card', 'aria-label': 'Bienvenida' });
   const tip = (icon, title, text) => h('div', { class: 'wc-tip' }, h('span', { class: 'wc-ico', icon }), h('div', {}, h('b', {}, title), h('small', {}, text)));
   card.append(
-    h('div', { class: 'wc-head' }, h('div', {}, h('div', { class: 'wc-kicker' }, 'Bienvenido a'), h('div', { class: 'logo', style: 'font-size:26px' }, 'Herria')),
+    h('div', { class: 'wc-head' }, h('div', {}, h('div', { class: 'wc-kicker' }, 'Bienvenido a'), h('div', { class: 'logo', style: 'font-size:26px' }, 'Ranchfolk')),
       h('button', { class: 'iconbtn plain', 'aria-label': 'Cerrar bienvenida', icon: 'close', onclick: () => { setFlag('card_closed'); card.remove(); } })),
     h('p', { class: 'wc-lead' }, 'La vida de rancho, en un solo lugar. Así funciona:'),
     h('div', { class: 'wc-tips' },
@@ -1746,7 +1752,7 @@ async function renderWelcome() {
       } catch (ex) { err.textContent = friendlyError(ex); save.disabled = false; }
     } },
       h('h1', { class: 'wl-title' }, 'Preséntanos a tu animal'),
-      h('p', { class: 'wl-sub' }, 'Tu caballo, tu vaca o tu perro también tienen perfil en Herria. La gente los puede seguir.'),
+      h('p', { class: 'wl-sub' }, 'Tu caballo, tu vaca o tu perro también tienen perfil en Ranchfolk. La gente los puede seguir.'),
       prev, fileIn,
       h('label', { for: 'wl_an', class: 'btn ghost small', style: 'display:inline-flex;align-items:center;cursor:pointer;margin:0 auto 22px' }, 'Elegir foto'),
       h('div', { class: 'field', style: 'text-align:left' }, h('label', { for: 'wl_n' }, '¿Cómo se llama?'), name),
@@ -1815,7 +1821,7 @@ async function unblockUser(userId, username) {
 function openRules() {
   const sec = (title, items) => h('section', { class: 'rules-sec' }, h('h4', {}, title), h('ul', {}, ...items.map(t => h('li', {}, t))));
   const body = h('div', { class: 'sheet-body rules' },
-    h('p', {}, 'Herria es para compartir la vida de rancho con respeto. Al usar la app aceptas estas reglas.'),
+    h('p', {}, 'Ranchfolk es para compartir la vida de rancho con respeto. Al usar la app aceptas estas reglas.'),
     sec('Lo que no se permite', [
       'Desnudos o contenido sexual.',
       'Maltrato animal, violencia o peleas.',
@@ -1829,12 +1835,12 @@ function openRules() {
       'Si alguien te molesta, bloquéalo: ya no verás nada suyo.']),
     sec('Tu privacidad', [
       'Guardamos tu correo, tu nombre, tu usuario, tu foto y lo que publicas.',
-      'Cualquier persona puede ver tus publicaciones en Herria, aunque no tenga cuenta; los mensajes son privados dentro de la app.',
+      'Cualquier persona puede ver tus publicaciones en Ranchfolk, aunque no tenga cuenta; los mensajes son privados dentro de la app.',
       'Ojo: quien tenga el enlace directo de una foto o video la puede abrir, así que no subas nada privado.',
-      'Tus datos se guardan en Supabase, el servicio que usa Herria. No los vendemos ni los compartimos.',
+      'Tus datos se guardan en Supabase, el servicio que usa Ranchfolk. No los vendemos ni los compartimos.',
       'Tú puedes borrar tus publicaciones cuando quieras.',
       'Para borrar tu cuenta completa, escríbenos y la borramos con todo lo que subiste.']),
-    sec('Contacto', [CONTACT || 'Escríbenos por mensaje a la página de Herria en Facebook.']));
+    sec('Contacto', [CONTACT || 'Escríbenos por mensaje a la página de Ranchfolk en Facebook.']));
   openSheet('Reglas y privacidad', body);
 }
 
@@ -2604,7 +2610,7 @@ async function renderProfile() {
         blocked ? h('button', { class: 'btn ghost', onclick: () => unblockUser(id, prof.username) }, 'Desbloquear')
           : h('button', { class: 'btn ghost', style: 'flex:0 0 52px', 'aria-label': 'Más opciones', onclick: () => {
               const close = openSheet('@' + prof.username, h('div', { class: 'sheet-body' },
-                h('button', { class: 'mn-row', onclick: async () => { close(); const url = location.origin + location.pathname; try { if (navigator.share) await navigator.share({ title: 'Herria', text: 'Mira el perfil de @' + prof.username + ' en Herria', url }); } catch (_) {} } }, h('span', { class: 'mn-emo sm' }, '📤'), h('div', {}, h('b', {}, 'Compartir perfil'))),
+                h('button', { class: 'mn-row', onclick: async () => { close(); const url = location.origin + location.pathname; try { if (navigator.share) await navigator.share({ title: 'Ranchfolk', text: 'Mira el perfil de @' + prof.username + ' en Ranchfolk', url }); } catch (_) {} } }, h('span', { class: 'mn-emo sm' }, '📤'), h('div', {}, h('b', {}, 'Compartir perfil'))),
                 h('button', { class: 'mn-row', onclick: async () => { close(); if (needLogin('Crea tu cuenta para bloquear')) return; if (await blockUser(id, prof.username)) go('feed'); } }, h('span', { class: 'mn-emo sm' }, '🚫'), h('div', {}, h('b', {}, 'Bloquear'), h('small', {}, 'No verás sus publicaciones ni te podrá escribir')))));
             } }, '⋯'));
 
@@ -2637,7 +2643,7 @@ async function renderProfile() {
   const ficha = h('section', { class: 'pf-card' },
     h('div', { class: 'pf-card-head' }, h('div', { class: 'lbl' }, 'Ficha del ranchero'), isMe && h('button', { class: 'linkbtn', onclick: () => editProfile(prof) }, '✏️')),
     dato('🏡', prof.rancho, 'Su rancho'), dato('🐄', prof.dedica, 'A qué se dedica'), dato('🔥', prof.fierro, 'Fierro o marca del rancho'), dato('📍', prof.ubicacion),
-    desde && dato('📅', `En Herria desde ${MESES[desde.getMonth()]} ${desde.getFullYear()}`),
+    desde && dato('📅', `En Ranchfolk desde ${MESES[desde.getMonth()]} ${desde.getFullYear()}`),
     !filled && isMe && h('button', { class: 'pf-fill', onclick: () => editProfile(prof) }, '＋ Llena tu ficha: tu rancho, a qué te dedicas y tu fierro'),
     badges.length ? h('div', { class: 'pf-badges' }, badges.map(t => h('span', { class: 'pf-badge' }, t))) : null);
 
@@ -2871,7 +2877,7 @@ function editProfile(prof) {
   close = openSheet('Editar perfil', body);
 }
 
-// ---------- Menú (☰) con todo lo que se puede hacer en Herria ----------
+// ---------- Menú (☰) con todo lo que se puede hacer en Ranchfolk ----------
 function menuButton() {
   return h('button', { class: 'iconbtn dm-btn', 'aria-label': 'Menú', onclick: () => openMenu() }, h('span', { icon: 'menu', style: 'display:flex' }));
 }
@@ -2902,19 +2908,19 @@ function openMenu() {
     if (pushState() !== 'no') pushOnHere().then(on => { lab.textContent = on ? 'Activados' : (pushState() === 'denied' ? 'Bloqueados en el navegador' : 'Apagados'); });
     return b;
   }
-  const inviteRow = row('📤', 'Invitar a Herria', async () => {
+  const inviteRow = row('📤', 'Invitar a Ranchfolk', async () => {
     const url = location.origin + location.pathname;
-    const data = { title: 'Herria', text: 'Únete a Herria, la app de la vida de rancho 🤠🐎', url };
+    const data = { title: 'Ranchfolk', text: 'Únete a Ranchfolk, la app de la vida de rancho 🤠🐎', url };
     try { if (navigator.share) await navigator.share(data); else { await navigator.clipboard.writeText(url); toast('Enlace copiado'); } } catch (_) {}
   }, 'Comparte la app con tu familia y amigos');
   const help = section('❓', 'Ayuda y soporte técnico', [
-    row('📖', 'Cómo usar Herria', () => openHowTo()),
+    row('📖', 'Cómo usar Ranchfolk', () => openHowTo()),
     row('🛠️', 'Reportar un problema', () => openSheet('Reportar un problema', h('div', { class: 'sheet-body', style: 'line-height:1.5' },
       h('p', {}, '¿Algo no funciona bien? Cuéntanos qué pasó y en qué pantalla.'),
-      h('p', {}, CONTACT ? 'Escríbenos a ' + CONTACT : 'Escríbenos por mensaje a la página de Herria en Facebook.'),
+      h('p', {}, CONTACT ? 'Escríbenos a ' + CONTACT : 'Escríbenos por mensaje a la página de Ranchfolk en Facebook.'),
       h('p', { style: 'color:var(--muted);font-size:14px' }, 'Si alguien te molesta, en su perfil o en el menú ⋯ de su publicación puedes reportarlo o bloquearlo.')))),
-    row('🤠', 'Acerca de Herria', () => openSheet('Acerca de Herria', h('div', { class: 'sheet-body', style: 'line-height:1.5;text-align:center' },
-      h('div', { class: 'logo', style: 'font-size:34px' }, 'Herria'),
+    row('🤠', 'Acerca de Ranchfolk', () => openSheet('Acerca de Ranchfolk', h('div', { class: 'sheet-body', style: 'line-height:1.5;text-align:center' },
+      h('div', { class: 'logo', style: 'font-size:34px' }, 'Ranchfolk'),
       h('p', {}, 'La vida de rancho, en un solo lugar: caballos, ganado, bailes, jaripeos, outfits y el día a día del rancho.'),
       h('p', { style: 'color:var(--muted);font-size:14px' }, 'Hecha en León, Guanajuato. 🇲🇽'))))]);
   const settings = section('⚙️', 'Configuración y privacidad', guest ? [
@@ -2949,7 +2955,7 @@ function openMenu() {
       help, settings, inviteRow,
       guest ? h('button', { class: 'btn', style: 'width:100%;margin-top:16px', onclick: goTo(() => { state.authMode = 'signup'; go('auth'); }) }, 'Crear mi cuenta')
             : h('button', { class: 'btn ghost', style: 'width:100%;margin-top:16px', onclick: async () => { if (!confirm('¿Cerrar sesión?')) return; bg.remove(); await sb.auth.signOut(); } }, 'Cerrar sesión'),
-      h('p', { class: 'mn-foot' }, 'Herria · Vida de rancho')));
+      h('p', { class: 'mn-foot' }, 'Ranchfolk · Vida de rancho')));
   const bg = h('div', { class: 'menu-bg', onclick: (e) => { if (e.target === bg) close(); } }, panel);
   bg._close = close;
   document.body.append(bg);
@@ -2965,7 +2971,7 @@ async function openBlockedList() {
 }
 function openHowTo() {
   const it = (e, t, d) => h('div', { class: 'mn-how' }, h('span', { class: 'mn-emo sm' }, e), h('div', {}, h('b', {}, t), h('p', {}, d)));
-  openSheet('Cómo usar Herria', h('div', { class: 'sheet-body' },
+  openSheet('Cómo usar Ranchfolk', h('div', { class: 'sheet-body' },
     it('📷', 'Publicar', 'Toca el + de abajo. Elige foto o video, la sección y, si quieres, una canción.'),
     it('🌅', 'Sundowns', 'Toca "Agregar" arriba. Ponle texto, emojis y música; arrástralos con el dedo. Duran 24 horas.'),
     it('🐎', 'Rides', 'Videos verticales en pantalla completa. Desliza hacia arriba para ver el siguiente.'),
@@ -3064,7 +3070,7 @@ function openListing(l) {
   car.addEventListener('scroll', () => { const i = Math.round(car.scrollLeft / car.clientWidth); [...dots.children].forEach((d, k) => d.classList.toggle('on', k === i)); }, { passive: true });
   car.addEventListener('click', (e) => { if (e.target.tagName === 'IMG') openMediaViewer(e.target.src, 'image'); });
   const link = location.origin + location.pathname + '#l=' + l.id;
-  const share = async () => { try { if (navigator.share) await navigator.share({ title: l.title, text: `${l.title} · ${money(l.price)} en La Feria de Herria`, url: link }); else { await navigator.clipboard.writeText(link); toast('Enlace copiado'); } } catch (_) {} };
+  const share = async () => { try { if (navigator.share) await navigator.share({ title: l.title, text: `${l.title} · ${money(l.price)} en La Feria de Ranchfolk`, url: link }); else { await navigator.clipboard.writeText(link); toast('Enlace copiado'); } } catch (_) {} };
   const actions = mine ? [
     h('button', { class: 'btn', onclick: async () => { const st = l.status === 'vendido' ? 'activo' : 'vendido'; const { error } = await sb.from('listings').update({ status: st }).eq('id', l.id); if (error) return toast('No se pudo guardar'); close(); toast(st === 'vendido' ? '¡Felicidades por la venta! 🎉' : 'Anuncio activo otra vez'); if (st === 'vendido') SFX.play('ajua'); if (state.view === 'feria') render(); } }, l.status === 'vendido' ? 'Volver a poner a la venta' : '✅ Marcar como vendido'),
     h('div', { style: 'display:flex;gap:8px;margin-top:8px' },
@@ -3409,7 +3415,7 @@ function pushCard() {
   try { if (localStorage.getItem('herria_push_later') && Date.now() - Number(localStorage.getItem('herria_push_later')) < 3 * 864e5) return null; } catch (_) {}
   const card = h('div', { class: 'push-card' },
     h('span', { class: 'push-emo' }, '🔔'),
-    h('div', {}, h('b', {}, 'Que no se te pase ningún mensaje'), h('small', {}, 'Te avisamos en el teléfono aunque tengas Herria cerrada.')),
+    h('div', {}, h('b', {}, 'Que no se te pase ningún mensaje'), h('small', {}, 'Te avisamos en el teléfono aunque tengas Ranchfolk cerrada.')),
     h('div', { class: 'push-btns' },
       h('button', { class: 'btn small', onclick: async () => { if (await enablePush()) card.remove(); } }, 'Activar'),
       h('button', { class: 'btn small ghost', onclick: () => { try { localStorage.setItem('herria_push_later', String(Date.now())); } catch (_) {} card.remove(); } }, 'Ahora no')));
@@ -3706,7 +3712,18 @@ async function renderChat() {
 }
 
 // ---------- arranque ----------
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+  // El aviso llegó con la app abierta: suena la campana aquí adentro
+  navigator.serviceWorker.addEventListener('message', (e) => {
+    if (!e.data || e.data.type !== 'herria-msg') return;
+    msgDing();
+    const b = document.querySelector('.msg-count'); if (b) refreshUnread(b);
+  });
+}
+// Despertar el audio con cualquier toque (cada vez que vuelves a la app también)
+['pointerdown', 'touchstart', 'keydown'].forEach(ev => document.addEventListener(ev, () => { if (!SFX.ready) SFX.unlock(); }, { passive: true, capture: true }));
+document.addEventListener('visibilitychange', () => { if (!document.hidden) { const b = document.querySelector('.msg-count'); if (b) refreshUnread(b); } });
 let started = false;
 // Botón "atrás" del teléfono: cierra lo que esté abierto, regresa al inicio, y en el inicio actualiza.
 // Botón "atrás" del teléfono: cierra lo que esté abierto y regresa al inicio.

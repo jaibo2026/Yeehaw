@@ -1,4 +1,4 @@
-// Herria: permite instalar la app. Todo se carga siempre desde internet,
+// Ranchfolk: permite instalar la app. Todo se carga siempre desde internet,
 // y la página principal siempre se revisa para que los cambios lleguen al momento.
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
@@ -9,14 +9,16 @@ self.addEventListener('fetch', (e) => {
   e.respondWith(fresh ? fetch(req, { cache: 'no-cache' }).catch(() => fetch(req)) : fetch(req));
 });
 
-// Avisos en el teléfono: llega un mensaje aunque Herria esté cerrada
+// Avisos en el teléfono: llega un mensaje aunque Ranchfolk esté cerrada
 self.addEventListener('push', (e) => {
   let d = {};
   try { d = e.data ? e.data.json() : {}; } catch (_) { d = { body: e.data ? e.data.text() : '' }; }
   e.waitUntil((async () => {
     const wins = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
-    const open = wins.some(w => w.visibilityState === 'visible');   // con la app abierta ya suena la campana
-    await self.registration.showNotification(d.title || 'Herria', {
+    const open = wins.some(w => w.visibilityState === 'visible');
+    // Con la app abierta: le avisamos a la app para que suene la campana adentro
+    wins.forEach(w => { if (w.visibilityState === 'visible') { try { w.postMessage({ type: 'herria-msg', tag: d.tag || '' }); } catch (_) {} } });
+    await self.registration.showNotification(d.title || 'Ranchfolk', {
       body: d.body || 'Tienes un mensaje nuevo',
       icon: 'icon-192.png',
       badge: 'icon-192.png',
