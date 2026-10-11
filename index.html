@@ -292,6 +292,64 @@ textarea.input{min-height:90px;resize:vertical}
 @keyframes rear{0%{transform:rotate(0) scale(1)}30%{transform:rotate(-16deg) translateY(-3px) scale(1.18)}55%{transform:rotate(6deg) scale(1.05)}75%{transform:rotate(-4deg)}100%{transform:rotate(0) scale(1)}}
 .burst-horse .horse{width:150px;height:150px;filter:drop-shadow(0 0 2px #FBF0D8) drop-shadow(0 0 2px #FBF0D8) drop-shadow(0 4px 14px rgba(0,0,0,.55))}
 .wc-ico .horse{width:24px;height:24px;filter:none}
+
+/* ---------- Sundown: recuadro 9:16 con textos, emojis y música ---------- */
+.sd-canvas{position:relative;width:min(100%,calc(100vh*9/16));width:min(100%,calc(100dvh*9/16));aspect-ratio:9/16;max-height:100%;margin:auto;container-type:inline-size;overflow:hidden}
+.sd-canvas>img,.sd-canvas>video{position:absolute;inset:0;width:100%!important;height:100%!important;object-fit:contain}
+.sdo-layer{position:absolute;inset:0;pointer-events:none;z-index:1}
+.sdo{position:absolute;white-space:pre-wrap;text-align:center;-webkit-user-select:none;user-select:none;touch-action:none;transform-origin:center}
+.sdo-text{font:800 7.5cqw/1.15 'Work Sans',system-ui,sans-serif;max-width:86cqw;padding:1.5cqw 3cqw;border-radius:2.5cqw;text-shadow:0 1px 4px rgba(0,0,0,.55);word-wrap:break-word}
+.sdo-text.box{text-shadow:none}
+.sdo-emoji{font-size:17cqw;line-height:1;filter:drop-shadow(0 2px 6px rgba(0,0,0,.35))}
+.sdo-music{display:flex;align-items:center;gap:2.5cqw;padding:2cqw 4cqw 2cqw 2cqw;border-radius:4cqw;background:rgba(255,253,248,.96);color:#172531;box-shadow:0 2cqw 6cqw rgba(0,0,0,.35);max-width:80cqw}
+.sdo-music img,.sdo-music .ph{width:11cqw;height:11cqw;border-radius:2.5cqw;object-fit:cover;flex-shrink:0;background:linear-gradient(135deg,#FA5C6E,#D21E3C);display:flex;align-items:center;justify-content:center;color:#fff;font-size:5cqw}
+.sdo-music .t{display:flex;flex-direction:column;min-width:0;text-align:left}
+.sdo-music b,.sdo-music small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sdo-music b{font-size:3.6cqw}.sdo-music small{font-size:3cqw;color:#4D6473}
+.sdo-music .eq{display:flex;align-items:flex-end;gap:.6cqw;height:4cqw}
+.sdo-music .eq i{width:.8cqw;height:40%;background:#2C4657;border-radius:1px;animation:eq .9s ease-in-out infinite}
+.sdo-music .eq i:nth-child(2){animation-delay:.2s}.sdo-music .eq i:nth-child(3){animation-delay:.4s}
+.sd-viewer.is-paused .sdo-music .eq i{animation-play-state:paused}
+/* creador */
+.sdc{position:fixed;inset:0;z-index:45;overscroll-behavior:contain;background:#000;color:#fff;overflow:hidden;animation:up .2s ease-out}
+.sdc-stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.sdo-layer.edit{pointer-events:auto}
+.sdo-layer.edit .sdo{pointer-events:auto;cursor:grab}
+.sdo.drag{filter:drop-shadow(0 0 0 transparent);opacity:.92}
+.sdc-top{position:absolute;left:0;right:0;top:0;z-index:3;display:flex;justify-content:space-between;align-items:flex-start;padding:calc(12px + env(safe-area-inset-top)) 12px 0;pointer-events:none}
+.sdc-top>*{pointer-events:auto}
+.sdc-x{width:44px;height:44px;border-radius:50%;border:none;background:rgba(0,0,0,.45);color:#fff;font-size:20px}
+.sdc-tools{display:flex;flex-direction:column;gap:12px}
+.sdc-tool{display:flex;flex-direction:column;align-items:center;gap:3px;border:none;background:none;color:#fff;padding:0}
+.sdc-tool span{width:48px;height:48px;border-radius:50%;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;font-family:Georgia,serif}
+.sdc-tool small{font-size:11px;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,.7)}
+.sdc-bottom{position:absolute;left:0;right:0;bottom:0;z-index:3;padding:14px 16px calc(16px + env(safe-area-inset-bottom));display:flex;justify-content:flex-end;background:linear-gradient(transparent,rgba(0,0,0,.55))}
+.sdc-share{height:48px;padding:0 22px;border:none;border-radius:24px;background:linear-gradient(135deg,#F3BD68,#C7843B);color:#172531;font-weight:800;font-size:16px;box-shadow:0 4px 14px rgba(0,0,0,.4)}
+.sdc-share:disabled{opacity:.7}
+.sdc-trash{position:absolute;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));transform:translateX(-50%) scale(.8);z-index:4;width:62px;height:62px;border-radius:50%;background:rgba(0,0,0,.5);border:2px solid rgba(255,255,255,.7);display:none;align-items:center;justify-content:center;font-size:28px;transition:transform .15s,background .15s}
+.sdc.dragging .sdc-trash{display:flex}
+.sdc.dragging .sdc-top,.sdc.dragging .sdc-bottom{opacity:0;pointer-events:none}
+.sdc-trash.hot{transform:translateX(-50%) scale(1.15);background:#E2333F}
+.sdc-hint{position:absolute;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:3;width:min(86%,340px);padding:10px 14px;border-radius:14px;background:rgba(0,0,0,.6);font-size:13px;line-height:1.35;text-align:center;pointer-events:none;animation:up .3s ease-out}
+.sdc-pane{position:absolute;inset:0;z-index:6;background:rgba(0,0,0,.72);display:flex;flex-direction:column;padding:calc(12px + env(safe-area-inset-top)) 14px calc(14px + env(safe-area-inset-bottom))}
+.sdc-pane-top{display:flex;justify-content:space-between;align-items:center}
+.sdc-done{height:40px;padding:0 18px;border:none;border-radius:20px;background:#fff;color:#172531;font-weight:800;font-size:15px}
+.sdc-mode{width:44px;height:44px;border-radius:12px;border:2px solid #fff;background:none;color:#fff;font:800 20px Georgia,serif}
+.sdc-mode.on{background:#fff;color:#172531}
+.sdc-ta-wrap{flex:1;display:flex;align-items:center;justify-content:center}
+.sdc-ta{width:100%;max-width:440px;border:none;outline:none;resize:none;text-align:center;font:800 30px/1.2 'Work Sans',system-ui,sans-serif;padding:10px 14px;border-radius:14px;caret-color:#F3BD68;text-shadow:0 1px 4px rgba(0,0,0,.4)}
+.sdc-ta::placeholder{color:rgba(255,255,255,.6)}
+.sdc-swatches{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;padding:8px 0}
+.sdc-swatches .sw{width:32px;height:32px;border-radius:50%;border:2px solid rgba(255,255,255,.85);padding:0}
+.sdc-swatches .sw.on{transform:scale(1.25);border-width:3px}
+.sdc-sheet{position:absolute;left:0;right:0;bottom:0;z-index:6;max-height:62%;display:flex;flex-direction:column;background:#FFFDF8;color:#172531;border-radius:22px 22px 0 0;padding-bottom:env(safe-area-inset-bottom);animation:up .2s ease-out}
+.sdc-sheet.tall{max-height:82%}
+.sdc-sheet-head{display:flex;justify-content:space-between;align-items:center;padding:12px 14px 10px 18px;border-bottom:1px solid #D9CBB0}
+.sdc-sheet-head .sdc-done{background:#2C4657;color:#fff}
+.sdc-sheet-body{padding:12px 14px;overflow-y:auto}
+.sdc-emojis{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;padding:10px;overflow-y:auto}
+.sdc-emojis button{font-size:34px;border:none;background:none;padding:6px 0;border-radius:12px}
+.sdc-emojis button:active{background:#EFE6D4;transform:scale(1.2)}
 /* ---------- Reacciones ---------- */
 .r-emo{display:inline-flex;align-items:center;justify-content:center;font-size:26px;line-height:1}
 .r-horse{display:inline-flex}
@@ -724,9 +782,10 @@ let HAS_SHARE = true;   // compartir publicaciones
 let HAS_VIEWS = true;   // "Visto por" en Sundowns
 const SHARE_EMBED = ',shared_id,orig:shared_id(id,user_id,caption,media_type,created_at,profiles!user_id(id,username,full_name,avatar_url))';
 function postSelect() {
-  return POST_SELECT.replace('likes(user_id)', HAS_REACT ? 'likes(user_id,reaction)' : 'likes(user_id)') + (HAS_KIND ? ',kind' : '') + (HAS_SONG ? ',song_url,song_title,song_preview,song_art,song_start' : '') + (HAS_ANIMALS ? ANIMAL_EMBED : '') + (HAS_SHARE ? SHARE_EMBED : '');
+  return POST_SELECT.replace('likes(user_id)', HAS_REACT ? 'likes(user_id,reaction)' : 'likes(user_id)') + (HAS_KIND ? ',kind' : '') + (HAS_SONG ? ',song_url,song_title,song_preview,song_art,song_start' : '') + (HAS_ANIMALS ? ANIMAL_EMBED : '') + (HAS_SHARE ? SHARE_EMBED : '') + (HAS_OVERLAYS ? ',overlays' : '');
 }
 function fixMissing(m) {   // si falta algún SQL, la app sigue funcionando sin esa parte
+  if (HAS_OVERLAYS && /overlays/i.test(m)) { HAS_OVERLAYS = false; return true; }
   if (HAS_SHARE && /shared|orig/i.test(m)) { HAS_SHARE = false; return true; }
   if (HAS_REACT && /reaction/i.test(m)) { HAS_REACT = false; return true; }
   if (HAS_ANIMALS && /animal/i.test(m)) { HAS_ANIMALS = false; return true; }
@@ -1031,7 +1090,7 @@ async function renderFeed() {
     const groups = await fetchSundownGroups();
     const mine = groups.find(g => g.user.id === state.me.id);
     const others = groups.filter(g => g.user.id !== state.me.id).sort((a, b) => b.unseen - a.unseen);
-    const newSundown = () => { if (needLogin('Crea tu cuenta para subir tu sundown')) return; state.uploadKind = 'sundown'; go('upload'); };
+    const newSundown = () => openSundownCreator(paintSundowns);
     const myBubble = h('button', { class: 'story', 'aria-label': mine ? 'Ver tu sundown' : 'Subir tu sundown', onclick: () => mine ? openSundowns([mine, ...others], 0, paintSundowns) : newSundown() },
       h('div', { class: 'ring' + (mine ? (mine.unseen ? ' new' : ' seen') : ' blank') }, mine ? sdThumb(mine) : h('div', {}, avatar(state.me, 56)),
         h('span', { class: 'sd-add', role: 'button', 'aria-label': 'Nuevo sundown', onclick: (e) => { e.stopPropagation(); newSundown(); } }, '+')),
@@ -1607,6 +1666,224 @@ function openRules() {
   openSheet('Reglas y privacidad', body);
 }
 
+// ---------- Creador de Sundowns (como las historias de Facebook) ----------
+let HAS_OVERLAYS = true;
+const SD_EMOJIS = ['🤠', '🐎', '🐴', '🐄', '🐂', '🐓', '🐖', '🐕', '🐑', '🌵', '🌾', '🌽', '🚜', '🛻', '🏡', '🌅', '🌄', '☀️', '🌙', '⭐', '✨', '🔥', '❤️', '😍', '😂', '🥹', '😎', '🙌', '👏', '🙏', '👍', '💯', '🎉', '🎊', '🎶', '🎸', '🎺', '🥁', '💃', '🕺', '👢', '🍺', '🍻', '🥃', '🌮', '🥩', '🌶️', '🏆', '⛪', '💐'];
+const SD_COLORS = ['#FFFFFF', '#000000', '#F3BD68', '#C7843B', '#E2333F', '#F7A8C9', '#2E9C93', '#3B82F6', '#2C4657', '#8B4A22'];
+const isHex = (c) => /^#[0-9A-Fa-f]{6}$/.test(c || '');
+// Dibuja los textos, emojis y la tarjeta de canción encima del Sundown (posiciones en % del recuadro 9:16)
+function sdOverlayEl(o, song) {
+  const pos = `left:${Math.max(0, Math.min(100, +o.x || 50))}%;top:${Math.max(0, Math.min(100, +o.y || 50))}%;transform:translate(-50%,-50%) rotate(${(+o.r || 0).toFixed(1)}deg) scale(${Math.max(0.3, Math.min(5, +o.s || 1)).toFixed(2)})`;
+  if (o.t === 'text') {
+    const c = isHex(o.c) ? o.c : '#FFFFFF';
+    const dark = ['#FFFFFF', '#F3BD68', '#F7A8C9'].includes(c);
+    const style = o.m === 1 ? `background:${c};color:${dark ? '#172531' : '#FFFFFF'}` : `color:${c}`;
+    return h('div', { class: 'sdo sdo-text' + (o.m === 1 ? ' box' : ''), style: pos + ';' + style }, String(o.txt || '').slice(0, 200));
+  }
+  if (o.t === 'emoji') return h('div', { class: 'sdo sdo-emoji', style: pos }, String(o.e || '').slice(0, 8));
+  if (o.t === 'music' && song && song.title) {
+    const [tn, ar] = String(song.title).split(' · ');
+    return h('div', { class: 'sdo sdo-music', style: pos },
+      song.art ? h('img', { src: song.art, alt: '' }) : h('span', { class: 'ph' }, '♫'),
+      h('div', { class: 't' }, h('b', {}, tn), ar ? h('small', {}, ar) : null), h('span', { class: 'eq', 'aria-hidden': 'true' }, h('i'), h('i'), h('i')));
+  }
+  return null;
+}
+function sdCanvas(mediaEl, it) {
+  const layer = h('div', { class: 'sdo-layer' });
+  const list = Array.isArray(it && it.overlays) ? it.overlays : [];
+  const song = it && it.song_preview ? { title: it.song_title, art: it.song_art } : null;
+  list.forEach(o => { const el = sdOverlayEl(o, song); if (el) layer.append(el); });
+  return h('div', { class: 'sd-canvas' }, mediaEl, layer);
+}
+const sdHasMusicSticker = (it) => Array.isArray(it && it.overlays) && it.overlays.some(o => o.t === 'music');
+
+function openSundownCreator(onDone) {
+  if (needLogin('Crea tu cuenta para subir tu sundown')) return;
+  const pick = h('input', { type: 'file', accept: 'image/*,video/*', hidden: true });
+  document.body.append(pick);
+  pick.addEventListener('change', () => { const f = pick.files && pick.files[0]; pick.remove(); if (f) startCreator(f, onDone); });
+  pick.click();
+}
+function startCreator(file, onDone) {
+  const isVideo = (file.type || '').startsWith('video/');
+  if (!isVideo && !(file.type || '').startsWith('image/')) return toast('Escoge una foto o un video');
+  if (file.size > MAX_VIDEO_MB * 1024 * 1024) return toast(`El video es muy pesado (máx. ${MAX_VIDEO_MB} MB)`);
+  const url = URL.createObjectURL(file);
+  const items = [];            // { t:'text'|'emoji'|'music', x, y, s, r, ... }
+  let song = null;             // { url, title, preview, art, start }
+  const media = isVideo ? h('video', { src: url, autoplay: true, loop: true, muted: true, playsInline: true }) : h('img', { src: url, alt: '' });
+  if (isVideo) { media.muted = true; media.play().catch(() => {}); }
+  const layer = h('div', { class: 'sdo-layer edit' });
+  const canvas = h('div', { class: 'sd-canvas' }, media, layer);
+  const trash = h('div', { class: 'sdc-trash', 'aria-hidden': 'true' }, '🗑️');
+  const shareBtn = h('button', { class: 'sdc-share', type: 'button' }, 'Compartir sundown');
+  const tool = (label, title, fn) => h('button', { class: 'sdc-tool', type: 'button', 'aria-label': title, onclick: fn }, h('span', {}, label), h('small', {}, title));
+  const root = h('div', { class: 'sdc', role: 'dialog', 'aria-label': 'Crear sundown' },
+    h('div', { class: 'sd-bg', style: isVideo ? 'background:#000' : `background-image:url("${url}")` }),
+    h('div', { class: 'sdc-stage' }, canvas),
+    h('div', { class: 'sdc-top' },
+      h('button', { class: 'sdc-x', type: 'button', 'aria-label': 'Cancelar', onclick: () => closeAsk() }, '✕'),
+      h('div', { class: 'sdc-tools' }, tool('Aa', 'Texto', () => editText(null)), tool('😊', 'Emojis', () => openEmojis()), tool('🎵', 'Música', () => openMusic()))),
+    trash,
+    h('div', { class: 'sdc-bottom' }, shareBtn));
+  document.body.append(root);
+  root.addEventListener('scroll', () => { root.scrollTop = 0; root.scrollLeft = 0; });
+  const hint = h('div', { class: 'sdc-hint' }, 'Agrega texto, emojis o música. Arrástralos con el dedo; con dos dedos los haces grandes o los giras.');
+  root.append(hint); setTimeout(() => hint.remove(), 4500);
+
+  const close = () => { stopSong(); URL.revokeObjectURL(url); root.remove(); };
+  const closeAsk = () => { if ((items.length || song) && !confirm('¿Descartar este sundown?')) return; close(); };
+  root._close = closeAsk;   // para el botón "atrás" del teléfono
+
+  // ---- dibujar y mover los elementos ----
+  function paint() {
+    layer.replaceChildren(...items.map(o => { const el = sdOverlayEl(o, song); if (el) armDrag(el, o); return el; }).filter(Boolean));
+  }
+  function armDrag(el, o) {
+    const pts = new Map(); let start = null, moved = false, t0 = 0;
+    const rect = () => canvas.getBoundingClientRect();
+    el.addEventListener('pointerdown', (e) => {
+      e.preventDefault(); el.setPointerCapture(e.pointerId); pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (pts.size === 1) { moved = false; t0 = Date.now(); }
+      start = snapshot(); el.classList.add('drag');
+    });
+    const snapshot = () => { const p = [...pts.values()]; return { o: { ...o }, p, d: p.length > 1 ? Math.hypot(p[1].x - p[0].x, p[1].y - p[0].y) : 0, a: p.length > 1 ? Math.atan2(p[1].y - p[0].y, p[1].x - p[0].x) : 0, c: center(p) }; };
+    const center = (p) => p.length > 1 ? { x: (p[0].x + p[1].x) / 2, y: (p[0].y + p[1].y) / 2 } : p[0];
+    el.addEventListener('pointermove', (e) => {
+      if (!pts.has(e.pointerId)) return;
+      pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      const p = [...pts.values()]; if (p.length !== start.p.length) start = snapshot();
+      const r = rect(), c = center(p);
+      const dx = c.x - start.c.x, dy = c.y - start.c.y;
+      if (Math.abs(dx) + Math.abs(dy) > 4) moved = true;
+      o.x = Math.max(0, Math.min(100, start.o.x + dx / r.width * 100));
+      o.y = Math.max(0, Math.min(100, start.o.y + dy / r.height * 100));
+      if (p.length > 1 && start.d) {
+        o.s = Math.max(0.3, Math.min(5, start.o.s * Math.hypot(p[1].x - p[0].x, p[1].y - p[0].y) / start.d));
+        o.r = start.o.r + (Math.atan2(p[1].y - p[0].y, p[1].x - p[0].x) - start.a) * 180 / Math.PI; moved = true;
+      }
+      el.style.left = o.x + '%'; el.style.top = o.y + '%';
+      el.style.transform = `translate(-50%,-50%) rotate(${o.r.toFixed(1)}deg) scale(${o.s.toFixed(2)})`;
+      const overTrash = p.length === 1 && moved && overBin(c);
+      root.classList.toggle('dragging', moved); trash.classList.toggle('hot', overTrash);
+    });
+    const end = (e) => {
+      if (!pts.has(e.pointerId)) return;
+      const p = pts.get(e.pointerId); pts.delete(e.pointerId);
+      if (pts.size) { start = snapshot(); return; }
+      const binned = moved && overBin(p);
+      el.classList.remove('drag'); root.classList.remove('dragging'); trash.classList.remove('hot');
+      if (binned) { items.splice(items.indexOf(o), 1); if (o.t === 'music') { song = null; stopSong(); } paint(); return; }
+      if (!moved && Date.now() - t0 < 350) { if (o.t === 'text') editText(o); else if (o.t === 'music') openMusic(); }
+    };
+    el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end);
+  }
+  const overBin = (p) => { const r = trash.getBoundingClientRect(); return Math.hypot(p.x - (r.left + r.width / 2), p.y - (r.top + r.height / 2)) < 60; };
+
+  // ---- texto ----
+  function editText(o) {
+    let color = o ? o.c : '#FFFFFF', mode = o ? (o.m || 0) : 0;
+    const ta = h('textarea', { class: 'sdc-ta', maxlength: '200', rows: 3, placeholder: 'Escribe algo…' });
+    ta.value = o ? o.txt : '';
+    const modeBtn = h('button', { class: 'sdc-mode', type: 'button', 'aria-label': 'Cambiar estilo del texto' }, 'A');
+    const sw = h('div', { class: 'sdc-swatches' });
+    const paintTa = () => {
+      const dark = ['#FFFFFF', '#F3BD68', '#F7A8C9'].includes(color);
+      ta.style.color = mode === 1 ? (dark ? '#172531' : '#FFFFFF') : color; ta.style.background = mode === 1 ? color : 'transparent';
+      modeBtn.classList.toggle('on', mode === 1);
+      sw.replaceChildren(...SD_COLORS.map(c => h('button', { type: 'button', class: 'sw' + (c === color ? ' on' : ''), style: `background:${c}`, 'aria-label': 'Color', onclick: () => { color = c; paintTa(); ta.focus(); } })));
+    };
+    modeBtn.addEventListener('click', () => { mode = mode ? 0 : 1; paintTa(); ta.focus(); });
+    const done = () => {
+      const txt = ta.value.trim(); pane.remove();
+      if (o) { if (!txt) items.splice(items.indexOf(o), 1); else Object.assign(o, { txt, c: color, m: mode }); }
+      else if (txt) items.push({ t: 'text', txt, c: color, m: mode, x: 50, y: 40, s: 1, r: 0 });
+      paint();
+    };
+    const pane = h('div', { class: 'sdc-pane text' },
+      h('div', { class: 'sdc-pane-top' }, modeBtn, h('button', { class: 'sdc-done', type: 'button', onclick: done }, 'Listo')),
+      h('div', { class: 'sdc-ta-wrap' }, ta), sw);
+    root.append(pane); paintTa(); setTimeout(() => ta.focus({ preventScroll: true }), 50);
+  }
+  // ---- emojis ----
+  function openEmojis() {
+    const pane = h('div', { class: 'sdc-sheet' },
+      h('div', { class: 'sdc-sheet-head' }, h('b', {}, 'Emojis'), h('button', { class: 'sdc-done', type: 'button', onclick: () => pane.remove() }, 'Cerrar')),
+      h('div', { class: 'sdc-emojis' }, SD_EMOJIS.map(e => h('button', { type: 'button', onclick: () => { items.push({ t: 'emoji', e, x: 50, y: 50, s: 1, r: 0 }); pane.remove(); paint(); } }, e))));
+    root.append(pane);
+  }
+  // ---- música (Apple Music, 30 s) ----
+  function openMusic() {
+    const input = h('input', { class: 'input', type: 'search', placeholder: 'Busca por canción o artista…', autocomplete: 'off', enterkeyhint: 'search' });
+    const list = h('div', { class: 'song-list' });
+    const cut = h('div');
+    const body = h('div', { class: 'sdc-sheet-body' }, input, cut, list);
+    const pane = h('div', { class: 'sdc-sheet tall' },
+      h('div', { class: 'sdc-sheet-head' }, h('b', {}, '🎵 Música'), h('button', { class: 'sdc-done', type: 'button', onclick: () => { stopSong(); pane.remove(); paint(); } }, 'Listo')), body);
+    root.append(pane);
+    const showCut = () => {
+      cut.replaceChildren();
+      if (!song) return;
+      const lab = h('b', {}, '0:' + String(song.start || 0).padStart(2, '0'));
+      const range = h('input', { type: 'range', min: '0', max: '25', step: '1', value: String(song.start || 0), class: 'song-range', 'aria-label': 'Desde qué segundo empieza la canción' });
+      const listen = () => { stopSong(); playSong(song.preview, null, song.start); };
+      range.addEventListener('input', () => { song.start = Number(range.value); lab.textContent = '0:' + String(song.start).padStart(2, '0'); });
+      range.addEventListener('change', listen);
+      cut.append(h('div', { class: 'song-cut' },
+        h('div', { class: 'song-cut-top' }, h('span', {}, '🎵 ' + song.title)),
+        h('div', { class: 'song-cut-top' }, h('span', {}, '✂️ Empieza en '), lab), range,
+        h('div', { class: 'song-cut-help' }, h('button', { type: 'button', class: 'linkbtn', style: 'text-decoration:underline', onclick: () => { stopSong(); song = null; const i = items.findIndex(x => x.t === 'music'); if (i >= 0) items.splice(i, 1); showCut(); } }, 'Quitar canción'),
+          h('button', { type: 'button', class: 'song-play', 'aria-label': 'Escuchar desde ahí', onclick: listen }, '▶'))));
+    };
+    let timer, seq = 0;
+    const search = async () => {
+      const q = input.value.trim(); const s = ++seq; list.replaceChildren(); if (q.length < 2) return;
+      list.append(h('small', { class: 'hint' }, 'Buscando…'));
+      try {
+        const r = await fetch('https://itunes.apple.com/search?' + new URLSearchParams({ term: q, country: 'MX', media: 'music', entity: 'song', limit: '10' }));
+        const j = await r.json(); if (s !== seq) return;
+        const res = (j.results || []).filter(x => x.previewUrl && x.trackViewUrl);
+        list.replaceChildren(...(res.length ? res.map(x => {
+          const title = (x.trackName + ' · ' + x.artistName).slice(0, 120), art = (x.artworkUrl100 || '').replace('100x100', '120x120');
+          const play = h('button', { type: 'button', class: 'song-play', 'aria-label': 'Escuchar ' + x.trackName, onclick: (e) => { e.stopPropagation(); playSong(x.previewUrl, play); } }, '▶');
+          return h('div', { class: 'song-row', role: 'button', tabindex: '0', onclick: () => {
+            song = { url: x.trackViewUrl.split('&uo=')[0], title, preview: x.previewUrl, art, start: 0 };
+            if (!items.some(i => i.t === 'music')) items.push({ t: 'music', x: 50, y: 74, s: 1, r: 0 });
+            input.value = ''; list.replaceChildren(); showCut(); stopSong(); playSong(song.preview, null, 0);
+          } }, h('img', { src: art, alt: '' }), h('div', { class: 'who' }, h('b', {}, x.trackName), h('small', {}, x.artistName)), play);
+        }) : [h('small', { class: 'hint' }, 'No encontramos esa canción. Prueba con el nombre del artista.')]));
+      } catch (_) { if (s === seq) list.replaceChildren(h('small', { class: 'err' }, 'No se pudo buscar. Revisa tu conexión.')); }
+    };
+    input.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(search, 450); });
+    showCut(); setTimeout(() => input.focus({ preventScroll: true }), 50);
+  }
+  // ---- publicar ----
+  shareBtn.addEventListener('click', async () => {
+    shareBtn.disabled = true; shareBtn.textContent = 'Subiendo…';
+    stopSong(); const endTrot = SFX.startUpload();
+    try {
+      const blob = isVideo ? file : await compressImage(file);
+      const ext = isVideo ? ((file.name.split('.').pop() || 'mp4').toLowerCase().replace(/[^a-z0-9]/g, '') || 'mp4') : (blob.type === 'image/png' ? 'png' : 'jpg');
+      const path = `${state.me.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+      const up = await sb.storage.from('media').upload(path, blob, { contentType: blob.type || file.type, cacheControl: '31536000' });
+      if (up.error) throw up.error;
+      const { data: pub } = sb.storage.from('media').getPublicUrl(path);
+      const row = { user_id: state.me.id, media_url: pub.publicUrl, media_type: isVideo ? 'video' : 'image', caption: null, category: null, shop_links: [], kind: 'sundown' };
+      const clean = items.map(o => ({ ...o, x: Math.round(o.x * 10) / 10, y: Math.round(o.y * 10) / 10, s: Math.round(o.s * 100) / 100, r: Math.round(o.r) }));
+      if (HAS_OVERLAYS && clean.length) row.overlays = clean;
+      if (HAS_SONG && song) Object.assign(row, { song_url: song.url, song_title: song.title, song_preview: song.preview, song_art: song.art || null, song_start: song.start || 0 });
+      let ins = await sb.from('posts').insert(row);
+      if (ins.error && /overlays/i.test(ins.error.message || '')) { HAS_OVERLAYS = false; delete row.overlays; ins = await sb.from('posts').insert(row); }
+      if (ins.error) { sb.storage.from('media').remove([path]); throw ins.error; }
+      endTrot(true); close();
+      toast('Sundown publicado. Se va con el sol en 24 h');
+      if (onDone) onDone();
+    } catch (ex) { endTrot(false); shareBtn.disabled = false; shareBtn.textContent = 'Compartir sundown'; toast(friendlyError(ex)); }
+  });
+  paint();
+}
+
 // ---------- Sundowns (desaparecen en 24 horas) ----------
 let SD_MUTED = false;
 function ytIdOf(it) { if (it.song_preview || !it.song_url) return null; const sg = parseSong(it.song_url); return sg && sg.type === 'yt' ? sg.id : null; }
@@ -1691,7 +1968,7 @@ function openSundowns(groups, gi, onClose) {
       h('div', { class: 'sp' }),
       muteBtn,
       pauseBtn,
-      it.user_id === state.me.id && h('button', { class: 'iconbtn plain', style: 'color:#fff', 'aria-label': 'Agregar otro sundown', icon: 'plus', onclick: () => { close(); state.uploadKind = 'sundown'; go('upload'); } }),
+      it.user_id === state.me.id && h('button', { class: 'iconbtn plain', style: 'color:#fff', 'aria-label': 'Agregar otro sundown', icon: 'plus', onclick: () => { close(); openSundownCreator(() => render()); } }),
       it.user_id === state.me.id && h('button', { class: 'iconbtn plain', style: 'color:#fff', 'aria-label': 'Borrar sundown', icon: 'trash', onclick: async () => {
         setPaused(true, 'button');
         if (await deletePost(it)) { g.items.splice(ii, 1); if (!g.items.length) { groups.splice(gi, 1); if (!groups.length) return close(); gi = Math.min(gi, groups.length - 1); ii = 0; } else ii = Math.min(ii, g.items.length - 1); show(); }
@@ -1708,7 +1985,7 @@ function openSundowns(groups, gi, onClose) {
       const [tn, ar] = String(it.song_title || 'Canción').split(' · ');
       music.replaceChildren(it.song_art ? h('img', { src: it.song_art, alt: '' }) : h('span', { class: 'ph' }, '♫'),
         h('div', { class: 't' }, h('b', {}, tn), ar ? h('small', {}, ar) : null), h('span', { class: 'eq', 'aria-hidden': 'true' }, h('i'), h('i'), h('i')));
-      music.style.display = 'flex';
+      music.style.display = sdHasMusicSticker(it) ? 'none' : 'flex';
     } else music.style.display = 'none';
     if (it.user_id !== (state.me && state.me.id)) {
       const inp = h('input', { type: 'text', maxlength: '500', placeholder: 'Responder a ' + (g.user.username || '') + '…', enterkeyhint: 'send', 'aria-label': 'Responder' });
@@ -1761,10 +2038,10 @@ function openSundowns(groups, gi, onClose) {
       video.addEventListener('ended', () => next());
       video.addEventListener('error', () => { safety = setTimeout(next, 3000); });
       video.play().catch(() => { if (video) { video.muted = true; video.play().catch(() => {}); } });
-      stage.replaceChildren(h('div', { class: 'sd-bg', style: `background-image:url("${(it.thumb_url || '').replace(/"/g, '')}")` }), video);
+      stage.replaceChildren(h('div', { class: 'sd-bg', style: 'background:#000' }), sdCanvas(video, it));
     } else {
       isImg = true;
-      stage.replaceChildren(h('div', { class: 'sd-bg', style: `background-image:url("${String(it.media_url).replace(/"/g, '')}")` }), h('img', { src: it.media_url, alt: it.caption || 'Sundown de ' + (g.user.username || '') }));
+      stage.replaceChildren(h('div', { class: 'sd-bg', style: `background-image:url("${String(it.media_url).replace(/"/g, '')}")` }), sdCanvas(h('img', { src: it.media_url, alt: it.caption || 'Sundown de ' + (g.user.username || '') }), it));
       lastT = performance.now();
       raf = requestAnimationFrame(tick);
     }
@@ -2024,6 +2301,7 @@ function renderUpload() {
   }).catch(() => {});
   const paintKind = () => {
     kindBar.replaceChildren(...KINDS.map(([k, label, icon]) => h('button', { type: 'button', role: 'tab', 'aria-selected': String(k === kind), class: k === kind ? 'on' : '', onclick: () => {
+      if (k === 'sundown') return openSundownCreator(() => go('feed'));
       kind = k; state.uploadKind = k;
       if (k === 'ride' && file && !file.type.startsWith('video/')) { file = null; fileInput.value = ''; picker.replaceChildren(...pickerEmpty()); }
       paintKind();
@@ -2627,7 +2905,7 @@ let ARMED = false;
 try { history.scrollRestoration = 'manual'; } catch (_) {}
 function armBack() { if (ARMED) return; try { history.pushState({ yh: 1 }, ''); ARMED = true; } catch (_) {} }
 function backNeeded() {
-  const overlay = document.querySelector('.sd-viewer,.sheet-bg,.react-pick-bg');
+  const overlay = document.querySelector('.sd-viewer,.sheet-bg,.react-pick-bg,.sdc');
   return !!overlay || state.view !== 'feed' || window.scrollY > 120;
 }
 function syncBack() { if (backNeeded()) armBack(); }
@@ -2639,6 +2917,10 @@ window.addEventListener('popstate', () => {
   ARMED = false;
   const picker = document.querySelector('.react-pick-bg');
   if (picker) { picker.remove(); return syncBack(); }
+  const sdcPane = document.querySelector('.sdc .sdc-pane .sdc-done, .sdc .sdc-sheet .sdc-done');
+  if (sdcPane) { sdcPane.click(); return syncBack(); }
+  const sdc = document.querySelector('.sdc');
+  if (sdc) { sdc._close(); return syncBack(); }
   const viewerClose = document.querySelector('.sd-viewer [aria-label="Cerrar"]');
   if (viewerClose) { viewerClose.click(); return syncBack(); }
   const sheets = document.querySelectorAll('.sheet-bg');
