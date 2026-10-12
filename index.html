@@ -1592,11 +1592,12 @@ const SFX = (() => {
     sad(t) { tone(t, 0.26, 440, 400, 'triangle', 0.5, 4); tone(t + 0.28, 0.5, 392, 262, 'triangle', 0.5, 6); }, // wa-waa
     fire(t) { noise(t, 0.04, 2800, 3, 0.9); noise(t + 0.25, 0.04, 2800, 3, 0.9); },            // chasquido de dedos
     subidaFin(t) { neigh(t); },
+    sent(t) { tone(t, 0.12, 600, 1400, 'sine', 0.35); },                                     // mensaje enviado (respaldo)
     msg(t) { bell(t, 523, 0.35, 1.2); bell(t + 0.22, 523, 0.25, 1); }                       // campana de rancho: mensaje nuevo                                                                // relincho al terminar
   };
   let loopTimer = null;
   // Sonidos reales (Mixkit) en la carpeta sfx/; si alguno no carga, suena el de respaldo de arriba
-  const FILES = { ajua: 'ajua', msg: 'mensaje', subidaFin: 'publicado' };
+  const FILES = { ajua: 'ajua', msg: 'mensaje', sent: 'enviado', subidaFin: 'publicado' };
   const BUF = {}, LOADING = {};
   const load = (k) => {
     if (BUF[k] || LOADING[k] || !FILES[k] || !ctx) return LOADING[k];
@@ -4222,6 +4223,7 @@ async function renderChat() {
     msgs = msgs.filter(m => m !== tmp);
     if (error) { input.value = text; grow(); paint(); return toast(failMsg(error)); }
     if (data && !seen.has(data.id)) { seen.add(data.id); msgs.push(data); }
+    SFX.play('sent');
     paint();
   }
   async function sendMedia(file) {
@@ -4243,7 +4245,7 @@ async function renderChat() {
     }
     msgs = msgs.filter(m => m !== tmp);
     if (error) { paint(); URL.revokeObjectURL(localUrl); return toast(failMsg(error)); }
-    if (data) { DM_SIGNED.set(path, { url: localUrl, exp: Date.now() + 3500e3 }); if (!seen.has(data.id)) { seen.add(data.id); msgs.push(data); } }
+    if (data) { DM_SIGNED.set(path, { url: localUrl, exp: Date.now() + 3500e3 }); if (!seen.has(data.id)) { seen.add(data.id); msgs.push(data); } SFX.play('sent'); }
     paint();
   }
   let channel = null;
