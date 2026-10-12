@@ -809,6 +809,8 @@ html,body{background:#F5EFE3!important;background-image:none!important;color:#17
 .fx-spec-grid .field{margin-bottom:10px}
 .notif .btn.small{flex:0 0 auto;height:34px;font-size:13px}
 .notif{cursor:pointer}
+.nav button{flex:1 1 0;min-width:0;width:auto}
+.nav .plus{flex:0 0 56px;width:56px}
 .sr-sec{margin:8px 0 14px}
 .sr-person{display:flex;align-items:center;gap:12px;padding:9px 0;cursor:pointer;border-bottom:1px solid #EFE6D4}
 .sr-person .who{flex:1;min-width:0;display:flex;flex-direction:column}
@@ -1352,11 +1354,12 @@ function go(view, extra) {
   if (typeof syncBack === 'function') syncBack();
 }
 function navBar() {
-  const b = (v, icon, label, isOn) => h('button', { class: isOn ? 'on' : '', 'aria-label': label, onclick: () => { if (v === 'profile' && needLogin('Crea tu cuenta para tener tu perfil')) return; go(v, v === 'profile' ? { profileId: state.me.id } : undefined); } },
+  const b = (v, icon, label, isOn) => h('button', { class: isOn ? 'on' : '', 'aria-label': label, onclick: () => { if (v === 'profile' && needLogin('Crea tu cuenta para tener tu perfil')) return; if (v === 'explore') state.focusSearch = true; go(v, v === 'profile' ? { profileId: state.me.id } : undefined); } },
     h('span', { icon }), label);
   const ownProfile = state.view === 'profile' && state.profileId === state.me.id;
   return h('nav', { class: 'nav' }, h('div', { class: 'nav-in' },
     b('feed', 'home', 'Inicio', state.view === 'feed'),
+    b('explore', 'search', 'Buscar', state.view === 'explore'),
     b('rides', 'horseshoe', 'Rides', state.view === 'rides'),
     h('button', { class: 'plus', 'aria-label': 'Subir', onclick: () => { if (needLogin('Crea tu cuenta para subir tus fotos y videos')) return; state.uploadKind = state.view === 'rides' ? 'ride' : 'post'; go('upload'); }, icon: 'plus' }),
     b('feria', 'feria', 'Feria', state.view === 'feria'),
@@ -1463,7 +1466,7 @@ function renderAuth() {
 
 async function renderFeed() {
   const main = h('main');
-  $app.append(h('header', { class: 'topbar' }, h('div', { class: 'logo' }, 'Ranchfolk'), h('div', { class: 'top-actions' }, searchButton(), menuButton(), bellButton(), dmButton())), main);
+  $app.append(h('header', { class: 'topbar' }, h('div', { class: 'logo' }, 'Ranchfolk'), h('div', { class: 'top-actions' }, menuButton(), bellButton(), dmButton())), main);
 
   const stories = h('div', { class: 'stories' });
   const chips = h('div', { class: 'chips' }, ['Todo', ...CATEGORIES].map(c =>
@@ -2573,7 +2576,7 @@ function rideCard(p) {
 
 async function renderExplore() {
   const main = h('main');
-  $app.append(h('header', { class: 'topbar' }, h('button', { class: 'iconbtn plain', 'aria-label': 'Regresar', icon: 'back', onclick: () => go(state.prevView && state.prevView !== 'explore' ? state.prevView : 'feed') }), h('div', { class: 'logo', style: 'font-size:24px' }, 'Buscar'), h('div', { style: 'width:44px' })), main);
+  $app.append(h('header', { class: 'topbar' }, h('div', { class: 'logo', style: 'font-size:24px' }, 'Buscar'), h('div', { class: 'top-actions' }, menuButton(), bellButton(), dmButton())), main);
   const search = h('input', { class: 'input', type: 'search', placeholder: 'Buscar personas, publicaciones, ventas, eventos…', 'aria-label': 'Buscar', enterkeyhint: 'search' });
   const people = h('div', { style: 'padding:0 16px' });
   const tagBar = h('div', { class: 'tag-bar' });
