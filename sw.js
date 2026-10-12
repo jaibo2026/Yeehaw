@@ -28,6 +28,7 @@ self.addEventListener('push', (e) => {
       silent: open,
       vibrate: [120, 60, 120],
       data: { url: d.url || './' },
+      actions: isChat ? [{ action: 'reply', title: '💬 Responder' }] : [],
     });
   })());
 });

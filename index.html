@@ -826,6 +826,28 @@ html,body{background:#F5EFE3!important;background-image:none!important;color:#17
 #heads.left .head-tip{right:auto;left:70px;border-radius:16px 16px 16px 4px}
 .head-tip.out{opacity:0;transform:translateY(4px);pointer-events:none}
 .heads-drop{position:fixed;left:50%;bottom:110px;z-index:39;width:64px;height:64px;margin-left:-32px;border-radius:50%;background:rgba(23,37,49,.75);color:#fff;font-size:26px;display:flex;align-items:center;justify-content:center;transition:transform .15s,background .15s}
+.mc-bg{position:fixed;inset:0;z-index:60;background:rgba(23,37,49,.35);display:flex;align-items:flex-end;justify-content:center;padding:0 10px calc(96px + env(safe-area-inset-bottom));animation:mcin .2s ease}
+.mc-bg.out{opacity:0;transition:opacity .18s}
+@keyframes mcin{from{opacity:0}to{opacity:1}}
+.mc-panel{width:100%;max-width:440px;height:min(62vh,520px);display:flex;flex-direction:column;background:#FFFDF8;border-radius:22px;overflow:hidden;box-shadow:0 18px 50px rgba(23,37,49,.4);border:1px solid #EADFCB;animation:mcup .25s cubic-bezier(.3,1.3,.5,1)}
+@keyframes mcup{from{transform:translateY(30px) scale(.95)}to{transform:none}}
+.mc-head{display:flex;align-items:center;gap:6px;padding:10px 8px 10px 12px;background:linear-gradient(180deg,#2C4657,#172531)}
+.mc-head .iconbtn{color:#fff}
+.mc-who{flex:1;min-width:0;display:flex;align-items:center;gap:10px;border:none;background:none;padding:0;text-align:left;color:#fff;cursor:pointer}
+.mc-who b{display:block;font-size:15px;color:#F3BD68;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mc-who small{font-size:11px;color:#C9D3DA}
+.mc-av{position:relative;flex:0 0 auto;padding-top:6px}
+.mc-av .head-hat{left:2px;top:-6px;width:38px}
+.mc-list{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:6px;background:#F5EFE3}
+.mc-msg{max-width:78%;align-self:flex-start;padding:8px 12px;border-radius:18px 18px 18px 4px;background:#fff;border:1px solid #EADFCB;font-size:15px;line-height:1.35;white-space:pre-wrap;word-wrap:break-word}
+.mc-msg.me{align-self:flex-end;border-radius:18px 18px 4px 18px;background:linear-gradient(180deg,#2C4657,#172531);color:#fff;border:none}
+.mc-msg.pend{opacity:.6}
+.mc-img{display:block;max-width:180px;max-height:200px;border-radius:12px}
+.mc-media{border:none;background:none;color:inherit;font:inherit;padding:0}
+.mc-empty{text-align:center;color:var(--muted);margin:auto}
+.mc-form .send{width:44px;height:44px;border-radius:22px;border:none;background:linear-gradient(135deg,#F3BD68,#C7843B);color:#172531;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mc-form .send:disabled{opacity:.5}
+.mc-form{display:flex;align-items:flex-end;gap:8px;padding:8px 10px;border-top:1px solid #EADFCB;background:#FFFDF8}
+.mc-form .input{flex:1;resize:none;min-height:42px;max-height:96px;padding:10px 14px;border-radius:21px}
 .heads-drop.on{transform:scale(1.25);background:#C2183A}
 .nav button{flex:1 1 0;min-width:0;width:auto}
 .nav .plus{flex:0 0 52px;width:52px}
@@ -3888,6 +3910,7 @@ function listenInbox() {
       msgDing(); LAST_UNREAD = (LAST_UNREAD || 0) + 1;
       const b = document.querySelector('.msg-count'); if (b) refreshUnread(b);
       const inThisChat = state.view === 'chat' && state.chat && state.chat.id === m.conversation_id;
+      if (MINI && MINI.conv === m.conversation_id) { MINI.add(m); return; }
       if (!inThisChat && state.view !== 'inbox') addHead(m.sender_id, m.body ? String(m.body).replace(/#[pleu]=[\w-]+/g, '').trim() : (m.media_type === 'video' ? '🎥 Video' : '📷 Foto'));
     }).subscribe();
   } catch (_) { INBOX_CH = null; }
@@ -3907,7 +3930,7 @@ function headsHost() {
   }
   return host;
 }
-function headsVisible() { return !isGuest() && !['inbox', 'chat', 'upload', 'welcome', 'auth'].includes(state.view); }
+function headsVisible() { return !isGuest() && !MINI && !['inbox', 'chat', 'upload', 'welcome', 'auth'].includes(state.view); }
 function paintHeads(previewFor, previewText) {
   const host = headsHost();
   const list = [...HEADS.entries()].map(([k, v]) => Object.assign(v, { key: k })).sort((a, b) => b.last - a.last).slice(0, 4);
@@ -3919,7 +3942,7 @@ function paintHeads(previewFor, previewText) {
       h('span', { class: 'head-av' }, avatar(x.prof, 56)),
       x.n ? h('span', { class: 'head-n' }, x.n > 9 ? '9+' : String(x.n)) : null,
       previewFor === x.key && previewText ? h('span', { class: 'head-tip' }, previewText.slice(0, 70)) : null);
-    btn.addEventListener('click', (e) => { if (host._dragged) return; e.stopPropagation(); HEADS.delete(x.key); paintHeads(); openChatWith(x.prof); });
+    btn.addEventListener('click', (e) => { if (host._dragged) return; e.stopPropagation(); x.n = 0; openMiniChat(x.prof); });
     return btn;
   }));
   if (previewFor) setTimeout(() => host.querySelectorAll('.head-tip').forEach(t => t.classList.add('out')), 3800);
@@ -3936,6 +3959,75 @@ async function addHead(senderId, text) {
   x.n += 1; x.last = Date.now();
   paintHeads(senderId, text);
   const host = document.getElementById('heads'); if (host) { host.classList.remove('pop'); void host.offsetWidth; host.classList.add('pop'); }
+}
+// ---------- Chat flotante: se abre ahí mismo, sin salir de donde estás ----------
+let MINI = null;   // { conv, other, add(m), close() }
+async function openMiniChat(prof) {
+  if (MINI) MINI.close(true);
+  if (!HEADS.has(prof.id)) HEADS.set(prof.id, { prof, n: 0, last: Date.now() });
+  const COLS = 'id,sender_id,body,media_path,media_type,created_at,read_at';
+  const list = h('div', { class: 'mc-list' }, h('div', { class: 'spinner' }));
+  const input = h('textarea', { class: 'input', rows: 1, maxlength: '2000', placeholder: 'Escribe un mensaje…', 'aria-label': 'Mensaje' });
+  const send = h('button', { class: 'send', type: 'submit', 'aria-label': 'Enviar', icon: 'send', disabled: true });
+  const blockedNow = state.blocked && state.blocked.has(prof.id);
+  if (blockedNow) { input.disabled = true; input.placeholder = 'Bloqueaste a esta persona'; }
+  const grow = () => { input.style.height = 'auto'; input.style.height = Math.min(96, input.scrollHeight) + 'px'; send.disabled = !input.value.trim() || blockedNow; };
+  input.addEventListener('input', grow);
+  input.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && !('ontouchstart' in window)) { e.preventDefault(); submit(); } });
+  const full = () => { const conv = mini.conv; close(true); HEADS.delete(prof.id); paintHeads(); state.chat = { id: conv, other: prof }; go('chat'); };
+  const panel = h('div', { class: 'mc-panel', role: 'dialog', 'aria-label': 'Chat con ' + (prof.username || '') },
+    h('div', { class: 'mc-head' },
+      h('button', { class: 'mc-who', onclick: full }, h('span', { class: 'mc-av' }, h('span', { class: 'head-hat', icon: 'hatmini' }), avatar(prof, 38)), h('div', {}, h('b', {}, prof.full_name || prof.username || '', vb(prof.id)), h('small', {}, 'Toca para abrir el chat completo'))),
+      h('button', { class: 'iconbtn plain', 'aria-label': 'Cerrar', icon: 'close', onclick: () => close() })),
+    list,
+    h('form', { class: 'mc-form', onsubmit: (e) => { e.preventDefault(); submit(); } }, input, send));
+  const bg = h('div', { class: 'mc-bg', onclick: (e) => { if (e.target === bg) close(); } }, panel);
+  document.body.append(bg);
+  let msgs = [];
+  const seen = new Set();
+  const paint = () => {
+    list.replaceChildren(...(msgs.length ? msgs.slice(-60).map(m => {
+      const mine = m.sender_id === state.me.id;
+      let content;
+      if (m.media_path || m.localUrl) {
+        const u = m.localUrl || (DM_SIGNED.get(m.media_path) || {}).url;
+        content = m.media_type === 'video' ? h('button', { class: 'mc-media', onclick: full }, '🎥 Video') : u ? h('img', { class: 'mc-img', src: u, alt: 'Foto', onclick: () => openMediaViewer(u, 'image') }) : h('span', {}, '📷 Foto');
+      } else content = String(m.body || '').replace(/#[pleu]=[\w-]+/g, '').trim();
+      return h('div', { class: 'mc-msg' + (mine ? ' me' : '') + (m.pending ? ' pend' : '') }, content);
+    }) : [h('p', { class: 'mc-empty' }, '¡Salúdalo! 🤠')]));
+    list.scrollTop = list.scrollHeight;
+  };
+  const markRead = () => { if (mini.conv && msgs.some(m => m.sender_id !== state.me.id && !m.read_at)) { sb.rpc('mark_read', { conv: mini.conv }).then(() => { const b = document.querySelector('.msg-count'); if (b) refreshUnread(b); }, () => {}); msgs.forEach(m => { if (m.sender_id !== state.me.id) m.read_at = m.read_at || new Date().toISOString(); }); } };
+  async function submit() {
+    const text = input.value.trim();
+    if (!text || blockedNow || !mini.conv) return;
+    input.value = ''; grow();
+    const tmp = { id: 'tmp' + Date.now(), sender_id: state.me.id, body: text, pending: true };
+    msgs.push(tmp); paint();
+    const { data, error } = await sb.from('messages').insert({ conversation_id: mini.conv, sender_id: state.me.id, body: text }).select(COLS).single();
+    msgs = msgs.filter(m => m !== tmp);
+    if (error) { input.value = text; grow(); paint(); return toast(/row-level|policy/i.test(error.message || '') ? 'No puedes mandarle mensajes a esta persona' : 'No se pudo mandar'); }
+    if (data && !seen.has(data.id)) { seen.add(data.id); msgs.push(data); }
+    SFX.play('sent'); paint();
+  }
+  function close(silent) {
+    bg.classList.add('out'); setTimeout(() => bg.remove(), 180);
+    if (MINI === mini) MINI = null;
+    if (!silent) paintHeads();
+  }
+  const mini = { conv: null, other: prof, close,
+    add(m) { if (seen.has(m.id)) return; seen.add(m.id); (async () => { if (m.media_path) await signDm([m.media_path]); msgs.push(m); paint(); markRead(); })(); } };
+  MINI = mini;
+  paintHeads();
+  const { data: conv, error } = await sb.rpc('open_conversation', { other: prof.id });
+  if (error || MINI !== mini) { if (error) { close(); toast('No se pudo abrir el chat'); } return; }
+  mini.conv = conv;
+  const { data } = await sb.from('messages').select(COLS).eq('conversation_id', conv).order('created_at', { ascending: false }).limit(40);
+  if (MINI !== mini) return;
+  msgs = (data || []).reverse(); msgs.forEach(m => seen.add(m.id));
+  await signDm(msgs.filter(m => m.media_path).map(m => m.media_path));
+  paint(); markRead();
+  setTimeout(() => { if (!('ontouchstart' in window)) input.focus(); }, 200);
 }
 // Al abrir la app: burbujas de quienes te escribieron y no has leído
 async function loadHeads() {
@@ -4333,7 +4425,7 @@ function openDeepLink() {
   const u = /^#u=([0-9a-f-]{36})$/.exec(location.hash || '');
   if (u && state.me && !isGuest()) {  // tocaste un aviso de mensaje: abre ese chat
     history.replaceState(history.state, '', location.pathname + location.search);
-    sb.from('profiles').select(PROF_MINI).eq('id', u[1]).maybeSingle().then(({ data }) => { if (data) openChatWith(data); });
+    sb.from('profiles').select(PROF_MINI).eq('id', u[1]).maybeSingle().then(({ data }) => { if (data) { if (state.view === 'chat' || state.view === 'inbox') openChatWith(data); else openMiniChat(data); } });
     return;
   }
   const m = /^#([ple])=(\d+)$/.exec(location.hash || '');
