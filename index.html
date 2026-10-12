@@ -841,6 +841,23 @@ html,body{background:#F5EFE3!important;background-image:none!important;color:#17
 .cmt-meta{display:flex;align-items:center;gap:12px;padding:6px 12px 0}
 .cmt-act{border:none;background:none;padding:0;font:inherit;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer;-webkit-user-select:none;user-select:none}
 .cmt-act.on{color:#B5652B}
+.adm{padding-bottom:110px}
+.adm-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px 14px 4px}
+.adm-stat{padding:10px 8px;border-radius:14px;background:linear-gradient(180deg,#2C4657,#172531);text-align:center}
+.adm-stat b{display:block;font-size:22px;color:#F3BD68}.adm-stat small{display:block;font-size:11px;color:#C9D3DA;line-height:1.2}
+.adm-stat.warn{background:linear-gradient(180deg,#B5322B,#7A1A14)}.adm-stat.warn b{color:#fff}
+.adm-box{padding:0 14px}
+.adm-rep{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid #EADFCB}
+.adm-thumb{flex:0 0 76px;height:96px;border:none;padding:0;border-radius:12px;overflow:hidden;background:#EFE6D4;display:flex;align-items:center;justify-content:center;font-size:24px}
+.adm-thumb img,.adm-thumb video{width:100%;height:100%;object-fit:cover}
+.adm-info{flex:1;min-width:0}.adm-info b{display:block;font-size:14px}.adm-info small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+.adm-info p{margin:6px 0 0;font-size:13px;color:var(--soft)}
+.adm-acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.adm-acts .btn{height:34px;font-size:13px;padding:0 12px}
+.adm-user{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #EFE6D4}
+.adm-uwho{flex:1;min-width:0;display:flex;align-items:center;gap:10px;border:none;background:none;padding:0;text-align:left;cursor:pointer}
+.adm-uwho b{font-size:14px}.adm-uwho small{display:block;font-size:12px;color:var(--muted)}
+.adm-ban{color:#B5322B!important;font-weight:700}
+.ban-note{margin:10px 14px;padding:12px 14px;border-radius:14px;background:#FBE3E0;color:#7A1A14;font-weight:600;font-size:14px;line-height:1.4}
 .ms-thumbs{display:flex;gap:6px;margin:0 0 12px;overflow-x:auto}
 .ms-th{flex:0 0 64px;width:64px;height:96px;border-radius:10px;object-fit:cover;background:#EFE6D4;display:flex;align-items:center;justify-content:center;font-size:24px}
 .mc-bg{position:fixed;inset:0;z-index:60;background:rgba(23,37,49,.35);display:flex;align-items:flex-end;justify-content:center;padding:0 10px calc(96px + env(safe-area-inset-bottom));animation:mcin .2s ease}
@@ -895,7 +912,8 @@ const YT_KEY = '';
 // =====================================================================
 
 const CATEGORIES = ['Bailes', 'Outfits', 'Caballos', 'Jaripeo', 'Ganado', 'Comida'];
-const MAX_VIDEO_MB = 50;
+const MAX_VIDEO_MB = 300;   // antes de comprimir (después debe quedar en menos de 50 MB)
+const MAX_UP_MB = 50;
 const CONTACT = 'ranchfolk.app@gmail.com'; // correo de contacto para la página de reglas (vacío = se usa la página de Facebook)
 
 const ICONS = {
@@ -978,6 +996,7 @@ function avatar(p, size) {
 function safeUrl(u) { return /^https?:\/\//i.test(u || '') ? u : null; }
 function friendlyError(e) {
   const m = (e && e.message) || String(e);
+  if (/row-level security|violates row-level/i.test(m) && state.me && state.me.banned_until && new Date(state.me.banned_until) > new Date()) return 'Tu cuenta está suspendida por no seguir las reglas de Ranchfolk.';
   if (/Invalid login/i.test(m)) return 'Correo o contraseña incorrectos.';
   if (/already registered/i.test(m)) return 'Ese correo ya tiene cuenta. Inicia sesión.';
   if (/Password should be/i.test(m)) return 'La contraseña debe tener al menos 6 caracteres.';
@@ -990,6 +1009,59 @@ function friendlyError(e) {
   if (/kind/i.test(m) && /column|columna/i.test(m)) return 'Falta actualizar la base de datos en Supabase (el paso del SQL de Rides y Sundowns).';
   return m;
 }
+// ---------- Comprimir videos (720p, ~1.5 Mbps) antes de subirlos, como Facebook o TikTok ----------
+// Se reproduce el video en silencio por dentro y se vuelve a grabar más ligero. Tarda lo que dura el video.
+async function shrinkVideo(file, onProgress) {
+  if (!file || !(file.type || '').startsWith('video/')) return file;
+  if (!window.MediaRecorder || !HTMLCanvasElement.prototype.captureStream) return file;
+  const mime = ['video/mp4;codecs=avc1.42E01E,mp4a.40.2', 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'].find(t => { try { return MediaRecorder.isTypeSupported(t); } catch (_) { return false; } });
+  if (!mime) return file;
+  const url = URL.createObjectURL(file);
+  const v = document.createElement('video');
+  let actx = null, raf = null;
+  const cleanup = () => { try { v.pause(); } catch (_) {} try { actx && actx.close(); } catch (_) {} URL.revokeObjectURL(url); };
+  try {
+    v.src = url; v.playsInline = true; v.preload = 'auto';
+    await new Promise((ok, no) => { v.onloadedmetadata = ok; v.onerror = no; setTimeout(no, 15000); });
+    const W = v.videoWidth, H = v.videoHeight, dur = v.duration;
+    if (!W || !H || !isFinite(dur) || dur <= 0) { cleanup(); return file; }
+    const sc = Math.min(1, 720 / Math.min(W, H));
+    const kbps = file.size * 8 / dur / 1000;
+    if (sc === 1 && (kbps < 2200 || file.size < 6 * 1048576)) { cleanup(); return file; }   // ya viene ligero
+    const cw = Math.round(W * sc / 2) * 2, ch = Math.round(H * sc / 2) * 2;
+    const c = document.createElement('canvas'); c.width = cw; c.height = ch;
+    const g = c.getContext('2d');
+    const stream = c.captureStream(30);
+    try {
+      actx = new (window.AudioContext || window.webkitAudioContext)();
+      const src = actx.createMediaElementSource(v), dest = actx.createMediaStreamDestination();
+      src.connect(dest);   // el audio va a la grabación, no a la bocina
+      dest.stream.getAudioTracks().forEach(t => stream.addTrack(t));
+    } catch (_) {}
+    const rec = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 1500000, audioBitsPerSecond: 96000 });
+    const chunks = [];
+    rec.ondataavailable = (e) => { if (e.data && e.data.size) chunks.push(e.data); };
+    const stopped = new Promise(r => { rec.onstop = r; });
+    const draw = () => {
+      try { g.drawImage(v, 0, 0, cw, ch); } catch (_) {}
+      if (onProgress) onProgress(Math.min(99, Math.round(v.currentTime / dur * 100)));
+      if (!v.ended) raf = v.requestVideoFrameCallback ? v.requestVideoFrameCallback(draw) : requestAnimationFrame(draw);
+    };
+    if (actx && actx.state === 'suspended') await actx.resume().catch(() => {});
+    await v.play();   // si el teléfono no deja reproducir, se sube el original
+    rec.start(1000);
+    draw();
+    const ok = await Promise.race([new Promise(r => { v.onended = () => r(true); }), new Promise(r => setTimeout(() => r(false), dur * 1000 * 2.5 + 15000))]);
+    rec.stop(); await stopped; cleanup();
+    if (!ok) return file;
+    const out = new Blob(chunks, { type: mime.split(';')[0] });
+    if (!out.size || out.size >= file.size * 0.9) return file;
+    if (onProgress) onProgress(100);
+    return out;
+  } catch (_) { cleanup(); return file; }
+}
+const videoExt = (blob, file) => blob !== file ? ((blob.type || '').includes('mp4') ? 'mp4' : 'webm') : (((file.name || '').split('.').pop() || 'mp4').toLowerCase().replace(/[^a-z0-9]/g, '') || 'mp4');
+function tooBig(blob) { return blob.size > MAX_UP_MB * 1048576; }
 async function compressImage(file, max = 1440) {
   if (!file.type.startsWith('image/') || file.type === 'image/gif') return file;
   const saver = SAVER.on; if (saver) max = Math.min(max, 1080);
@@ -1029,6 +1101,8 @@ async function loadMe() {
   const bl = await sb.from('blocks').select('blocked_id').eq('blocker_id', state.session.user.id);
   state.blocked = new Set(bl.error ? [] : (bl.data || []).map(b => b.blocked_id));
   try { await loadFollowing(); } catch (_) {}
+  state.isAdmin = false;
+  sb.rpc('is_admin').then(({ data }) => { state.isAdmin = data === true; }, () => {});
 }
 // ---------- Seguir a personas ----------
 let HAS_FOLLOW = true;
@@ -1437,7 +1511,7 @@ function render() {
   if (!state.me) { $app.append(h('div', { class: 'spinner' })); return; }
   if (isGuest() && !['feed', 'rides', 'explore', 'profile', 'animal'].includes(state.view)) state.view = 'feed';
   if (state.view === 'welcome') return renderWelcome();
-  const views = { feed: renderFeed, rides: renderRides, explore: renderExplore, upload: renderUpload, profile: renderProfile, animal: renderAnimal, inbox: renderInbox, chat: renderChat, notifs: renderNotifs, feria: renderFeria };
+  const views = { admin: renderAdmin, feed: renderFeed, rides: renderRides, explore: renderExplore, upload: renderUpload, profile: renderProfile, animal: renderAnimal, inbox: renderInbox, chat: renderChat, notifs: renderNotifs, feria: renderFeria };
   (views[state.view] || renderFeed)();
   if (state.view !== 'chat') $app.append(navBar());
   if (HEADS.size) paintHeads(); else if (!HEADS_LOADED && !isGuest()) setTimeout(loadHeads, 1500);
@@ -1538,7 +1612,8 @@ async function renderFeed() {
   const seg = HAS_FOLLOW && !isGuest() ? h('div', { class: 'fx-seg feed-seg' },
     h('button', { class: mode === 'all' ? 'on' : '', onclick: () => { state.feedMode = 'all'; render(); } }, '🌎 Para ti'),
     h('button', { class: mode === 'following' ? 'on' : '', onclick: () => { state.feedMode = 'following'; render(); } }, '🤠 Siguiendo')) : null;
-  main.append(...[stories, feriaShowcase(), welcomeCard(), seg, chips, list].filter(Boolean));
+  const banned = state.me && state.me.banned_until && new Date(state.me.banned_until) > new Date();
+  main.append(...[banned ? h('div', { class: 'ban-note' }, '⛔ Tu cuenta está suspendida' + (new Date(state.me.banned_until).getFullYear() > 2100 ? '' : ' hasta el ' + new Date(state.me.banned_until).toLocaleDateString('es-MX')) + ' por no seguir las reglas. Puedes ver la app, pero no publicar, comentar ni mandar mensajes.') : null, stories, feriaShowcase(), welcomeCard(), seg, chips, list].filter(Boolean));
 
   // Sundowns: lo que subieron en las últimas 24 horas
   const paintSundowns = async () => {
@@ -2494,8 +2569,9 @@ function startCreator(file, onDone, opts = {}) {
     shareBtn.disabled = true; shareBtn.textContent = 'Subiendo…';
     stopSong(); const endTrot = SFX.startUpload();
     try {
-      const blob = isVideo ? file : await compressImage(file);
-      const ext = isVideo ? ((file.name.split('.').pop() || 'mp4').toLowerCase().replace(/[^a-z0-9]/g, '') || 'mp4') : (blob.type === 'image/png' ? 'png' : 'jpg');
+      const blob = isVideo ? await shrinkVideo(file, (n) => { shareBtn.textContent = `Preparando video… ${n}%`; }) : await compressImage(file);
+      if (isVideo) { shareBtn.textContent = 'Subiendo…'; if (tooBig(blob)) throw new Error('El video es muy largo. Prueba con uno más corto.'); }
+      const ext = isVideo ? videoExt(blob, file) : (blob.type === 'image/png' ? 'png' : 'jpg');
       const path = `${state.me.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
       const up = await sb.storage.from('media').upload(path, blob, { contentType: blob.type || file.type, cacheControl: '31536000' });
       if (up.error) throw up.error;
@@ -2990,8 +3066,9 @@ function renderUpload() {
     stopSong(); const endTrot = SFX.startUpload();
     try {
       const isVideo = file.type.startsWith('video/');
-      const blob = isVideo ? file : await compressImage(file);
-      const ext = isVideo ? ((file.name.split('.').pop() || 'mp4').toLowerCase().replace(/[^a-z0-9]/g, '') || 'mp4') : (blob.type === 'image/gif' ? 'gif' : (blob.type === 'image/png' ? 'png' : 'jpg'));
+      const blob = isVideo ? await shrinkVideo(file, (n) => { btn.textContent = `Preparando video… ${n}%`; }) : await compressImage(file);
+      if (isVideo) { btn.textContent = 'Subiendo…'; if (tooBig(blob)) throw new Error('El video es muy largo. Prueba con uno más corto (menos de 3 minutos).'); }
+      const ext = isVideo ? videoExt(blob, file) : (blob.type === 'image/gif' ? 'gif' : (blob.type === 'image/png' ? 'png' : 'jpg'));
       const path = `${state.me.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
       const up = await sb.storage.from('media').upload(path, blob, { contentType: blob.type || file.type, cacheControl: '31536000' });
       if (up.error) throw up.error;
@@ -3451,6 +3528,7 @@ function openMenu() {
     tile('📅', 'Eventos', () => { state.feriaTab = 'eventos'; go('feria'); }),
     tile('🔍', 'Explorar', () => go('explore')),
     tile('🤝', 'Invitar compas', inviteFriends),
+    state.isAdmin ? tile('🛡️', 'Administrar', () => go('admin')) : null,
     tile('🐴', 'Mis animales', () => go('profile', { profileId: state.me.id }))];
   const panel = h('div', { class: 'mn-panel', role: 'dialog', 'aria-label': 'Menú' },
     h('div', { class: 'mn-top' }, h('b', {}, 'Menú'), h('button', { class: 'iconbtn plain', 'aria-label': 'Cerrar', icon: 'close', onclick: close })),
@@ -4051,6 +4129,84 @@ function listenInbox() {
     }).subscribe();
   } catch (_) { INBOX_CH = null; }
 }
+// ---------- Panel de administrador (solo lo ven las cuentas administradoras) ----------
+async function renderAdmin() {
+  const main = h('main', { class: 'adm' });
+  $app.append(h('header', { class: 'topbar' }, h('button', { class: 'iconbtn plain', 'aria-label': 'Regresar', icon: 'back', onclick: () => go('feed') }), h('b', { style: 'font-size:18px' }, '🛡️ Administración'), h('div', { style: 'width:44px' })), main);
+  if (!state.isAdmin) { const { data } = await sb.rpc('is_admin'); state.isAdmin = data === true; }
+  if (!state.isAdmin) return main.append(h('div', { class: 'empty' }, 'Esta sección es solo para administradores.'));
+  const statsBox = h('section', { class: 'adm-stats' }, h('div', { class: 'spinner' }));
+  const tabs = h('div', { class: 'fx-seg' });
+  const box = h('div', { class: 'adm-box' });
+  main.append(statsBox, tabs, box);
+  let tab = state.admTab || 'reports';
+  const paintTabs = () => tabs.replaceChildren(
+    h('button', { class: tab === 'reports' ? 'on' : '', onclick: () => { tab = state.admTab = 'reports'; paintTabs(); loadTab(); } }, '🚩 Reportes'),
+    h('button', { class: tab === 'users' ? 'on' : '', onclick: () => { tab = state.admTab = 'users'; paintTabs(); loadTab(); } }, '👥 Usuarios'));
+  paintTabs();
+  const stat = (n, l, warn) => h('div', { class: 'adm-stat' + (warn && n ? ' warn' : '') }, h('b', {}, Number(n || 0).toLocaleString('es-MX')), h('small', {}, l));
+  const loadStats = async () => {
+    const { data: st, error } = await sb.rpc('admin_stats');
+    if (error) return statsBox.replaceChildren(h('p', { class: 'err' }, /admin_stats|function/i.test(error.message || '') ? 'Falta activar el panel en Supabase.' : friendlyError(error)));
+    statsBox.replaceChildren(
+      stat(st.users, 'Usuarios'), stat(st.users_today, 'Nuevos hoy'), stat(st.users_week, 'Nuevos 7 días'),
+      stat(st.active_today, 'Activos hoy'), stat(st.active_week, 'Activos 7 días'), stat(st.posts_today, 'Publicaciones hoy'),
+      stat(st.messages_today, 'Mensajes hoy'), stat(st.listings, 'Anuncios activos'), stat(st.events, 'Eventos próximos'),
+      stat(st.reports_open, 'Reportes pendientes', true), stat(st.banned, 'Suspendidos'), stat(st.posts, 'Publicaciones total'));
+  };
+  const banSheet = (uid, username, after) => {
+    const close = openSheet('Suspender a @' + (username || ''), h('div', { class: 'sheet-body menu' },
+      h('p', { style: 'margin:0 0 10px;color:var(--muted);font-size:14px' }, 'No podrá publicar, comentar, mandar mensajes, vender ni publicar eventos. Sí podrá ver la app.'),
+      ...[[1, '1 día'], [7, '7 días'], [30, '30 días'], [36500, 'Para siempre']].map(([d, l]) => h('button', { class: 'menu-item' + (d > 30 ? ' danger' : ''), onclick: async () => {
+        const { error } = await sb.rpc('admin_ban', { uid, days: d });
+        close(); if (error) return toast(friendlyError(error));
+        toast('@' + username + ' suspendido ' + (d > 30 ? 'para siempre' : l)); after && after(); loadStats();
+      } }, h('span', {}, '⛔'), l))));
+  };
+  const unban = async (uid, username, after) => { const { error } = await sb.rpc('admin_ban', { uid, days: 0 }); if (error) return toast(friendlyError(error)); toast('@' + username + ' ya puede usar la app otra vez'); after && after(); loadStats(); };
+  const isBanned = (t) => t && new Date(t) > new Date();
+  async function loadTab() {
+    box.replaceChildren(h('div', { class: 'spinner' }));
+    if (tab === 'reports') {
+      const { data, error } = await sb.rpc('admin_reports');
+      if (error) return box.replaceChildren(h('p', { class: 'err' }, friendlyError(error)));
+      const seenPost = new Set();
+      const rows = (data || []).filter(r => !r.post_id || (!seenPost.has(r.post_id) && seenPost.add(r.post_id)));
+      if (!rows.length) return box.replaceChildren(h('div', { class: 'dm-empty' }, h('div', {}, '✅'), h('b', {}, 'No hay reportes pendientes'), 'Cuando alguien reporte una publicación, aparecerá aquí.'));
+      box.replaceChildren(...rows.map(r => {
+        const card = h('div', { class: 'adm-rep' });
+        const thumb = r.media_url ? (r.media_type === 'video' ? h('video', { src: r.media_url + '#t=0.5', muted: true, playsInline: true, preload: 'metadata' }) : h('img', { src: r.media_url, alt: '' })) : h('span', {}, '🗑️');
+        card.append(
+          h('button', { class: 'adm-thumb', onclick: () => r.post_id && openPostById(r.post_id) }, thumb),
+          h('div', { class: 'adm-info' },
+            h('b', {}, '🚩 ' + r.reason + (r.times > 1 ? ` · ${r.times} reportes` : '')),
+            h('small', {}, 'De @' + (r.owner_username || '¿?') + (isBanned(r.owner_banned_until) ? ' (suspendido)' : '') + ' · reportó @' + (r.reporter_username || '¿?') + ' · ' + timeAgo(r.created_at)),
+            r.caption ? h('p', {}, r.caption.slice(0, 120)) : (r.post_id ? null : h('p', {}, 'La publicación ya fue borrada.')),
+            h('div', { class: 'adm-acts' },
+              r.post_id ? h('button', { class: 'btn small danger-btn', onclick: async () => { if (!confirm('¿Borrar esta publicación para siempre?')) return; const { error: e2 } = await sb.rpc('admin_delete_post', { pid: r.post_id }); if (e2) return toast(friendlyError(e2)); toast('Publicación borrada'); card.remove(); loadStats(); } }, '🗑️ Borrar') : null,
+              r.owner_id ? (isBanned(r.owner_banned_until) ? h('button', { class: 'btn small ghost', onclick: () => unban(r.owner_id, r.owner_username, loadTab) }, 'Quitar suspensión') : h('button', { class: 'btn small ghost', onclick: () => banSheet(r.owner_id, r.owner_username, loadTab) }, '⛔ Suspender')) : null,
+              h('button', { class: 'btn small ghost', onclick: async () => { const { error: e2 } = await sb.rpc('admin_resolve_report', { rid: r.id }); if (e2) return toast(friendlyError(e2)); toast('Reporte descartado'); card.remove(); loadStats(); } }, '✓ Está bien'))));
+        return card;
+      }));
+    } else {
+      const q = h('input', { class: 'input', type: 'search', placeholder: 'Buscar usuario…', value: state.admQ || '' });
+      const list = h('div', {}, h('div', { class: 'spinner' }));
+      box.replaceChildren(h('div', { style: 'padding:0 0 10px' }, q), list);
+      const load = async () => {
+        const { data, error } = await sb.rpc('admin_users', { q: q.value.trim() || null });
+        if (error) return list.replaceChildren(h('p', { class: 'err' }, friendlyError(error)));
+        list.replaceChildren(...(data || []).map(u => h('div', { class: 'adm-user' },
+          h('button', { class: 'adm-uwho', onclick: () => go('profile', { profileId: u.id }) }, avatar(u, 42),
+            h('div', {}, h('b', {}, '@' + u.username, vb(u.id)), h('small', {}, [u.full_name, u.estado, u.posts + ' publ.', 'desde ' + new Date(u.created_at).toLocaleDateString('es-MX')].filter(Boolean).join(' · ')),
+              isBanned(u.banned_until) ? h('small', { class: 'adm-ban' }, '⛔ Suspendido hasta ' + (new Date(u.banned_until).getFullYear() > 2100 ? 'siempre' : new Date(u.banned_until).toLocaleDateString('es-MX'))) : null)),
+          isBanned(u.banned_until) ? h('button', { class: 'btn small ghost', onclick: () => unban(u.id, u.username, load) }, 'Quitar') : (u.id === state.me.id ? null : h('button', { class: 'btn small ghost', onclick: () => banSheet(u.id, u.username, load) }, '⛔')))));
+      };
+      let t; q.addEventListener('input', () => { clearTimeout(t); t = setTimeout(() => { state.admQ = q.value; load(); }, 350); });
+      load();
+    }
+  }
+  loadStats(); loadTab();
+}
 // ---------- Burbujas de chat (como Messenger, pero con sombrero) ----------
 const HAT_SVG = '<svg viewBox="0 0 64 40" aria-hidden="true"><path d="M3 27c6 7 18 10 29 10s23-3 29-10c-7 2.5-17 3.6-29 3.6S10 29.5 3 27z" fill="#7A3E1A" stroke="#3A1C0A" stroke-width="1.2"/><path d="M17 27.5c.2-8 2.3-17.5 7.5-20.5 2.2-1.2 4.4-.4 5.6.8 1 1 1.6 1.2 1.9 1.2s.9-.2 1.9-1.2c1.2-1.2 3.4-2 5.6-.8 5.2 3 7.3 12.5 7.5 20.5-4.2-1.2-9.4-1.9-15-1.9s-10.8.7-15 1.9z" fill="#A0602D" stroke="#3A1C0A" stroke-width="1.2"/><path d="M17.6 22.6c4.2-1.1 9.2-1.7 14.4-1.7s10.2.6 14.4 1.7l.3 3.2c-4.3-1.1-9.3-1.7-14.7-1.7s-10.4.6-14.7 1.7z" fill="#F3BD68"/></svg>';
 ICONS.hatmini = HAT_SVG;
@@ -4458,14 +4614,16 @@ async function renderChat() {
     if (blockedNow) return;
     const isVideo = (file.type || '').startsWith('video/');
     if (!isVideo && !(file.type || '').startsWith('image/')) return toast('Solo se pueden mandar fotos o videos');
-    if (file.size > 50 * 1024 * 1024) return toast('El video es muy pesado (máx. 50 MB)');
-    const blob = isVideo ? file : await compressImage(file, 1600);
+    if (file.size > MAX_VIDEO_MB * 1024 * 1024) return toast(`El video es muy pesado (máx. ${MAX_VIDEO_MB} MB)`);
+    if (isVideo) toast('Preparando el video para mandarlo… no salgas del chat');
+    const blob = isVideo ? await shrinkVideo(file) : await compressImage(file, 1600);
+    if (isVideo && tooBig(blob)) return toast('El video es muy largo. Prueba con uno más corto.');
     const localUrl = URL.createObjectURL(blob);
     const tmp = { id: 'tmp' + Date.now(), sender_id: state.me.id, media_type: isVideo ? 'video' : 'image', localUrl, created_at: new Date().toISOString(), pending: true };
     msgs.push(tmp); paint();
-    const ext = isVideo ? ((file.name.split('.').pop() || 'mp4').toLowerCase().replace(/[^a-z0-9]/g, '') || 'mp4') : 'jpg';
+    const ext = isVideo ? videoExt(blob, file) : 'jpg';
     const path = `${chat.id}/${state.me.id}-${Date.now()}.${ext}`;
-    const up = await sb.storage.from('dm').upload(path, blob, { contentType: isVideo ? (file.type || 'video/mp4') : 'image/jpeg', upsert: false });
+    const up = await sb.storage.from('dm').upload(path, blob, { contentType: isVideo ? (blob.type || file.type || 'video/mp4') : 'image/jpeg', upsert: false });
     let data = null, error = up.error;
     if (!error) {
       const r = await sb.from('messages').insert({ conversation_id: chat.id, sender_id: state.me.id, media_path: path, media_type: tmp.media_type }).select(COLS).single();
