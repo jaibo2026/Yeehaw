@@ -3456,6 +3456,7 @@ const SPEC_FIELDS = [
   ['arete', '🏷️ Arete SINIIGA', ['Sí', 'No'], null, 'Ganado'],
   ['fierro', '🔥 Fierro', 'text', 'ej. "M" con media luna']];
 const SPEC_CATS = ['Caballos', 'Ganado'];
+const MAX_LPHOTOS = 20;
 const money = (n) => n == null ? 'Precio a tratar' : '$' + Number(n).toLocaleString('es-MX', { maximumFractionDigits: 0 });
 const isFeat = (x) => !!(x && x.featured_until && new Date(x.featured_until) > new Date());
 const feriaMissing = (e) => /listings|events|event_going|relation|schema/i.test((e && e.message) || '');
@@ -3590,9 +3591,9 @@ function listingForm(l) {
   const paintPhotos = () => {
     const tiles = [...kept.map((u, i) => ({ src: u, rm: () => { kept.splice(i, 1); paintPhotos(); } })), ...files.map((f, i) => ({ src: f._url, rm: () => { files.splice(i, 1); paintPhotos(); } }))];
     photosBox.replaceChildren(...tiles.map(t => h('div', { class: 'fx-ph' }, h('img', { src: t.src, alt: '' }), h('button', { type: 'button', 'aria-label': 'Quitar foto', onclick: t.rm }, '✕'))),
-      tiles.length < 6 ? h('button', { type: 'button', class: 'fx-ph add', onclick: () => picker.click() }, h('span', {}, '📷'), h('small', {}, tiles.length ? 'Agregar' : 'Fotos (hasta 6)')) : null);
+      tiles.length < MAX_LPHOTOS ? h('button', { type: 'button', class: 'fx-ph add', onclick: () => picker.click() }, h('span', {}, '📷'), h('small', {}, tiles.length ? `Agregar (${tiles.length}/${MAX_LPHOTOS})` : 'Fotos (hasta ' + MAX_LPHOTOS + ')')) : null);
   };
-  picker.addEventListener('change', () => { [...picker.files].slice(0, 6 - kept.length - files.length).forEach(f => { f._url = URL.createObjectURL(f); files.push(f); }); picker.value = ''; paintPhotos(); });
+  picker.addEventListener('change', () => { [...picker.files].slice(0, MAX_LPHOTOS - kept.length - files.length).forEach(f => { f._url = URL.createObjectURL(f); files.push(f); }); picker.value = ''; paintPhotos(); });
   paintPhotos();
   const title = h('input', { class: 'input', maxlength: '80', placeholder: 'ej. Yegua cuarto de milla, 5 años', value: (l && l.title) || '' });
   const catChips = h('div', { class: 'chips', style: 'padding:0 0 12px;flex-wrap:wrap' });
@@ -3636,8 +3637,9 @@ function listingForm(l) {
         const up = await sb.storage.from('media').upload(path, blob, { contentType: 'image/jpeg', cacheControl: '31536000' });
         if (up.error) throw up.error;
         urls.push(sb.storage.from('media').getPublicUrl(path).data.publicUrl);
+        save.textContent = `Subiendo fotos ${urls.length}/${kept.length + files.length}…`;
       }
-      const row = { title: tt, category: cat, price: p, location: loc.value.trim() || null, description: desc.value.trim() || null, photos: urls.slice(0, 6) };
+      const row = { title: tt, category: cat, price: p, location: loc.value.trim() || null, description: desc.value.trim() || null, photos: urls.slice(0, MAX_LPHOTOS) };
       if (HAS_NOV) {
         row.estado = est.value || null;
         const keep = SPEC_CATS.includes(cat) ? SPEC_FIELDS.filter(f => !f[4] || f[4] === cat).map(f => f[0]) : [];
@@ -3649,9 +3651,10 @@ function listingForm(l) {
       endTrot(true); close(); toast(isNew ? '¡Tu anuncio ya está en La Feria!' : 'Anuncio actualizado');
       state.feriaTab = 'mercado'; if (state.view === 'feria') render(); else go('feria');
       if (res.data) setTimeout(() => openListing(res.data), 400);
-    } catch (ex) { endTrot(false); save.disabled = false; save.textContent = isNew ? 'Publicar anuncio' : 'Guardar cambios'; err.textContent = feriaMissing(ex) ? 'La Feria todavía no está activada.' : friendlyError(ex); }
+    } catch (ex) { endTrot(false); save.disabled = false; save.textContent = isNew ? 'Publicar anuncio' : 'Guardar cambios'; err.textContent = feriaMissing(ex) ? 'La Feria todavía no está activada.' : /photos|check/i.test((ex && ex.message) || '') ? 'Por ahora el máximo es de 6 fotos por anuncio.' : friendlyError(ex); }
   } },
     picker, photosBox,
+    h('small', { class: 'hint', style: 'display:block;margin:-4px 0 12px' }, '📸 Puedes escoger varias fotos a la vez. La primera es la portada.'),
     h('div', { class: 'field' }, h('label', {}, '¿Qué vendes?'), title),
     h('div', { class: 'field' }, h('label', {}, 'Categoría')), catChips,
     h('div', { class: 'field' }, h('label', {}, 'Precio (pesos)'), price, h('label', { class: 'fx-check' }, nego, ' Precio a tratar')),
