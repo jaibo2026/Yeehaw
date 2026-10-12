@@ -826,6 +826,8 @@ html,body{background:#F5EFE3!important;background-image:none!important;color:#17
 #heads.left .head-tip{right:auto;left:70px;border-radius:16px 16px 16px 4px}
 .head-tip.out{opacity:0;transform:translateY(4px);pointer-events:none}
 .heads-drop{position:fixed;left:50%;bottom:110px;z-index:39;width:64px;height:64px;margin-left:-32px;border-radius:50%;background:rgba(23,37,49,.75);color:#fff;font-size:26px;display:flex;align-items:center;justify-content:center;transition:transform .15s,background .15s}
+.ms-thumbs{display:flex;gap:6px;margin:0 0 12px;overflow-x:auto}
+.ms-th{flex:0 0 64px;width:64px;height:96px;border-radius:10px;object-fit:cover;background:#EFE6D4;display:flex;align-items:center;justify-content:center;font-size:24px}
 .mc-bg{position:fixed;inset:0;z-index:60;background:rgba(23,37,49,.35);display:flex;align-items:flex-end;justify-content:center;padding:0 10px calc(96px + env(safe-area-inset-bottom));animation:mcin .2s ease}
 .mc-bg.out{opacity:0;transition:opacity .18s}
 @keyframes mcin{from{opacity:0}to{opacity:1}}
@@ -2198,12 +2200,50 @@ const sdHasMusicSticker = (it) => Array.isArray(it && it.overlays) && it.overlay
 
 function openSundownCreator(onDone) {
   if (needLogin('Crea tu cuenta para subir tu sundown')) return;
-  const pick = h('input', { type: 'file', accept: 'image/*,video/*', hidden: true });
+  const pick = h('input', { type: 'file', accept: 'image/*,video/*', multiple: true, hidden: true });
   document.body.append(pick);
-  pick.addEventListener('change', () => { const f = pick.files && pick.files[0]; pick.remove(); if (f) startCreator(f, onDone); });
+  pick.addEventListener('change', () => { const fs = [...(pick.files || [])].slice(0, 10); pick.remove(); if (fs.length === 1) startCreator(fs[0], onDone); else if (fs.length > 1) multiSundown(fs, onDone); });
   pick.click();
 }
-function startCreator(file, onDone) {
+// Varias fotos: como en Facebook, una historia tras otra, o todas juntas en un collage
+function multiSundown(files, onDone) {
+  const imgs = files.filter(f => (f.type || '').startsWith('image/'));
+  const chain = (i) => { if (i >= files.length) { if (onDone) onDone(); return; } startCreator(files[i], () => chain(i + 1), { step: i + 1, total: files.length }); };
+  const thumbs = h('div', { class: 'ms-thumbs' }, files.slice(0, 6).map(f => (f.type || '').startsWith('video/') ? h('div', { class: 'ms-th' }, '🎥') : h('img', { class: 'ms-th', src: URL.createObjectURL(f), alt: '' })));
+  const close = openSheet(files.length + ' fotos y videos', h('div', { class: 'sheet-body' },
+    thumbs,
+    h('button', { class: 'mn-row', onclick: () => { close(); chain(0); } }, h('span', { class: 'mn-emo sm' }, '📚'), h('div', {}, h('b', {}, 'Una tras otra'), h('small', {}, 'Cada foto o video es un sundown; puedes ponerle texto y música a cada uno'))),
+    imgs.length >= 2 ? h('button', { class: 'mn-row', onclick: async () => { close(); toast('Armando tu collage…'); try { const f = await makeCollage(imgs.slice(0, 6)); startCreator(f, onDone); } catch (_) { toast('No se pudo armar el collage'); } } },
+      h('span', { class: 'mn-emo sm' }, '🖼️'), h('div', {}, h('b', {}, 'Collage'), h('small', {}, (imgs.length > 6 ? 'Las primeras 6 fotos' : 'Todas las fotos') + ' juntas en un solo sundown'))) : null));
+}
+async function makeCollage(files) {
+  const W = 1080, H = 1920, G = 14, R = 26;
+  const LAYOUT = { 2: [1, 1], 3: [1, 2], 4: [2, 2], 5: [2, 1, 2], 6: [2, 2, 2] }[files.length] || [1];
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  const x = c.getContext('2d');
+  const g = x.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#2C4657'); g.addColorStop(1, '#172531');
+  x.fillStyle = g; x.fillRect(0, 0, W, H);
+  const bmps = await Promise.all(files.map(f => createImageBitmap(f)));
+  const rowH = (H - G * (LAYOUT.length + 1)) / LAYOUT.length;
+  let k = 0;
+  LAYOUT.forEach((cols, ri) => {
+    const cw = (W - G * (cols + 1)) / cols, y = G + ri * (rowH + G);
+    for (let ci = 0; ci < cols; ci++, k++) {
+      const b = bmps[k]; if (!b) continue;
+      const cx = G + ci * (cw + G);
+      const sc = Math.max(cw / b.width, rowH / b.height), sw = cw / sc, sh = rowH / sc;
+      x.save(); x.beginPath();
+      if (x.roundRect) x.roundRect(cx, y, cw, rowH, R); else x.rect(cx, y, cw, rowH);
+      x.clip();
+      x.drawImage(b, (b.width - sw) / 2, (b.height - sh) / 2, sw, sh, cx, y, cw, rowH);
+      x.restore();
+      x.strokeStyle = 'rgba(243,189,104,.55)'; x.lineWidth = 3; x.beginPath(); if (x.roundRect) { x.roundRect(cx, y, cw, rowH, R); x.stroke(); }
+    }
+  });
+  const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.88));
+  return new File([blob], 'collage.jpg', { type: 'image/jpeg' });
+}
+function startCreator(file, onDone, opts = {}) {
   const isVideo = (file.type || '').startsWith('video/');
   if (!isVideo && !(file.type || '').startsWith('image/')) return toast('Escoge una foto o un video');
   if (file.size > MAX_VIDEO_MB * 1024 * 1024) return toast(`El video es muy pesado (máx. ${MAX_VIDEO_MB} MB)`);
@@ -2215,7 +2255,8 @@ function startCreator(file, onDone) {
   const layer = h('div', { class: 'sdo-layer edit' });
   const canvas = h('div', { class: 'sd-canvas' }, media, layer);
   const trash = h('div', { class: 'sdc-trash', 'aria-hidden': 'true' }, '🗑️');
-  const shareBtn = h('button', { class: 'sdc-share', type: 'button' }, 'Compartir sundown');
+  const shareLabel = opts.total ? `Compartir ${opts.step} de ${opts.total}` : 'Compartir sundown';
+  const shareBtn = h('button', { class: 'sdc-share', type: 'button' }, shareLabel);
   const tool = (label, title, fn) => h('button', { class: 'sdc-tool', type: 'button', 'aria-label': title, onclick: fn }, h('span', {}, label), h('small', {}, title));
   const root = h('div', { class: 'sdc', role: 'dialog', 'aria-label': 'Crear sundown' },
     h('div', { class: 'sd-bg', style: isVideo ? 'background:#000' : `background-image:url("${url}")` }),
@@ -2375,9 +2416,9 @@ function startCreator(file, onDone) {
       if (ins.error && /overlays/i.test(ins.error.message || '')) { HAS_OVERLAYS = false; delete row.overlays; ins = await sb.from('posts').insert(row); }
       if (ins.error) { sb.storage.from('media').remove([path]); throw ins.error; }
       endTrot(true); close();
-      toast('Sundown publicado. Se va con el sol en 24 h');
+      toast(opts.total && opts.step < opts.total ? `Sundown ${opts.step} de ${opts.total} publicado ✓` : 'Sundown publicado. Se va con el sol en 24 h');
       if (onDone) onDone();
-    } catch (ex) { endTrot(false); shareBtn.disabled = false; shareBtn.textContent = 'Compartir sundown'; toast(friendlyError(ex)); }
+    } catch (ex) { endTrot(false); shareBtn.disabled = false; shareBtn.textContent = shareLabel; toast(friendlyError(ex)); }
   });
   paint();
 }
