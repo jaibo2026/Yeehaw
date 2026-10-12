@@ -809,6 +809,13 @@ html,body{background:#F5EFE3!important;background-image:none!important;color:#17
 .fx-spec-grid .field{margin-bottom:10px}
 .notif .btn.small{flex:0 0 auto;height:34px;font-size:13px}
 .notif{cursor:pointer}
+.sr-sec{margin:8px 0 14px}
+.sr-person{display:flex;align-items:center;gap:12px;padding:9px 0;cursor:pointer;border-bottom:1px solid #EFE6D4}
+.sr-person .who{flex:1;min-width:0;display:flex;flex-direction:column}
+.sr-person .who small{color:var(--muted);font-size:13px}.sr-h{padding:6px 0 4px}
+.sr-sec .grid{margin:0 -16px}
+.sr-row{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.sr-row .fx-card{flex:0 0 150px}
 @media (display-mode: standalone){#splash{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#F5EFE3;transition:opacity .35s ease}}
 #splash img{width:112px;height:112px;border-radius:50%;box-shadow:0 8px 24px rgba(23,37,49,.25);margin-bottom:8px}
 #splash b{font-family:'Rye','Work Sans',serif;font-size:34px;color:#172531;letter-spacing:.5px}
@@ -1249,12 +1256,13 @@ function openSong(url, title, after) {
 }
 let HAS_ANIMALS = true;
 const ANIMAL_EMBED = ',animal_id,animals!animal_id(id,name,species,photo_url)';
-async function fetchPosts({ category, userId, userIds, tag, kinds = ['post', 'ride'], since, animalId } = {}) {
+async function fetchPosts({ category, userId, userIds, tag, text, kinds = ['post', 'ride'], since, animalId } = {}) {
   const build = () => {
     let q = sb.from('posts').select(postSelect()).order('created_at', { ascending: false }).limit(60);
     if (category && category !== 'Todo') q = q.eq('category', category);
     if (userId) q = q.eq('user_id', userId);
     if (userIds) q = q.in('user_id', userIds.slice(0, 300));
+    if (text) q = q.ilike('caption', '%' + String(text).replace(/[%,()_\\]/g, '') + '%');
     if (tag) q = q.ilike('caption', '%#' + String(tag).replace(/[%,()_\\]/g, '') + '%');
     if (since) q = q.gte('created_at', since);
     if (animalId) q = q.eq('animal_id', animalId);
@@ -1455,7 +1463,7 @@ function renderAuth() {
 
 async function renderFeed() {
   const main = h('main');
-  $app.append(h('header', { class: 'topbar' }, h('div', { class: 'logo' }, 'Ranchfolk'), h('div', { class: 'top-actions' }, menuButton(), bellButton(), dmButton())), main);
+  $app.append(h('header', { class: 'topbar' }, h('div', { class: 'logo' }, 'Ranchfolk'), h('div', { class: 'top-actions' }, searchButton(), menuButton(), bellButton(), dmButton())), main);
 
   const stories = h('div', { class: 'stories' });
   const chips = h('div', { class: 'chips' }, ['Todo', ...CATEGORIES].map(c =>
@@ -2565,8 +2573,8 @@ function rideCard(p) {
 
 async function renderExplore() {
   const main = h('main');
-  $app.append(h('header', { class: 'topbar' }, h('div', { class: 'logo', style: 'font-size:24px' }, 'Explorar')), main);
-  const search = h('input', { class: 'input', type: 'search', placeholder: 'Buscar personas, ranchos, animales o #etiquetas…', 'aria-label': 'Buscar', enterkeyhint: 'search' });
+  $app.append(h('header', { class: 'topbar' }, h('button', { class: 'iconbtn plain', 'aria-label': 'Regresar', icon: 'back', onclick: () => go(state.prevView && state.prevView !== 'explore' ? state.prevView : 'feed') }), h('div', { class: 'logo', style: 'font-size:24px' }, 'Buscar'), h('div', { style: 'width:44px' })), main);
+  const search = h('input', { class: 'input', type: 'search', placeholder: 'Buscar personas, publicaciones, ventas, eventos…', 'aria-label': 'Buscar', enterkeyhint: 'search' });
   const people = h('div', { style: 'padding:0 16px' });
   const tagBar = h('div', { class: 'tag-bar' });
   search.addEventListener('keydown', (e) => { if (e.key === 'Enter') { const v = search.value.trim(); if (/^#.{2,}/.test(v)) { search.blur(); openTag(v.slice(1)); } } });
@@ -2574,24 +2582,39 @@ async function renderExplore() {
     h('button', { class: 'chip' + (state.category === c ? ' on' : ''), onclick: () => { state.category = c; render(); } }, c)));
   const grid = h('div', {}, h('div', { class: 'spinner' }));
   main.append(...[h('div', { style: 'padding:0 16px' }, search), people, tagBar, state.tag ? null : chips, grid].filter(Boolean));
+  if (state.focusSearch) { state.focusSearch = false; setTimeout(() => search.focus(), 80); }
 
   let timer;
   search.addEventListener('input', () => {
     clearTimeout(timer);
     timer = setTimeout(async () => {
       const q = search.value.trim().replace(/[%,()]/g, '');
-      if (!q) return people.replaceChildren();
+      if (!q) { [tagBar, chips, grid].forEach(x => { if (x) x.hidden = false; }); return people.replaceChildren(); }
       if (q.startsWith('#')) { const t = q.slice(1); return people.replaceChildren(t.length >= 2 ? h('button', { class: 'btn small', style: 'margin:10px 0', onclick: () => openTag(t) }, 'Ver publicaciones con #' + t) : ''); }
-      const [{ data }, animals] = await Promise.all([
-        sb.from('profiles').select('id,username,full_name,avatar_url,rancho').or(`username.ilike.%${q}%,full_name.ilike.%${q}%,rancho.ilike.%${q}%`).limit(10),
-        fetchAnimals({ search: q }).catch(() => [])]);
-      const rowStyle = 'width:100%;border:none;background:none;padding:10px 0;text-align:left';
-      people.replaceChildren(
-        ...(data || []).map(p => h('button', { class: 'post-head', style: rowStyle, onclick: () => go('profile', { profileId: p.id }) },
-          avatar(p, 44), h('div', { class: 'who' }, h('b', {}, p.username, vb(p.id)), h('small', {}, [p.full_name, p.rancho].filter(Boolean).join(' · '))), followBtn(p.id, { small: true }))),
-        ...animals.slice(0, 10).map(a => h('button', { class: 'post-head', style: rowStyle, onclick: () => go('animal', { animalId: a.id }) },
-          animalPic(a, 44), h('div', { class: 'who' }, h('b', {}, a.name), h('small', {}, [a.species, a.profiles && ('de @' + a.profiles.username)].filter(Boolean).join(' · '))))));
-      if (data && !data.length && !animals.length) people.append(h('p', { style: 'color:var(--muted)' }, 'No encontramos a nadie con ese nombre.'));
+      const browse = [tagBar, chips, grid];
+      const showBrowse = (on) => browse.forEach(x => { if (x) x.hidden = !on; });
+      people.replaceChildren(h('div', { class: 'spinner' })); showBrowse(false);
+      const ev = HAS_FERIA ? sb.from('events').select(EVT_SEL).ilike('title', `%${q}%`).gte('starts_at', new Date(Date.now() - 6 * 36e5).toISOString()).order('starts_at').limit(6).then(r => r.data || [], () => []) : Promise.resolve([]);
+      const [{ data }, animals, posts, listings, events] = await Promise.all([
+        sb.from('profiles').select('id,username,full_name,avatar_url,rancho,estado').or(`username.ilike.%${q}%,full_name.ilike.%${q}%,rancho.ilike.%${q}%`).limit(10),
+        fetchAnimals({ search: q }).catch(() => []),
+        fetchPosts({ text: q, kinds: ['post', 'ride'] }).catch(() => []),
+        fetchListings({ q, limit: 8 }).catch(() => []),
+        ev]);
+      if (search.value.trim().replace(/[%,()]/g, '') !== q) return;  // ya escribió otra cosa
+      const b = state.blocked || new Set();
+      const ppl = (data || []).filter(x => !b.has(x.id));
+      const sec = (title, n, kids) => n ? h('section', { class: 'sr-sec' }, h('div', { class: 'lbl sr-h' }, title + ' · ' + n), kids) : null;
+      const rowStyle = 'width:100%;border:none;background:none;padding:10px 0;text-align:left;cursor:pointer';
+      const parts = [
+        sec('👤 Personas', ppl.length, ppl.map(pp => h('div', { class: 'sr-person', role: 'button', onclick: () => go('profile', { profileId: pp.id }) },
+          avatar(pp, 44), h('div', { class: 'who' }, h('b', {}, pp.username, vb(pp.id)), h('small', {}, [pp.full_name, pp.rancho, pp.estado].filter(Boolean).join(' · '))), followBtn(pp.id, { small: true })))),
+        sec('🐴 Animales', Math.min(animals.length, 8), animals.slice(0, 8).map(a => h('div', { class: 'sr-person', role: 'button', onclick: () => go('animal', { animalId: a.id }) },
+          animalPic(a, 44), h('div', { class: 'who' }, h('b', {}, a.name), h('small', {}, [a.species, a.profiles && ('de @' + a.profiles.username)].filter(Boolean).join(' · ')))))),
+        sec('📷 Publicaciones', posts.length, gridOf(posts.slice(0, 18), '')),
+        sec('🛒 En La Feria', listings.length, h('div', { class: 'sr-row' }, listings.map(listingCard))),
+        sec('📅 Eventos', events.length, h('div', {}, events.map(e => eventCard(e))))].filter(Boolean);
+      people.replaceChildren(...(parts.length ? parts : [h('p', { style: 'color:var(--muted);padding:12px 0' }, `No encontramos nada con “${q}”. Prueba con otra palabra.`)]));
     }, 300);
   });
 
@@ -3173,6 +3196,9 @@ function editProfile(prof) {
 }
 
 // ---------- Menú (☰) con todo lo que se puede hacer en Ranchfolk ----------
+function searchButton() {
+  return h('button', { class: 'iconbtn dm-btn', 'aria-label': 'Buscar personas', onclick: () => { state.focusSearch = true; go('explore'); } }, h('span', { icon: 'search', style: 'display:flex' }));
+}
 function menuButton() {
   return h('button', { class: 'iconbtn dm-btn', 'aria-label': 'Menú', onclick: () => openMenu() }, h('span', { icon: 'menu', style: 'display:flex' }));
 }
