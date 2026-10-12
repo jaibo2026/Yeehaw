@@ -778,7 +778,17 @@ html,body{background:#F5EFE3!important;background-image:none!important;color:#17
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFD23F"/><stop offset=".5" stop-color="#FF7A1A"/><stop offset="1" stop-color="#E8172E"/></linearGradient></defs></svg>
+<div id="splash" aria-hidden="true"><img src="icon-maskable-192.png" alt=""><b>Ranchfolk</b><small>La red social del rancho</small></div>
+<style>
+#splash{display:none}
+@media (display-mode: standalone){#splash{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#F5EFE3;transition:opacity .35s ease}}
+#splash img{width:112px;height:112px;border-radius:50%;box-shadow:0 8px 24px rgba(23,37,49,.25);margin-bottom:8px}
+#splash b{font-family:'Rye','Work Sans',serif;font-size:34px;color:#172531;letter-spacing:.5px}
+#splash small{font-size:14px;color:#8a6a3c}
+#splash.out{opacity:0;pointer-events:none}
+</style>
 <div id="app"></div>
+<script>(function(){var t0=Date.now();function go(){var s=document.getElementById('splash');if(!s)return;setTimeout(function(){s.classList.add('out');setTimeout(function(){s.remove()},400)},Math.max(0,900-(Date.now()-t0)))}if(document.readyState==='complete')go();else window.addEventListener('load',go);setTimeout(go,4000)})();</script>
 <script>
 // ===== CONFIGURACIÓN (la llena Claude con tus datos de Supabase) =====
 const SUPABASE_URL = 'https://olflxehmwfxvsnzoqzrm.supabase.co';
