@@ -810,7 +810,10 @@ html,body{background:#F5EFE3!important;background-image:none!important;color:#17
 .notif .btn.small{flex:0 0 auto;height:34px;font-size:13px}
 .notif{cursor:pointer}
 .nav button{flex:1 1 0;min-width:0;width:auto}
-.nav .plus{flex:0 0 56px;width:56px}
+.nav .plus{flex:0 0 52px;width:52px}
+.nav button{font-size:10.5px}
+.nav-ico{position:relative;display:flex}
+.nav-badge{top:-7px;right:-11px;min-width:17px;height:17px;font-size:10px;border-width:1.5px}
 .sr-sec{margin:8px 0 14px}
 .sr-person{display:flex;align-items:center;gap:12px;padding:9px 0;cursor:pointer;border-bottom:1px solid #EFE6D4}
 .sr-person .who{flex:1;min-width:0;display:flex;flex-direction:column}
@@ -1362,6 +1365,7 @@ function navBar() {
     b('explore', 'search', 'Buscar', state.view === 'explore'),
     b('rides', 'horseshoe', 'Rides', state.view === 'rides'),
     h('button', { class: 'plus', 'aria-label': 'Subir', onclick: () => { if (needLogin('Crea tu cuenta para subir tus fotos y videos')) return; state.uploadKind = state.view === 'rides' ? 'ride' : 'post'; go('upload'); }, icon: 'plus' }),
+    navBell(),
     b('feria', 'feria', 'Feria', state.view === 'feria'),
     b('profile', 'user', 'Perfil', ownProfile)
   ));
@@ -1466,7 +1470,7 @@ function renderAuth() {
 
 async function renderFeed() {
   const main = h('main');
-  $app.append(h('header', { class: 'topbar' }, h('div', { class: 'logo' }, 'Ranchfolk'), h('div', { class: 'top-actions' }, menuButton(), bellButton(), dmButton())), main);
+  $app.append(h('header', { class: 'topbar' }, h('div', { class: 'logo' }, 'Ranchfolk'), h('div', { class: 'top-actions' }, menuButton(), dmButton())), main);
 
   const stories = h('div', { class: 'stories' });
   const chips = h('div', { class: 'chips' }, ['Todo', ...CATEGORIES].map(c =>
@@ -2576,7 +2580,7 @@ function rideCard(p) {
 
 async function renderExplore() {
   const main = h('main');
-  $app.append(h('header', { class: 'topbar' }, h('div', { class: 'logo', style: 'font-size:24px' }, 'Buscar'), h('div', { class: 'top-actions' }, menuButton(), bellButton(), dmButton())), main);
+  $app.append(h('header', { class: 'topbar' }, h('div', { class: 'logo', style: 'font-size:24px' }, 'Buscar'), h('div', { class: 'top-actions' }, menuButton(), dmButton())), main);
   const search = h('input', { class: 'input', type: 'search', placeholder: 'Buscar personas, publicaciones, ventas, eventos…', 'aria-label': 'Buscar', enterkeyhint: 'search' });
   const people = h('div', { style: 'padding:0 16px' });
   const tagBar = h('div', { class: 'tag-bar' });
@@ -2877,7 +2881,7 @@ async function renderProfile() {
   const main = h('main');
   const top = h('header', { class: 'topbar' },
     !isMe ? h('button', { class: 'iconbtn plain', 'aria-label': 'Regresar', icon: 'back', onclick: () => go('feed') }) : h('div', { class: 'logo', style: 'font-size:24px' }, 'Perfil'),
-    isMe ? h('div', { class: 'top-actions' }, menuButton(), bellButton(), dmButton()) : h('div'));
+    isMe ? h('div', { class: 'top-actions' }, menuButton(), dmButton()) : h('div'));
   $app.append(top, main);
   main.append(h('div', { class: 'spinner' }));
 
@@ -3407,7 +3411,7 @@ async function fetchEvents({ limit = 60, estado } = {}) {
 // ---- pantalla La Feria ----
 async function renderFeria() {
   const main = h('main', { class: 'fx' });
-  $app.append(h('header', { class: 'topbar' }, h('div', { class: 'logo' }, 'La Feria'), h('div', { class: 'top-actions' }, menuButton(), bellButton(), dmButton())), main);
+  $app.append(h('header', { class: 'topbar' }, h('div', { class: 'logo' }, 'La Feria'), h('div', { class: 'top-actions' }, menuButton(), dmButton())), main);
   const tab = state.feriaTab || 'mercado';
   const seg = h('div', { class: 'fx-seg' },
     h('button', { class: tab === 'mercado' ? 'on' : '', onclick: () => { state.feriaTab = 'mercado'; render(); } }, '🛒 Mercado'),
@@ -3749,6 +3753,14 @@ async function fetchNotifs(force) {
   ((fw && fw.data) || []).forEach(x => items.push({ t: 'follow', at: x.created_at, who: x.profiles, uid: x.follower_id }));
   NOTIF_CACHE = { at: Date.now(), items: items.filter(i => i.who && !b.has(i.uid)).sort((a, c) => (a.at < c.at ? 1 : -1)).slice(0, 80) };
   return NOTIF_CACHE.items;
+}
+// Botón de notificaciones en la barra de abajo (con globito de cuántas hay nuevas)
+function navBell() {
+  const badge = h('span', { class: 'dm-badge nav-badge', hidden: true });
+  const btn = h('button', { class: state.view === 'notifs' ? 'on' : '', 'aria-label': 'Notificaciones', onclick: () => { if (needLogin('Crea tu cuenta para recibir avisos')) return; go('notifs'); } },
+    h('span', { class: 'nav-ico' }, h('span', { icon: 'bell', style: 'display:flex' }), badge), 'Avisos');
+  if (!isGuest() && state.view !== 'notifs') fetchNotifs().then(items => { const seen = notifSeen(); const n = items.filter(i => i.at > seen).length; badge.hidden = !n; badge.textContent = n > 9 ? '9+' : String(n); }).catch(() => {});
+  return btn;
 }
 function bellButton() {
   if (isGuest()) return null;
@@ -4138,7 +4150,7 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').catch(() => {});
   // El aviso llegó con la app abierta: suena la campana aquí adentro
   navigator.serviceWorker.addEventListener('message', (e) => {
-    if (e.data && e.data.type === 'herria-notif') { NOTIF_CACHE.at = 0; const bell = document.querySelector('[aria-label="Notificaciones"]'); if (bell && state.view !== 'notifs') { const nb = bellButton(); if (nb) bell.replaceWith(nb); } return; }
+    if (e.data && e.data.type === 'herria-notif') { NOTIF_CACHE.at = 0; const bell = document.querySelector('.nav [aria-label="Notificaciones"]'); if (bell && state.view !== 'notifs') bell.replaceWith(navBell()); return; }
     if (!e.data || e.data.type !== 'herria-msg') return;
     msgDing();
     const b = document.querySelector('.msg-count'); if (b) refreshUnread(b);
