@@ -826,6 +826,21 @@ html,body{background:#F5EFE3!important;background-image:none!important;color:#17
 #heads.left .head-tip{right:auto;left:70px;border-radius:16px 16px 16px 4px}
 .head-tip.out{opacity:0;transform:translateY(4px);pointer-events:none}
 .heads-drop{position:fixed;left:50%;bottom:110px;z-index:39;width:64px;height:64px;margin-left:-32px;border-radius:50%;background:rgba(23,37,49,.75);color:#fff;font-size:26px;display:flex;align-items:center;justify-content:center;transition:transform .15s,background .15s}
+.c-btn{width:auto!important;padding:0 6px;gap:4px;display:inline-flex;align-items:center}
+.c-count{font-size:14px;font-weight:700;color:var(--soft)}
+.c-prev{padding:2px 16px 0;display:flex;flex-direction:column;gap:2px}
+.c-line{border:none;background:none;padding:2px 0;text-align:left;font:inherit;font-size:14px;line-height:1.35;color:var(--soft);cursor:pointer;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.c-line b{color:var(--text)}
+.cmt-bubble{position:relative;display:inline-block;max-width:100%;padding:8px 12px;border-radius:16px;background:#F3ECDD}
+.cmt-bubble b{font-size:13px}
+.cmt-bubble p{margin:2px 0 0}
+.cmt-rx{position:absolute;right:-6px;bottom:-12px;display:inline-flex;align-items:center;gap:1px;padding:2px 6px 2px 3px;border-radius:12px;background:#fff;box-shadow:0 1px 4px rgba(23,37,49,.2);font-size:12px}
+.cmt-rx b{margin-left:3px;font-size:12px;color:var(--soft)}
+.cmt-rx .r-emo{font-size:13px}
+.cmt-rx .r-horse{width:16px;height:16px}
+.cmt-meta{display:flex;align-items:center;gap:12px;padding:6px 12px 0}
+.cmt-act{border:none;background:none;padding:0;font:inherit;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer;-webkit-user-select:none;user-select:none}
+.cmt-act.on{color:#B5652B}
 .ms-thumbs{display:flex;gap:6px;margin:0 0 12px;overflow-x:auto}
 .ms-th{flex:0 0 64px;width:64px;height:96px;border-radius:10px;object-fit:cover;background:#EFE6D4;display:flex;align-items:center;justify-content:center;font-size:24px}
 .mc-bg{position:fixed;inset:0;z-index:60;background:rgba(23,37,49,.35);display:flex;align-items:flex-end;justify-content:center;padding:0 10px calc(96px + env(safe-area-inset-bottom));animation:mcin .2s ease}
@@ -1838,8 +1853,20 @@ async function deletePost(p) {
 function postCard(p) {
   const prof = p.profiles || {};
   const myId = state.me.id;
-  const commentCount = (p.comments && p.comments[0] && p.comments[0].count) || 0;
+  let commentCount = (p.comments && p.comments[0] && p.comments[0].count) || 0;
   const { likeBtn, countEl, setLike } = likeControls(p, false);
+  const cCount = h('span', { class: 'c-count' });
+  const cPrev = h('div', { class: 'c-prev', hidden: true });
+  const cLink = h('button', { class: 'linkbtn', onclick: () => openComments(p, refreshComments) });
+  const paintCount = () => { cCount.textContent = commentCount ? String(commentCount) : ''; cLink.textContent = commentCount ? `Ver ${commentCount === 1 ? 'el comentario' : `los ${commentCount} comentarios`}` : 'Comentar'; };
+  const fillPrev = (cs) => { cPrev.hidden = !cs.length; cPrev.replaceChildren(...cs.map(c => h('button', { class: 'c-line', onclick: () => openComments(p, refreshComments) }, h('b', {}, (c.profiles && c.profiles.username) || ''), ' ', String(c.body || '').slice(0, 140) + (String(c.body || '').length > 140 ? '…' : '')))); };
+  async function refreshComments() {
+    const { count } = await sb.from('comments').select('id', { count: 'exact', head: true }).eq('post_id', p.id);
+    if (typeof count === 'number') { commentCount = count; p.comments = [{ count }]; paintCount(); }
+    queueCommentPreview(p.id, fillPrev);
+  }
+  paintCount();
+  if (commentCount) queueCommentPreview(p.id, fillPrev);
   const burst = burstEl();
   const mediaEl = p.media_type === 'video'
     ? h('video', { src: p.media_url, controls: true, playsInline: true, preload: SAVER.on ? 'none' : 'metadata' })
@@ -1877,15 +1904,14 @@ function postCard(p) {
         h('b', {}, l.name || 'Ver producto'), h('span', {}, 'Ver en tienda'))))),
     h('div', { class: 'actions' },
       likeBtn,
-      h('button', { class: 'iconbtn plain', 'aria-label': 'Comentarios', icon: 'comment', onclick: () => openComments(p) }),
+      h('button', { class: 'iconbtn plain c-btn', 'aria-label': 'Comentarios', onclick: () => openComments(p, refreshComments) }, h('span', { icon: 'comment', style: 'display:flex' }), cCount),
       h('button', { class: 'iconbtn plain', 'aria-label': 'Compartir', icon: 'share', onclick: () => sharePost(p) }),
       countEl),
     p.animals && h('div', { style: 'padding:2px 12px 4px' }, animalTag(p.animals)),
     capEl,
     p.song_url && h('div', { style: 'margin:8px 16px 0' }, songChip(p.song_url, p.song_title, { preview: p.song_preview, art: p.song_art, start: p.song_start })),
-    h('div', { class: 'meta' },
-      h('button', { class: 'linkbtn', onclick: () => openComments(p) }, commentCount ? `Ver ${commentCount === 1 ? 'el comentario' : `los ${commentCount} comentarios`}` : 'Comentar'),
-      ' · ', timeAgo(p.created_at))
+    cPrev,
+    h('div', { class: 'meta' }, cLink, ' · ', timeAgo(p.created_at))
   );
   return card;
 }
@@ -1900,7 +1926,8 @@ function openSheet(title, body, foot) {
   return close;
 }
 
-async function openComments(p) {
+let HAS_CRX = true;   // reacciones en comentarios
+async function openComments(p, onChange) {
   const body = h('div', { class: 'sheet-body' }, h('div', { class: 'spinner' }));
   const input = h('input', { class: 'input', placeholder: 'Escribe un comentario…', maxlength: '500', 'aria-label': 'Comentario' });
   const send = h('button', { class: 'btn small', type: 'submit' }, 'Enviar');
@@ -1911,19 +1938,84 @@ async function openComments(p) {
     const { error } = await sb.from('comments').insert({ post_id: p.id, user_id: state.me.id, body: text });
     send.disabled = false;
     if (error) return toast('No se pudo enviar');
-    input.value = ''; load();
+    input.value = ''; changed = true; load(true);
   } }, input, send);
-  openSheet('Comentarios', body, isGuest() ? h('div', { class: 'sheet-foot' }, h('button', { class: 'btn', onclick: () => { document.querySelectorAll('.sheet-bg').forEach(x => x.remove()); needLogin('Crea tu cuenta para comentar'); } }, 'Entra para comentar')) : foot);
-  async function load() {
+  let changed = false;
+  const closeSheet = openSheet('Comentarios', body, isGuest() ? h('div', { class: 'sheet-foot' }, h('button', { class: 'btn', onclick: () => { document.querySelectorAll('.sheet-bg').forEach(x => x.remove()); needLogin('Crea tu cuenta para comentar'); } }, 'Entra para comentar')) : foot);
+  // al cerrar, avisa a la tarjeta para que actualice el número y la vista previa
+  const bgEl = body.closest('.sheet-bg');
+  if (bgEl && onChange) new MutationObserver((m, obs) => { if (!document.body.contains(bgEl)) { obs.disconnect(); if (changed) onChange(); } }).observe(document.body, { childList: true });
+  const rx = new Map();   // id del comentario -> [{ user_id, reaction }]
+  let list = [];
+  async function loadRx() {
+    if (!HAS_CRX || !list.length) return;
+    const { data, error } = await sb.from('comment_reactions').select('comment_id,user_id,reaction').in('comment_id', list.map(c => c.id).slice(-300));
+    if (error) { if (/comment_reactions|relation|schema/i.test(error.message || '')) HAS_CRX = false; return; }
+    rx.clear(); (data || []).forEach(r => { if (!rx.has(r.comment_id)) rx.set(r.comment_id, []); rx.get(r.comment_id).push(r); });
+    paint();
+  }
+  async function setRx(c, k) {
+    if (needLogin('Crea tu cuenta para reaccionar')) return;
+    const cur = (rx.get(c.id) || []).find(r => r.user_id === state.me.id);
+    const removing = cur && cur.reaction === k;
+    const next = (rx.get(c.id) || []).filter(r => r.user_id !== state.me.id);
+    if (!removing) next.push({ comment_id: c.id, user_id: state.me.id, reaction: k });
+    rx.set(c.id, next); paint();
+    if (!removing) SFX.play(k);
+    try { navigator.vibrate && navigator.vibrate(12); } catch (_) {}
+    const res = removing ? await sb.from('comment_reactions').delete().eq('comment_id', c.id).eq('user_id', state.me.id)
+      : cur ? await sb.from('comment_reactions').update({ reaction: k }).eq('comment_id', c.id).eq('user_id', state.me.id)
+      : await sb.from('comment_reactions').insert({ comment_id: c.id, user_id: state.me.id, reaction: k });
+    if (res.error) { toast(/comment_reactions|relation|schema/i.test(res.error.message || '') ? 'Las reacciones en comentarios todavía no están activadas' : 'No se pudo guardar'); loadRx(); }
+  }
+  function rxSummary(c) {
+    const l = rx.get(c.id) || []; if (!l.length) return null;
+    const kinds = [...new Set(l.map(r => r.reaction))].slice(0, 3);
+    return h('span', { class: 'cmt-rx' }, ...kinds.map(k => reactIcon(k, 'cmt-rx-ico')), h('b', {}, String(l.length)));
+  }
+  function rxButton(c) {
+    const mine = (rx.get(c.id) || []).find(r => r.user_id === state.me.id);
+    const b = h('button', { class: 'cmt-act' + (mine ? ' on' : ''), type: 'button' }, mine ? (REACT[mine.reaction] || REACT.ajua).l : 'Reaccionar');
+    let t = null, long = false;
+    b.addEventListener('pointerdown', () => { long = false; t = setTimeout(() => { long = true; openReactPicker(b, mine && mine.reaction, (k) => setRx(c, k)); }, 450); });
+    ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => b.addEventListener(ev, () => clearTimeout(t)));
+    b.addEventListener('contextmenu', (e) => e.preventDefault());
+    b.addEventListener('click', () => { if (long) return; setRx(c, mine ? mine.reaction : 'ajua'); });
+    return b;
+  }
+  function paint() {
+    const top = body.scrollTop;
+    body.replaceChildren();
+    if (!list.length) return body.append(h('p', { class: 'empty', style: 'padding:30px 10px' }, 'Sé el primero en comentar.'));
+    list.forEach(c => body.append(h('div', { class: 'cmt' }, avatar(c.profiles, 34),
+      h('div', { style: 'flex:1;min-width:0' },
+        h('div', { class: 'cmt-bubble' }, h('b', {}, (c.profiles && c.profiles.username) || '', vb(c.user_id)), h('p', {}, ...richText(c.body)), rxSummary(c)),
+        h('div', { class: 'cmt-meta' }, h('small', {}, timeAgo(c.created_at)), HAS_CRX ? rxButton(c) : null)))));
+    body.scrollTop = top;
+  }
+  async function load(toBottom) {
     const { data, error } = await sb.from('comments').select('id,body,created_at,user_id,profiles!user_id(username,full_name,avatar_url)').eq('post_id', p.id).order('created_at');
     if (error) return body.replaceChildren(h('p', { class: 'err' }, friendlyError(error)));
-    body.replaceChildren();
-    if (!data.length) body.append(h('p', { class: 'empty', style: 'padding:30px 10px' }, 'Sé el primero en comentar.'));
-    visible(data).forEach(c => body.append(h('div', { class: 'cmt' }, avatar(c.profiles, 34),
-      h('div', {}, h('p', {}, h('b', {}, (c.profiles && c.profiles.username) || '', vb(c.user_id)), ' ', ...richText(c.body)), h('small', {}, timeAgo(c.created_at))))));
-    body.scrollTop = body.scrollHeight;
+    list = visible(data || []);
+    paint(); body.scrollTop = body.scrollHeight;
+    loadRx();
   }
   load();
+}
+// Vista previa de comentarios en las publicaciones (como Facebook): se piden juntos para no gastar datos
+const CPREV = { q: new Map(), t: null };
+function queueCommentPreview(postId, fill) {
+  CPREV.q.set(postId, fill);
+  clearTimeout(CPREV.t);
+  CPREV.t = setTimeout(async () => {
+    const batch = new Map(CPREV.q); CPREV.q.clear();
+    const ids = [...batch.keys()];
+    if (!ids.length) return;
+    const { data } = await sb.from('comments').select('id,post_id,body,created_at,user_id,profiles!user_id(username)').in('post_id', ids).order('created_at', { ascending: false }).limit(Math.min(400, ids.length * 6));
+    const by = new Map();
+    visible(data || []).forEach(c => { if (!by.has(c.post_id)) by.set(c.post_id, []); const a = by.get(c.post_id); if (a.length < 2) a.push(c); });
+    batch.forEach((fn, id) => fn((by.get(id) || []).reverse()));
+  }, 120);
 }
 
 function gridOf(posts, onEmpty) {
