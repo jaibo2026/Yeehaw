@@ -9,7 +9,7 @@ self.addEventListener('fetch', (e) => {
   e.respondWith(fresh ? fetch(req, { cache: 'no-cache' }).catch(() => fetch(req)) : fetch(req));
 });
 
-// Avisos en el teléfono: llega un mensaje aunque Ranchfolk esté cerrada
+// Avisos en el teléfono: mensajes, reacciones, comentarios y seguidores, aunque Ranchfolk esté cerrada
 self.addEventListener('push', (e) => {
   let d = {};
   try { d = e.data ? e.data.json() : {}; } catch (_) { d = { body: e.data ? e.data.text() : '' }; }
@@ -17,10 +17,11 @@ self.addEventListener('push', (e) => {
     const wins = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
     const open = wins.some(w => w.visibilityState === 'visible');
     // Con la app abierta: le avisamos a la app para que suene la campana adentro
-    wins.forEach(w => { if (w.visibilityState === 'visible') { try { w.postMessage({ type: 'herria-msg', tag: d.tag || '' }); } catch (_) {} } });
+    const isChat = String(d.tag || '').startsWith('chat-');
+    wins.forEach(w => { if (w.visibilityState === 'visible') { try { w.postMessage({ type: isChat ? 'herria-msg' : 'herria-notif', tag: d.tag || '' }); } catch (_) {} } });
     await self.registration.showNotification(d.title || 'Ranchfolk', {
       body: d.body || 'Tienes un mensaje nuevo',
-      icon: 'icon-192.png',
+      icon: 'icon-maskable-192.png',
       badge: 'icon-192.png',
       tag: d.tag || 'herria',
       renotify: true,

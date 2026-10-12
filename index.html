@@ -781,6 +781,34 @@ html,body{background:#F5EFE3!important;background-image:none!important;color:#17
 <div id="splash" aria-hidden="true"><img src="icon-maskable-192.png" alt=""><b>Ranchfolk</b><small>La red social del rancho</small></div>
 <style>
 #splash{display:none}
+.feed-seg{margin:10px 14px 4px}
+.pf-statbtn{background:none;border:none;padding:0;cursor:pointer;color:inherit;font:inherit}
+.pf-statbtn b{display:block;font-size:20px;color:#F3BD68}.pf-statbtn small{display:block;font-size:11px;color:#C9D3DA;line-height:1.2}
+.sg-card{margin:10px 0 14px;padding:12px 0 14px;background:#FFFDF8;border-top:1px solid #EADFCB;border-bottom:1px solid #EADFCB}
+.sg-head{display:flex;align-items:center;justify-content:space-between;padding:0 14px 10px}
+.sg-head b{font-size:15px}
+.sg-row{display:flex;gap:10px;overflow-x:auto;padding:0 14px;scrollbar-width:none}
+.sg-row::-webkit-scrollbar{display:none}
+.sg-item{flex:0 0 132px;display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 8px;border:1px solid #EADFCB;border-radius:16px;background:#fff;text-align:center;cursor:pointer}
+.sg-item b{font-size:13px;max-width:116px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sg-item small{font-size:11px;color:var(--muted);max-width:116px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sg-item .btn{margin-top:6px;width:100%;height:34px;font-size:13px;padding:0 8px}
+.wa-btn{display:flex;align-items:center;justify-content:center;width:100%;background:#25D366!important;color:#fff!important;text-decoration:none;border:none}
+.htag{background:none;border:none;padding:0;font:inherit;color:#B5652B;font-weight:700;cursor:pointer}
+.ride-info .htag{color:#F3BD68}
+.tag-head{display:flex;align-items:center;justify-content:space-between;margin:12px 16px 6px;padding:10px 14px;border-radius:14px;background:linear-gradient(180deg,#2C4657,#172531)}
+.tag-head b{color:#F3BD68;font-size:20px}.tag-head .iconbtn{color:#fff}
+.fx-filters{display:flex;flex-direction:column;gap:8px;padding:0 14px 10px}
+.fx-estado{height:44px;font-weight:600}
+.fx-views{margin:4px 0 2px;padding:8px 12px;border-radius:12px;background:#EEF4EA;color:#2F5E2A;font-weight:700;font-size:14px}
+.fx-specs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0 4px}
+.fx-spec{padding:8px 10px;border-radius:12px;background:#F5EFE3;border:1px solid #EADFCB}
+.fx-spec small{display:block;font-size:12px;color:var(--muted)}.fx-spec b{font-size:15px}
+.fx-spec-form{margin:2px 0 6px}
+.fx-spec-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+.fx-spec-grid .field{margin-bottom:10px}
+.notif .btn.small{flex:0 0 auto;height:34px;font-size:13px}
+.notif{cursor:pointer}
 @media (display-mode: standalone){#splash{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#F5EFE3;transition:opacity .35s ease}}
 #splash img{width:112px;height:112px;border-radius:50%;box-shadow:0 8px 24px rgba(23,37,49,.25);margin-bottom:8px}
 #splash b{font-family:'Rye','Work Sans',serif;font-size:34px;color:#172531;letter-spacing:.5px}
@@ -832,6 +860,7 @@ const ICONS = {
   send: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>',
   pause: '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>',
   resume: '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>',
+  edit: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
   trash: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>'
 };
 
@@ -894,13 +923,14 @@ function friendlyError(e) {
 }
 async function compressImage(file, max = 1440) {
   if (!file.type.startsWith('image/') || file.type === 'image/gif') return file;
+  const saver = SAVER.on; if (saver) max = Math.min(max, 1080);
   try {
     const bmp = await createImageBitmap(file);
     const s = Math.min(1, max / Math.max(bmp.width, bmp.height));
     const c = document.createElement('canvas');
     c.width = Math.round(bmp.width * s); c.height = Math.round(bmp.height * s);
     c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
-    const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.82));
+    const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', saver ? 0.7 : 0.82));
     return blob || file;
   } catch (_) { return file; }
 }
@@ -929,6 +959,124 @@ async function loadMe() {
   state.me = data;
   const bl = await sb.from('blocks').select('blocked_id').eq('blocker_id', state.session.user.id);
   state.blocked = new Set(bl.error ? [] : (bl.data || []).map(b => b.blocked_id));
+  try { await loadFollowing(); } catch (_) {}
+}
+// ---------- Seguir a personas ----------
+let HAS_FOLLOW = true;
+state.following = new Set();
+async function loadFollowing() {
+  state.following = new Set();
+  if (!state.session || !state.me) return;
+  const { data, error } = await sb.from('follows').select('following_id').eq('follower_id', state.me.id).limit(3000);
+  if (error) { if (/follows|relation|schema/i.test(error.message || '')) HAS_FOLLOW = false; return; }
+  state.following = new Set((data || []).map(x => x.following_id));
+}
+const isFollowing = (id) => !!(state.following && state.following.has(id));
+async function setFollow(id, on) {
+  if (needLogin('Crea tu cuenta para seguir a la gente del rancho')) return null;
+  const r = on ? await sb.from('follows').insert({ follower_id: state.me.id, following_id: id })
+               : await sb.from('follows').delete().eq('follower_id', state.me.id).eq('following_id', id);
+  if (r.error && !/duplicate/i.test(r.error.message || '')) { toast('No se pudo guardar'); return null; }
+  if (on) { state.following.add(id); SFX.play('ajua'); } else state.following.delete(id);
+  return on;
+}
+// Botón Seguir / Siguiendo. onChange(on) avisa cuando cambia.
+function followBtn(id, opts = {}) {
+  if (!HAS_FOLLOW || (state.me && id === state.me.id)) return null;
+  const b = h('button', { type: 'button' });
+  const paint = () => { const on = isFollowing(id); b.className = (opts.small ? 'btn small ' : 'btn ') + (on ? 'ghost' : (opts.gold ? 'pf-gold' : '')); b.textContent = on ? '✓ Siguiendo' : '＋ Seguir'; };
+  b.addEventListener('click', async (e) => {
+    e.stopPropagation(); b.disabled = true;
+    const on = await setFollow(id, !isFollowing(id));
+    b.disabled = false; paint(); if (on !== null && opts.onChange) opts.onChange(on);
+  });
+  paint();
+  return b;
+}
+async function openFollowList(id, which) {
+  const body = h('div', { class: 'sheet-body' }, h('div', { class: 'spinner' }));
+  openSheet(which === 'followers' ? 'Seguidores' : 'Siguiendo', body);
+  const col = which === 'followers' ? 'follower_id' : 'following_id';
+  const { data, error } = await sb.from('follows').select('created_at,profiles!' + col + '(id,username,full_name,avatar_url,rancho)').eq(which === 'followers' ? 'following_id' : 'follower_id', id).order('created_at', { ascending: false }).limit(300);
+  if (error) return body.replaceChildren(h('p', { class: 'err' }, friendlyError(error)));
+  const b = state.blocked || new Set();
+  const people = (data || []).map(x => x.profiles).filter(x => x && !b.has(x.id));
+  if (!people.length) return body.replaceChildren(h('p', { class: 'empty', style: 'padding:24px 8px' }, which === 'followers' ? 'Todavía nadie sigue esta cuenta.' : 'Todavía no sigue a nadie.'));
+  body.replaceChildren(...people.map(personRow));
+}
+function personRow(pp) {
+  return h('div', { class: 'inbox-row', style: 'cursor:pointer', onclick: () => { document.querySelectorAll('.sheet-bg').forEach(x => x.remove()); go('profile', { profileId: pp.id }); } },
+    avatar(pp, 44), h('div', { class: 'who' }, h('b', {}, pp.username || '', vb(pp.id)), h('span', {}, [pp.full_name, pp.rancho || pp.estado].filter(Boolean).join(' · '))),
+    followBtn(pp.id, { small: true }));
+}
+// Gente que quizá conozcas (primero los de tu estado y con foto)
+async function suggestedPeople(n = 10) {
+  if (isGuest()) return [];
+  const { data } = await sb.from('profiles').select('id,username,full_name,avatar_url,rancho,estado').order('created_at', { ascending: false }).limit(80);
+  const b = state.blocked || new Set();
+  const myEst = state.me && state.me.estado;
+  return (data || []).filter(x => x.id !== state.me.id && !isFollowing(x.id) && !b.has(x.id))
+    .sort((a, c) => ((c.estado && c.estado === myEst) - (a.estado && a.estado === myEst)) || (!!c.avatar_url - !!a.avatar_url))
+    .slice(0, n);
+}
+function suggestionsCard(title) {
+  if (isGuest() || !HAS_FOLLOW) return null;
+  const box = h('section', { class: 'sg-card', hidden: true });
+  suggestedPeople(12).then(list => {
+    if (!list.length) return;
+    box.replaceChildren(h('div', { class: 'sg-head' }, h('b', {}, title || '🤠 Gente que quizá conozcas'), h('button', { class: 'linkbtn', onclick: inviteFriends }, 'Invitar compas')),
+      h('div', { class: 'sg-row' }, list.map(pp => h('div', { class: 'sg-item', onclick: () => go('profile', { profileId: pp.id }) },
+        avatar(pp, 64), h('b', {}, pp.username || '', vb(pp.id)), h('small', {}, pp.estado || pp.rancho || 'Ranchfolk'),
+        followBtn(pp.id, { small: true, gold: true })))));
+    box.hidden = false;
+  }).catch(() => {});
+  return box;
+}
+// ---------- Invitar por WhatsApp ----------
+const INVITE_TXT = '¡Únete a Ranchfolk, la red social del rancho! 🤠🐎 Comparte tus caballos y tu ganado, entérate de jaripeos, cabalgatas y bailes, y compra y vende en La Feria. Es gratis:';
+function inviteFriends() {
+  const url = location.origin + location.pathname;
+  const wa = 'https://wa.me/?text=' + encodeURIComponent(INVITE_TXT + ' ' + url);
+  const close = openSheet('Invitar a mis compas', h('div', { class: 'sheet-body', style: 'line-height:1.5' },
+    h('p', { style: 'margin-top:0' }, 'Entre más gente de rancho haya, más ventas, eventos y amigos vas a encontrar. 🤝'),
+    h('a', { class: 'btn wa-btn', href: wa, target: '_blank', rel: 'noopener', onclick: () => setTimeout(() => close(), 300) }, '💬 Invitar por WhatsApp'),
+    h('button', { class: 'btn ghost', style: 'width:100%;margin-top:10px', onclick: async () => { try { if (navigator.share) await navigator.share({ title: 'Ranchfolk', text: INVITE_TXT, url }); else { await navigator.clipboard.writeText(INVITE_TXT + ' ' + url); toast('Invitación copiada'); } } catch (_) {} } }, '📤 Otras apps (Facebook, Messenger…)')));
+}
+// ---------- Estados de México ----------
+const ESTADOS = ['Aguascalientes', 'Baja California', 'Baja California Sur', 'Campeche', 'Chiapas', 'Chihuahua', 'Ciudad de México', 'Coahuila', 'Colima', 'Durango', 'Estado de México', 'Guanajuato', 'Guerrero', 'Hidalgo', 'Jalisco', 'Michoacán', 'Morelos', 'Nayarit', 'Nuevo León', 'Oaxaca', 'Puebla', 'Querétaro', 'Quintana Roo', 'San Luis Potosí', 'Sinaloa', 'Sonora', 'Tabasco', 'Tamaulipas', 'Tlaxcala', 'Veracruz', 'Yucatán', 'Zacatecas', 'Estados Unidos', 'Otro país'];
+function estadoSelect(value, first) {
+  const sel = h('select', { class: 'input' }, h('option', { value: '' }, first || 'Escoge tu estado'), ...ESTADOS.map(e => h('option', { value: e }, e)));
+  sel.value = value || '';
+  return sel;
+}
+// Filtro de estado para La Feria (Mercado y Eventos)
+function estadoFilter(onPick) {
+  const myEst = state.me && state.me.estado;
+  const sel = h('select', { class: 'input fx-estado', 'aria-label': 'Filtrar por estado' },
+    h('option', { value: '' }, '📍 Todo México'),
+    myEst ? h('option', { value: myEst }, '📍 Cerca de mí: ' + myEst) : null,
+    ...ESTADOS.filter(e => e !== myEst).map(e => h('option', { value: e }, e)));
+  sel.value = state.feriaEstado || '';
+  sel.addEventListener('change', () => { state.feriaEstado = sel.value; onPick(); });
+  return sel;
+}
+// ---------- Ahorro de datos ----------
+const SAVER = {
+  get on() { try { return localStorage.getItem('rf_ahorro') === '1'; } catch (_) { return false; } },
+  set on(v) { try { localStorage.setItem('rf_ahorro', v ? '1' : '0'); } catch (_) {} }
+};
+// ---------- #Etiquetas ----------
+const TAG_RE = /(#[0-9A-Za-zÁÉÍÓÚÜÑáéíóúüñ_]{2,30})/g;
+function richText(text) {
+  if (!text) return [];
+  return String(text).split(TAG_RE).map((part, i) => i % 2
+    ? h('button', { type: 'button', class: 'htag', onclick: (e) => { e.stopPropagation(); openTag(part.slice(1)); } }, part)
+    : part);
+}
+function tagsIn(text) { return (String(text || '').match(TAG_RE) || []).map(t => t.slice(1).toLowerCase()); }
+function openTag(tag) {
+  document.querySelectorAll('.sheet-bg').forEach(x => x.remove());
+  state.tag = String(tag).toLowerCase(); go('explore');
 }
 const GUEST = { id: '__guest__', username: 'invitado', guest: true };
 // Cuentas verificadas ✓ (solo Ranchfolk las marca desde Supabase)
@@ -1101,11 +1249,13 @@ function openSong(url, title, after) {
 }
 let HAS_ANIMALS = true;
 const ANIMAL_EMBED = ',animal_id,animals!animal_id(id,name,species,photo_url)';
-async function fetchPosts({ category, userId, kinds = ['post', 'ride'], since, animalId } = {}) {
+async function fetchPosts({ category, userId, userIds, tag, kinds = ['post', 'ride'], since, animalId } = {}) {
   const build = () => {
     let q = sb.from('posts').select(postSelect()).order('created_at', { ascending: false }).limit(60);
     if (category && category !== 'Todo') q = q.eq('category', category);
     if (userId) q = q.eq('user_id', userId);
+    if (userIds) q = q.in('user_id', userIds.slice(0, 300));
+    if (tag) q = q.ilike('caption', '%#' + String(tag).replace(/[%,()_\\]/g, '') + '%');
     if (since) q = q.gte('created_at', since);
     if (animalId) q = q.eq('animal_id', animalId);
     if (HAS_KIND) q = q.in('kind', kinds);
@@ -1188,6 +1338,7 @@ function go(view, extra) {
   state.view = view;
   if (extra && 'profileId' in extra) state.profileId = extra.profileId;
   if (extra && 'animalId' in extra) state.animalId = extra.animalId;
+  if (view !== 'explore') state.tag = null;
   window.scrollTo({ top: 0, behavior: 'instant' });
   render();
   if (typeof syncBack === 'function') syncBack();
@@ -1310,7 +1461,11 @@ async function renderFeed() {
   const chips = h('div', { class: 'chips' }, ['Todo', ...CATEGORIES].map(c =>
     h('button', { class: 'chip' + (state.category === c ? ' on' : ''), onclick: () => { state.category = c; render(); } }, c)));
   const list = h('div', {}, h('div', { class: 'spinner' }));
-  main.append(...[stories, feriaShowcase(), welcomeCard(), chips, list].filter(Boolean));
+  const mode = HAS_FOLLOW && !isGuest() ? (state.feedMode || 'all') : 'all';
+  const seg = HAS_FOLLOW && !isGuest() ? h('div', { class: 'fx-seg feed-seg' },
+    h('button', { class: mode === 'all' ? 'on' : '', onclick: () => { state.feedMode = 'all'; render(); } }, '🌎 Para ti'),
+    h('button', { class: mode === 'following' ? 'on' : '', onclick: () => { state.feedMode = 'following'; render(); } }, '🤠 Siguiendo')) : null;
+  main.append(...[stories, feriaShowcase(), welcomeCard(), seg, chips, list].filter(Boolean));
 
   // Sundowns: lo que subieron en las últimas 24 horas
   const paintSundowns = async () => {
@@ -1331,15 +1486,25 @@ async function renderFeed() {
   paintSundowns();
 
   try {
-    const posts = await fetchPosts({ category: state.category });
+    if (mode === 'following' && !state.following.size) {
+      list.replaceChildren(h('div', { class: 'empty', style: 'padding-bottom:8px' }, h('b', { style: 'display:block;font-size:17px;color:var(--text);margin-bottom:6px' }, 'Todavía no sigues a nadie'),
+        'Sigue a la gente del rancho para ver aquí lo que suben.'), suggestionsCard('🤠 Empieza siguiendo a estos') || '',
+        h('div', { style: 'padding:6px 16px 24px;text-align:center' }, h('button', { class: 'btn wa-btn', onclick: inviteFriends }, '💬 Invitar a mis compas')));
+      return;
+    }
+    const posts = await fetchPosts(mode === 'following' ? { category: state.category, userIds: [...state.following, state.me.id] } : { category: state.category });
     list.replaceChildren();
+    if (!posts.length && mode === 'following') {
+      list.append(h('div', { class: 'empty' }, 'La gente que sigues no ha subido nada' + (state.category !== 'Todo' ? ' de ' + state.category : '') + ' todavía.'), suggestionsCard() || '');
+      return;
+    }
     if (!posts.length) {
       list.append(h('div', { class: 'empty' }, state.category === 'Todo'
         ? 'Todavía no hay nada por aquí. ¡Sube la primera foto del rancho con el botón +!'
         : `Nadie ha subido nada de ${state.category} todavía. ¡Estrénala tú!`,
         h('div', { style: 'margin-top:18px' }, h('button', { class: 'btn small', onclick: () => go('upload') }, 'Subir algo'))));
     }
-    posts.forEach(p => list.append(postCard(p)));
+    posts.forEach((p, i) => { list.append(postCard(p)); if (i === 2 && mode === 'all' && state.following.size < 15) { const sc = suggestionsCard(); if (sc) list.append(sc); } });
   } catch (e) { list.replaceChildren(h('div', { class: 'empty' }, friendlyError(e))); }
 }
 
@@ -1618,7 +1783,7 @@ function postCard(p) {
   const { likeBtn, countEl, setLike } = likeControls(p, false);
   const burst = burstEl();
   const mediaEl = p.media_type === 'video'
-    ? h('video', { src: p.media_url, controls: true, playsInline: true, preload: 'metadata' })
+    ? h('video', { src: p.media_url, controls: true, playsInline: true, preload: SAVER.on ? 'none' : 'metadata' })
     : h('img', { src: p.media_url, alt: p.caption ? p.caption.slice(0, 120) : 'Foto de ' + (prof.username || '') , loading: 'lazy' });
   const media = h('div', { class: 'media' }, mediaEl, burst);
   if (p.media_type !== 'video') {
@@ -1631,13 +1796,16 @@ function postCard(p) {
   }
 
   const links = (Array.isArray(p.shop_links) ? p.shop_links : []).filter(l => l && safeUrl(l.url));
+  const capEl = h('p', { class: 'caption' });
+  const paintCap = () => { capEl.hidden = !p.caption; capEl.replaceChildren(h('b', {}, prof.username || ''), ' ', ...richText(p.caption)); };
+  paintCap();
   const card = h('article', { class: 'post' },
     h('div', { class: 'post-head' },
       avatar(prof, 40),
       h('button', { class: 'who', onclick: () => go('profile', { profileId: p.user_id }) },
         h('b', {}, prof.username || 'usuario', vb(p.user_id)), h('small', {}, p.kind === 'ride' ? 'Ride · ' + timeAgo(p.created_at) : (prof.rancho || timeAgo(p.created_at)))),
       p.category && h('span', { class: 'tag' }, p.category),
-      h('button', { class: 'iconbtn plain', 'aria-label': 'Más opciones', icon: 'more', onclick: () => postMenu(p, () => card.remove()) })
+      h('button', { class: 'iconbtn plain', 'aria-label': 'Más opciones', icon: 'more', onclick: () => postMenu(p, () => card.remove(), () => paintCap()) })
     ),
     p.shared_id && h('div', { class: 'shared-note' },
       h('span', {}, '🔁'), h('span', {}, 'Compartió una publicación de '),
@@ -1654,7 +1822,7 @@ function postCard(p) {
       h('button', { class: 'iconbtn plain', 'aria-label': 'Compartir', icon: 'share', onclick: () => sharePost(p) }),
       countEl),
     p.animals && h('div', { style: 'padding:2px 12px 4px' }, animalTag(p.animals)),
-    p.caption && h('p', { class: 'caption' }, h('b', {}, prof.username || ''), ' ', p.caption),
+    capEl,
     p.song_url && h('div', { style: 'margin:8px 16px 0' }, songChip(p.song_url, p.song_title, { preview: p.song_preview, art: p.song_art, start: p.song_start })),
     h('div', { class: 'meta' },
       h('button', { class: 'linkbtn', onclick: () => openComments(p) }, commentCount ? `Ver ${commentCount === 1 ? 'el comentario' : `los ${commentCount} comentarios`}` : 'Comentar'),
@@ -1693,7 +1861,7 @@ async function openComments(p) {
     body.replaceChildren();
     if (!data.length) body.append(h('p', { class: 'empty', style: 'padding:30px 10px' }, 'Sé el primero en comentar.'));
     visible(data).forEach(c => body.append(h('div', { class: 'cmt' }, avatar(c.profiles, 34),
-      h('div', {}, h('p', {}, h('b', {}, (c.profiles && c.profiles.username) || '', vb(c.user_id)), ' ', c.body), h('small', {}, timeAgo(c.created_at))))));
+      h('div', {}, h('p', {}, h('b', {}, (c.profiles && c.profiles.username) || '', vb(c.user_id)), ' ', ...richText(c.body)), h('small', {}, timeAgo(c.created_at))))));
     body.scrollTop = body.scrollHeight;
   }
   load();
@@ -1848,7 +2016,7 @@ async function renderWelcome() {
 
 // ---------- Reportar, bloquear, borrar ----------
 const REPORT_REASONS = ['Contenido sexual o desnudos', 'Violencia o maltrato animal', 'Acoso o insultos', 'Spam, estafa o venta ilegal', 'Algo más'];
-function postMenu(p, onGone) {
+function postMenu(p, onGone, onEdit) {
   if (needLogin('Crea tu cuenta para reportar o bloquear')) return;
   const mine = p.user_id === state.me.id;
   const who = (p.profiles && p.profiles.username) || 'esta persona';
@@ -1856,6 +2024,7 @@ function postMenu(p, onGone) {
   let close;
   const item = (icon, label, fn, danger) => h('button', { class: 'menu-item' + (danger ? ' danger' : ''), onclick: fn }, h('span', { icon }), label);
   if (mine) {
+    if (p.kind !== 'sundown') body.append(item('edit', 'Editar descripción', () => { close(); editCaption(p, onEdit); }));
     body.append(item('trash', 'Borrar publicación', async () => { close(); if (await deletePost(p)) onGone && onGone(); }, true));
   } else {
     body.append(
@@ -1864,6 +2033,21 @@ function postMenu(p, onGone) {
   }
   body.append(item('close', 'Cancelar', () => close()));
   close = openSheet('Opciones', body);
+}
+function editCaption(p, onSaved) {
+  const ta = h('textarea', { class: 'input', maxlength: '1000', rows: '5', placeholder: 'Escribe algo… usa #etiquetas como #charreada o #cuartodemilla' }); ta.value = p.caption || '';
+  const err = h('p', { class: 'err', role: 'alert' });
+  const save = h('button', { class: 'btn', type: 'submit', style: 'width:100%' }, 'Guardar');
+  let close;
+  const body = h('form', { class: 'sheet-body', onsubmit: async (e) => {
+    e.preventDefault(); save.disabled = true; err.textContent = '';
+    const v = ta.value.trim() || null;
+    const { error } = await sb.from('posts').update({ caption: v }).eq('id', p.id);
+    if (error) { save.disabled = false; err.textContent = /policy|permission|row-level/i.test(error.message || '') ? 'Falta activar "editar publicaciones" en Supabase.' : friendlyError(error); return; }
+    p.caption = v; close(); toast('Descripción actualizada'); if (onSaved) onSaved(); else if (state.view === 'rides') render();
+  } }, h('div', { class: 'field' }, h('label', {}, 'Descripción'), ta), err, save);
+  close = openSheet('Editar publicación', body);
+  setTimeout(() => ta.focus(), 250);
 }
 function reportPost(p, onGone) {
   const body = h('div', { class: 'sheet-body menu' }, h('p', { class: 'hint', style: 'margin:0 0 10px' }, '¿Por qué la reportas? Nadie más sabrá que fuiste tú.'));
@@ -2336,7 +2520,8 @@ function rideCard(p) {
   const prof = p.profiles || {};
   const commentCount = (p.comments && p.comments[0] && p.comments[0].count) || 0;
   const { likeBtn, countEl, setLike } = likeControls(p, true);
-  const video = h('video', { src: p.media_url, loop: true, playsInline: true, muted: state.ridesMuted, preload: 'metadata' });
+  const video = h('video', { src: p.media_url, loop: true, playsInline: true, muted: state.ridesMuted, preload: SAVER.on ? 'none' : 'metadata' });
+  let allowed = !SAVER.on;  // con ahorro de datos, el video espera a que lo toques
   video.muted = state.ridesMuted;
   const burst = burstEl();
   const paused = h('div', { class: 'ride-paused', style: 'display:none' }, h('span', { icon: 'playbig' }));
@@ -2348,7 +2533,7 @@ function rideCard(p) {
   });
   muteBtn.classList.add('mutebtn');
   let wantPlay = false;
-  const play = () => { wantPlay = true; video.muted = state.ridesMuted; video.play().then(() => { paused.style.display = 'none'; }).catch(() => { video.muted = true; video.play().catch(() => { paused.style.display = 'flex'; }); }); };
+  const play = () => { if (!allowed) { paused.style.display = 'flex'; return; } wantPlay = true; video.muted = state.ridesMuted; video.play().then(() => { paused.style.display = 'none'; }).catch(() => { video.muted = true; video.play().catch(() => { paused.style.display = 'flex'; }); }); };
   const pause = () => { wantPlay = false; video.pause(); };
   let last = 0, tapTimer = null;
   const tapLayer = h('button', { 'aria-label': 'Pausar o reproducir. Doble toque para dar ajúa', style: 'position:absolute;inset:0;z-index:1;border:none;background:none;padding:0' });
@@ -2357,7 +2542,7 @@ function rideCard(p) {
     if (now - last < 300) { clearTimeout(tapTimer); fireBurst(burst); setLike(true); last = 0; return; }
     last = now;
     tapTimer = setTimeout(() => {
-      if (video.paused) { video.play().catch(() => {}); paused.style.display = 'none'; }
+      if (video.paused) { allowed = true; video.play().catch(() => {}); paused.style.display = 'none'; }
       else { video.pause(); paused.style.display = 'flex'; }
     }, 300);
   });
@@ -2366,7 +2551,7 @@ function rideCard(p) {
     h('div', { class: 'ride-info' },
       h('button', { class: 'who', onclick: () => go('profile', { profileId: p.user_id }) }, avatar(prof, 40), h('b', {}, prof.username || 'usuario', vb(p.user_id))),
       p.animals && h('div', { style: 'margin-bottom:8px' }, animalTag(p.animals)),
-      p.caption && h('p', {}, p.caption),
+      p.caption && h('p', {}, ...richText(p.caption)),
       p.song_url && h('div', { style: 'margin-bottom:8px' }, songChip(p.song_url, p.song_title, { dark: true, preview: p.song_preview, art: p.song_art, start: p.song_start, before: () => { if (!p.song_preview) try { video.pause(); } catch (_) {} } })),
       h('div', { style: 'display:flex;gap:8px;align-items:center' }, p.category && h('span', { class: 'tag' }, p.category), h('small', { style: 'color:rgba(255,255,255,.8)' }, timeAgo(p.created_at)))),
     h('div', { class: 'ride-side' },
@@ -2374,19 +2559,21 @@ function rideCard(p) {
       h('button', { class: 'iconbtn', 'aria-label': 'Comentarios', icon: 'comment', onclick: () => openComments(p) }), h('span', {}, String(commentCount)),
       h('button', { class: 'iconbtn', 'aria-label': 'Compartir', icon: 'share', onclick: () => sharePost(p) }), h('span', {}, ' '),
       muteBtn,
-      h('button', { class: 'iconbtn', 'aria-label': 'Más opciones', icon: 'more', style: 'margin-top:6px', onclick: () => { pause(); postMenu(p, () => el.remove()); } })))
+      h('button', { class: 'iconbtn', 'aria-label': 'Más opciones', icon: 'more', style: 'margin-top:6px', onclick: () => { pause(); postMenu(p, () => el.remove(), () => render()); } })))
   return { el, play, pause };
 }
 
 async function renderExplore() {
   const main = h('main');
   $app.append(h('header', { class: 'topbar' }, h('div', { class: 'logo', style: 'font-size:24px' }, 'Explorar')), main);
-  const search = h('input', { class: 'input', type: 'search', placeholder: 'Buscar personas, ranchos o animales…', 'aria-label': 'Buscar' });
+  const search = h('input', { class: 'input', type: 'search', placeholder: 'Buscar personas, ranchos, animales o #etiquetas…', 'aria-label': 'Buscar', enterkeyhint: 'search' });
   const people = h('div', { style: 'padding:0 16px' });
+  const tagBar = h('div', { class: 'tag-bar' });
+  search.addEventListener('keydown', (e) => { if (e.key === 'Enter') { const v = search.value.trim(); if (/^#.{2,}/.test(v)) { search.blur(); openTag(v.slice(1)); } } });
   const chips = h('div', { class: 'chips', style: 'padding-top:12px' }, ['Todo', ...CATEGORIES].map(c =>
     h('button', { class: 'chip' + (state.category === c ? ' on' : ''), onclick: () => { state.category = c; render(); } }, c)));
   const grid = h('div', {}, h('div', { class: 'spinner' }));
-  main.append(h('div', { style: 'padding:0 16px' }, search), people, chips, grid);
+  main.append(...[h('div', { style: 'padding:0 16px' }, search), people, tagBar, state.tag ? null : chips, grid].filter(Boolean));
 
   let timer;
   search.addEventListener('input', () => {
@@ -2394,20 +2581,35 @@ async function renderExplore() {
     timer = setTimeout(async () => {
       const q = search.value.trim().replace(/[%,()]/g, '');
       if (!q) return people.replaceChildren();
+      if (q.startsWith('#')) { const t = q.slice(1); return people.replaceChildren(t.length >= 2 ? h('button', { class: 'btn small', style: 'margin:10px 0', onclick: () => openTag(t) }, 'Ver publicaciones con #' + t) : ''); }
       const [{ data }, animals] = await Promise.all([
         sb.from('profiles').select('id,username,full_name,avatar_url,rancho').or(`username.ilike.%${q}%,full_name.ilike.%${q}%,rancho.ilike.%${q}%`).limit(10),
         fetchAnimals({ search: q }).catch(() => [])]);
       const rowStyle = 'width:100%;border:none;background:none;padding:10px 0;text-align:left';
       people.replaceChildren(
         ...(data || []).map(p => h('button', { class: 'post-head', style: rowStyle, onclick: () => go('profile', { profileId: p.id }) },
-          avatar(p, 44), h('div', { class: 'who' }, h('b', {}, p.username), h('small', {}, [p.full_name, p.rancho].filter(Boolean).join(' · '))))),
+          avatar(p, 44), h('div', { class: 'who' }, h('b', {}, p.username, vb(p.id)), h('small', {}, [p.full_name, p.rancho].filter(Boolean).join(' · '))), followBtn(p.id, { small: true }))),
         ...animals.slice(0, 10).map(a => h('button', { class: 'post-head', style: rowStyle, onclick: () => go('animal', { animalId: a.id }) },
           animalPic(a, 44), h('div', { class: 'who' }, h('b', {}, a.name), h('small', {}, [a.species, a.profiles && ('de @' + a.profiles.username)].filter(Boolean).join(' · '))))));
       if (data && !data.length && !animals.length) people.append(h('p', { style: 'color:var(--muted)' }, 'No encontramos a nadie con ese nombre.'));
     }, 300);
   });
 
-  try { grid.replaceChildren(gridOf(await fetchPosts({ category: state.category }), 'Aún no hay publicaciones aquí.')); }
+  try {
+    if (state.tag) {
+      tagBar.replaceChildren(h('div', { class: 'tag-head' }, h('b', {}, '#' + state.tag), h('button', { class: 'iconbtn plain', 'aria-label': 'Quitar etiqueta', icon: 'close', onclick: () => { state.tag = null; render(); } })));
+      grid.replaceChildren(gridOf(await fetchPosts({ tag: state.tag }), 'Nadie ha usado #' + state.tag + ' todavía. ¡Úsala tú en tu próxima publicación!'));
+      return;
+    }
+    const posts = await fetchPosts({ category: state.category });
+    // Etiquetas populares en lo más reciente
+    const counts = {};
+    posts.forEach(p => new Set(tagsIn(p.caption)).forEach(t => { counts[t] = (counts[t] || 0) + 1; }));
+    const top = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 10);
+    if (top.length) tagBar.replaceChildren(h('div', { class: 'lbl', style: 'padding:12px 16px 0' }, 'Etiquetas del momento'),
+      h('div', { class: 'chips', style: 'padding-top:6px' }, top.map(([t]) => h('button', { class: 'chip', onclick: () => openTag(t) }, '#' + t))));
+    grid.replaceChildren(gridOf(posts, 'Aún no hay publicaciones aquí.'));
+  }
   catch (e) { grid.replaceChildren(h('div', { class: 'empty' }, friendlyError(e))); }
 }
 
@@ -2653,13 +2855,15 @@ async function renderProfile() {
   $app.append(top, main);
   main.append(h('div', { class: 'spinner' }));
 
-  const [{ data: prof }, posts, sdGroups, animals, hls, sdCount] = await Promise.all([
+  const cnt = (col) => HAS_FOLLOW ? sb.from('follows').select('follower_id', { count: 'exact', head: true }).eq(col, id).then(r => r.error ? null : (r.count || 0), () => null) : Promise.resolve(null);
+  const [{ data: prof }, posts, sdGroups, animals, hls, sdCount, nFollowers, nFollowing] = await Promise.all([
     sb.from('profiles').select('*').eq('id', id).maybeSingle(),
     fetchPosts({ userId: id }).catch(() => []),
     fetchSundownGroups(id),
     fetchAnimals({ ownerId: id }).catch(() => []),
     fetchHighlights(id),
-    HAS_KIND ? sb.from('posts').select('id', { count: 'exact', head: true }).eq('user_id', id).eq('kind', 'sundown').then(r => r.count || 0, () => 0) : Promise.resolve(0)
+    HAS_KIND ? sb.from('posts').select('id', { count: 'exact', head: true }).eq('user_id', id).eq('kind', 'sundown').then(r => r.count || 0, () => 0) : Promise.resolve(0),
+    cnt('following_id'), cnt('follower_id')
   ]);
   const sd = sdGroups[0];
   if (!prof) return main.replaceChildren(h('div', { class: 'empty' }, 'No encontramos este perfil.'));
@@ -2669,27 +2873,36 @@ async function renderProfile() {
   const blocked = state.blocked && state.blocked.has(id);
 
   // Encabezado marino
-  const stat = (n, label) => h('div', {}, h('b', {}, Number(n).toLocaleString('es-MX')), h('small', {}, label));
+  const stat = (n, label, onclick) => h(onclick ? 'button' : 'div', onclick ? { class: 'pf-statbtn', type: 'button', onclick } : {}, h('b', {}, Number(n).toLocaleString('es-MX')), h('small', {}, label));
+  const hasF = nFollowers !== null && nFollowing !== null;
+  let followersN = nFollowers || 0;
+  const followersStat = hasF ? stat(followersN, followersN === 1 ? 'Seguidor' : 'Seguidores', () => openFollowList(id, 'followers')) : null;
+  const bumpFollowers = (on) => { followersN += on ? 1 : -1; if (followersStat) { followersStat.firstChild.textContent = Number(followersN).toLocaleString('es-MX'); followersStat.lastChild.textContent = followersN === 1 ? 'Seguidor' : 'Seguidores'; } };
   const hero = h('section', { class: 'pf-hero' },
     h('button', { class: 'pf-av', 'aria-label': sd ? 'Ver sundown' : 'Foto de perfil', onclick: () => { if (sd) openSundowns([sd], 0, () => render()); } },
       h('div', { class: 'ring' + (sd ? (sd.unseen ? ' new' : ' seen') : '') }, h('div', {}, avatar(prof, 96)))),
     h('h1', {}, prof.full_name || prof.username, vb(prof.id)),
-    h('div', { class: 'pf-sub' }, '@' + prof.username + (prof.ubicacion ? ' · 📍 ' + prof.ubicacion : '')),
-    h('div', { class: 'pf-stats' },
+    h('div', { class: 'pf-sub' }, '@' + prof.username + (prof.ubicacion || prof.estado ? ' · 📍 ' + [prof.ubicacion, prof.estado && !(prof.ubicacion || '').toLowerCase().includes(prof.estado.toLowerCase()) ? prof.estado : ''].filter(Boolean).join(', ') : '')),
+    hasF ? h('div', { class: 'pf-stats' },
+      stat(posts.length, posts.length === 1 ? 'Publicación' : 'Publicaciones'), followersStat,
+      stat(nFollowing, 'Siguiendo', () => openFollowList(id, 'following')), stat(totalLikes, 'Ajúas'))
+    : h('div', { class: 'pf-stats' },
       stat(posts.length, posts.length === 1 ? 'Publicación' : 'Publicaciones'), stat(totalLikes, 'Ajúas'),
       stat(animals.length, animals.length === 1 ? 'Animal' : 'Animales'), stat(animalFans, 'Siguen a sus animales')));
 
   // Botones
   const btns = isMe
     ? h('div', { class: 'pf-btns' },
-        h('button', { class: 'btn pf-gold', onclick: () => openSundownCreator(() => render()) }, '🌅 Agregar a sundown'),
-        h('button', { class: 'btn ghost', onclick: () => editProfile(prof) }, '✏️ Editar perfil'))
+        h('button', { class: 'btn pf-gold', onclick: () => openSundownCreator(() => render()) }, '🌅 Sundown'),
+        h('button', { class: 'btn ghost', onclick: () => editProfile(prof) }, '✏️ Editar perfil'),
+        h('button', { class: 'btn ghost', style: 'flex:0 0 52px', 'aria-label': 'Invitar a mis compas', onclick: inviteFriends }, '📤'))
     : h('div', { class: 'pf-btns' },
-        !blocked && (HAS_DM || isGuest()) && h('button', { class: 'btn pf-gold', onclick: () => { if (!needLogin('Crea tu cuenta para mandar mensajes')) openChatWith(prof); } }, '💬 Mensaje'),
+        !blocked && hasF && followBtn(id, { gold: true, onChange: bumpFollowers }),
+        !blocked && (HAS_DM || isGuest()) && h('button', { class: 'btn ' + (hasF ? 'ghost' : 'pf-gold'), onclick: () => { if (!needLogin('Crea tu cuenta para mandar mensajes')) openChatWith(prof); } }, '💬 Mensaje'),
         blocked ? h('button', { class: 'btn ghost', onclick: () => unblockUser(id, prof.username) }, 'Desbloquear')
           : h('button', { class: 'btn ghost', style: 'flex:0 0 52px', 'aria-label': 'Más opciones', onclick: () => {
               const close = openSheet('@' + prof.username, h('div', { class: 'sheet-body' },
-                h('button', { class: 'mn-row', onclick: async () => { close(); const url = location.origin + location.pathname; try { if (navigator.share) await navigator.share({ title: 'Ranchfolk', text: 'Mira el perfil de @' + prof.username + ' en Ranchfolk', url }); } catch (_) {} } }, h('span', { class: 'mn-emo sm' }, '📤'), h('div', {}, h('b', {}, 'Compartir perfil'))),
+                h('button', { class: 'mn-row', onclick: async () => { close(); const url = location.origin + location.pathname + '#f=' + id; try { if (navigator.share) await navigator.share({ title: 'Ranchfolk', text: 'Mira el perfil de @' + prof.username + ' en Ranchfolk', url }); else { await navigator.clipboard.writeText(url); toast('Enlace copiado'); } } catch (_) {} } }, h('span', { class: 'mn-emo sm' }, '📤'), h('div', {}, h('b', {}, 'Compartir perfil'))),
                 h('button', { class: 'mn-row', onclick: async () => { close(); if (needLogin('Crea tu cuenta para bloquear')) return; if (await blockUser(id, prof.username)) go('feed'); } }, h('span', { class: 'mn-emo sm' }, '🚫'), h('div', {}, h('b', {}, 'Bloquear'), h('small', {}, 'No verás sus publicaciones ni te podrá escribir')))));
             } }, '⋯'));
 
@@ -2718,10 +2931,10 @@ async function renderProfile() {
   const desde = prof.created_at ? new Date(prof.created_at) : null;
   const dato = (e, txt, sub) => txt ? h('div', { class: 'pf-dato' }, h('i', {}, e), h('div', {}, txt, sub ? h('small', {}, sub) : null)) : null;
   const badges = badgesFor(prof, posts, animals, totalLikes, sdCount > 0);
-  const filled = prof.rancho || prof.dedica || prof.fierro || prof.ubicacion;
+  const filled = prof.rancho || prof.dedica || prof.fierro || prof.ubicacion || prof.estado;
   const ficha = h('section', { class: 'pf-card' },
     h('div', { class: 'pf-card-head' }, h('div', { class: 'lbl' }, 'Ficha del ranchero'), isMe && h('button', { class: 'linkbtn', onclick: () => editProfile(prof) }, '✏️')),
-    dato('🏡', prof.rancho, 'Su rancho'), dato('🐄', prof.dedica, 'A qué se dedica'), dato('🔥', prof.fierro, 'Fierro o marca del rancho'), dato('📍', prof.ubicacion),
+    dato('🏡', prof.rancho, 'Su rancho'), dato('🐄', prof.dedica, 'A qué se dedica'), dato('🔥', prof.fierro, 'Fierro o marca del rancho'), dato('📍', [prof.ubicacion, prof.estado].filter(Boolean).filter((x, i, a) => i === 0 || !(a[0] || '').toLowerCase().includes(x.toLowerCase())).join(', ')),
     desde && dato('📅', `En Ranchfolk desde ${MESES[desde.getMonth()]} ${desde.getFullYear()}`),
     !filled && isMe && h('button', { class: 'pf-fill', onclick: () => editProfile(prof) }, '＋ Llena tu ficha: tu rancho, a qué te dedicas y tu fierro'),
     badges.length ? h('div', { class: 'pf-badges' }, badges.map(t => h('span', { class: 'pf-badge' }, t))) : null);
@@ -2922,7 +3135,8 @@ function editProfile(prof) {
   });
   const name = h('input', { class: 'input', id: 'pn', value: prof.full_name || '', maxlength: '60' });
   const rancho = h('input', { class: 'input', id: 'pr', value: prof.rancho || '', maxlength: '60', placeholder: 'ej. Rancho El Mezquite' });
-  const ubic = h('input', { class: 'input', id: 'pu', value: prof.ubicacion || '', maxlength: '60', placeholder: 'ej. León, Guanajuato' });
+  const ubic = h('input', { class: 'input', id: 'pu', value: prof.ubicacion || '', maxlength: '60', placeholder: 'ej. León' });
+  const estado = estadoSelect(prof.estado); estado.id = 'pe';
   const dedica = h('input', { class: 'input', id: 'pd', value: prof.dedica || '', maxlength: '60', placeholder: 'ej. Ganado lechero, caballos de rienda' });
   const fierro = h('input', { class: 'input', id: 'pf', value: prof.fierro || '', maxlength: '80', placeholder: 'ej. "M" con media luna' });
   const err = h('p', { class: 'err', role: 'alert' });
@@ -2931,7 +3145,7 @@ function editProfile(prof) {
   const body = h('form', { class: 'sheet-body', onsubmit: async (e) => {
     e.preventDefault(); save.disabled = true; err.textContent = '';
     try {
-      const patch = { full_name: name.value.trim() || null, rancho: rancho.value.trim() || null, ubicacion: ubic.value.trim() || null, dedica: dedica.value.trim() || null, fierro: fierro.value.trim() || null };
+      const patch = { full_name: name.value.trim() || null, rancho: rancho.value.trim() || null, ubicacion: ubic.value.trim() || null, estado: estado.value || null, dedica: dedica.value.trim() || null, fierro: fierro.value.trim() || null };
       if (newAvatar) {
         const blob = await compressImage(newAvatar, 480);
         const path = `${state.me.id}/avatar-${Date.now()}.jpg`;
@@ -2940,6 +3154,7 @@ function editProfile(prof) {
         patch.avatar_url = sb.storage.from('media').getPublicUrl(path).data.publicUrl;
       }
       let { error } = await sb.from('profiles').update(patch).eq('id', state.me.id);
+      if (error && /estado/i.test(error.message || '')) { delete patch.estado; ({ error } = await sb.from('profiles').update(patch).eq('id', state.me.id)); }
       if (error && /ubicacion|dedica|fierro/i.test(error.message || '')) { delete patch.ubicacion; delete patch.dedica; delete patch.fierro; ({ error } = await sb.from('profiles').update(patch).eq('id', state.me.id)); if (!error) toast('Falta activar la ficha del ranchero en Supabase'); }
       if (error) throw error;
       await loadMe(); close(); toast('Perfil actualizado'); render();
@@ -2949,7 +3164,8 @@ function editProfile(prof) {
       fileIn, h('label', { for: 'av', class: 'btn ghost small', style: 'display:inline-flex;align-items:center;cursor:pointer' }, 'Cambiar foto')),
     h('div', { class: 'field' }, h('label', { for: 'pn' }, 'Nombre'), name),
     h('div', { class: 'field' }, h('label', { for: 'pr' }, '🏡 Tu rancho'), rancho),
-    h('div', { class: 'field' }, h('label', { for: 'pu' }, '📍 Ubicación'), ubic),
+    h('div', { class: 'field' }, h('label', { for: 'pu' }, '📍 Ciudad o pueblo'), ubic),
+    h('div', { class: 'field' }, h('label', { for: 'pe' }, '🗺️ Estado'), estado, h('small', { class: 'hint' }, 'Para mostrarte ventas, eventos y gente cerca de ti.')),
     h('div', { class: 'field' }, h('label', { for: 'pd' }, '🐄 ¿A qué te dedicas?'), dedica),
     h('div', { class: 'field' }, h('label', { for: 'pf' }, '🔥 Fierro o marca del rancho'), fierro),
     err, save);
@@ -2987,11 +3203,11 @@ function openMenu() {
     if (pushState() !== 'no') pushOnHere().then(on => { lab.textContent = on ? 'Activados' : (pushState() === 'denied' ? 'Bloqueados en el navegador' : 'Apagados'); });
     return b;
   }
-  const inviteRow = row('📤', 'Invitar a Ranchfolk', async () => {
-    const url = location.origin + location.pathname;
-    const data = { title: 'Ranchfolk', text: 'Únete a Ranchfolk, la app de la vida de rancho 🤠🐎', url };
-    try { if (navigator.share) await navigator.share(data); else { await navigator.clipboard.writeText(url); toast('Enlace copiado'); } } catch (_) {}
-  }, 'Comparte la app con tu familia y amigos');
+  const inviteRow = row('💬', 'Invitar a mis compas', goTo(inviteFriends), 'Mándales Ranchfolk por WhatsApp');
+  const saverRow = () => { const lab = h('small', {}, SAVER.on ? 'Activado: videos no se reproducen solos y las fotos se suben más ligeras' : 'Apagado');
+    const e2 = h('span', { class: 'mn-emo sm' }, SAVER.on ? '🐢' : '📶');
+    return h('button', { class: 'mn-row', type: 'button', onclick: () => { SAVER.on = !SAVER.on; lab.textContent = SAVER.on ? 'Activado: videos no se reproducen solos y las fotos se suben más ligeras' : 'Apagado'; e2.textContent = SAVER.on ? '🐢' : '📶'; toast(SAVER.on ? 'Ahorro de datos activado' : 'Ahorro de datos apagado'); } },
+      e2, h('div', {}, h('b', {}, 'Ahorro de datos'), lab)); };
   const help = section('❓', 'Ayuda y soporte técnico', [
     row('📖', 'Cómo usar Ranchfolk', () => openHowTo()),
     row('🛠️', 'Reportar un problema', () => openSheet('Reportar un problema', h('div', { class: 'sheet-body', style: 'line-height:1.5' },
@@ -3003,10 +3219,11 @@ function openMenu() {
       h('p', {}, 'La vida de rancho, en un solo lugar: caballos, ganado, bailes, jaripeos, outfits y el día a día del rancho.'),
       h('p', { style: 'color:var(--muted);font-size:14px' }, 'Hecha en León, Guanajuato. 🇲🇽'))))]);
   const settings = section('⚙️', 'Configuración y privacidad', guest ? [
-    soundRow(), row('📜', 'Reglas y privacidad', () => openRules())] : [
+    soundRow(), saverRow(), row('📜', 'Reglas y privacidad', () => openRules())] : [
     row('✏️', 'Editar perfil', goTo(() => editProfile(state.me)), 'Foto, nombre, rancho'),
     soundRow(),
     pushRow(),
+    saverRow(),
     row('🚫', 'Personas bloqueadas', () => openBlockedList()),
     row('📜', 'Reglas y privacidad', () => openRules()),
     row('🗑️', 'Borrar mi cuenta', () => openDeleteAccount(), 'Elimina tu cuenta y todo lo que subiste')]);
@@ -3025,6 +3242,7 @@ function openMenu() {
     tile('🎪', 'La Feria', () => { state.feriaTab = 'mercado'; go('feria'); }),
     tile('📅', 'Eventos', () => { state.feriaTab = 'eventos'; go('feria'); }),
     tile('🔍', 'Explorar', () => go('explore')),
+    tile('🤝', 'Invitar compas', inviteFriends),
     tile('🐴', 'Mis animales', () => go('profile', { profileId: state.me.id }))];
   const panel = h('div', { class: 'mn-panel', role: 'dialog', 'aria-label': 'Menú' },
     h('div', { class: 'mn-top' }, h('b', {}, 'Menú'), h('button', { class: 'iconbtn plain', 'aria-label': 'Cerrar', icon: 'close', onclick: close })),
@@ -3092,6 +3310,9 @@ function openHowTo() {
     it('💬', 'Mensajes', 'Toca el botón de mensajes arriba. Puedes mandar fotos, videos y reaccionar dejando presionado un mensaje.'),
     it('🔁', 'Compartir', 'Con el botón de enviar puedes compartir en tu perfil, por mensaje o por WhatsApp.'),
     it('🐄', 'Tus animales', 'En tu perfil agrega a tus caballos, vacas y más; otros pueden seguirlos.'),
+    it('🤠', 'Seguir gente', 'Toca "Seguir" en el perfil de alguien. En el inicio, la pestaña "Siguiendo" te muestra solo lo de ellos.'),
+    it('#️⃣', 'Etiquetas', 'Escribe #charreada, #becerros o lo que sea en tu publicación. Toca una etiqueta para ver todo lo de ese tema.'),
+    it('🐢', 'Ahorro de datos', 'En el menú ☰ > Configuración. Úsalo si en el rancho tienes poca señal.'),
     it('⬅️', 'Salir', 'En el inicio, el botón atrás te sube arriba; tócalo otra vez para salir.')));
 }
 
@@ -3101,8 +3322,24 @@ const LCATS = [['Caballos', '🐎'], ['Ganado', '🐄'], ['Monturas y equipo', '
 const LCAT_EMO = Object.fromEntries(LCATS);
 const EKINDS = [['Jaripeo', '🐂'], ['Charreada', '🤠'], ['Cabalgata', '🐎'], ['Baile', '💃'], ['Feria', '🎡'], ['Rodeo', '🏇'], ['Coleadero', '🐃'], ['Carreras', '🏁'], ['Otro', '🎉']];
 const EKIND_EMO = Object.fromEntries(EKINDS);
-const LIST_SEL = 'id,user_id,title,category,price,location,description,photos,status,featured_until,created_at,profiles!user_id(id,username,full_name,avatar_url,ubicacion)';
-const EVT_SEL = 'id,user_id,title,kind,starts_at,place,city,description,photo_url,featured_until,created_at,profiles!user_id(id,username,full_name,avatar_url),event_going(user_id)';
+let HAS_NOV = true;  // columnas nuevas: estado, ficha de ganado y vistas
+const LIST_SEL_OLD = 'id,user_id,title,category,price,location,description,photos,status,featured_until,created_at,profiles!user_id(id,username,full_name,avatar_url,ubicacion)';
+const EVT_SEL_OLD = 'id,user_id,title,kind,starts_at,place,city,description,photo_url,featured_until,created_at,profiles!user_id(id,username,full_name,avatar_url),event_going(user_id)';
+let LIST_SEL = LIST_SEL_OLD.replace('created_at,', 'created_at,estado,details,views,');
+let EVT_SEL = EVT_SEL_OLD.replace('created_at,', 'created_at,estado,');
+const novMissing = (e) => /estado|details|views/i.test((e && e.message) || '');
+function noNov() { HAS_NOV = false; LIST_SEL = LIST_SEL_OLD; EVT_SEL = EVT_SEL_OLD; }
+// Ficha de ganado y caballos
+const SPEC_FIELDS = [
+  ['raza', '🧬 Raza', 'text', 'ej. Cuarto de milla, Brahman, Holstein'],
+  ['sexo', '⚥ Sexo', ['Macho', 'Hembra', 'Machos y hembras']],
+  ['edad', '🎂 Edad', 'text', 'ej. 5 años, 8 meses'],
+  ['peso', '⚖️ Peso aprox.', 'text', 'ej. 450 kg'],
+  ['cabezas', '🔢 Cabezas', 'text', 'ej. 12', 'Ganado'],
+  ['registro', '📜 Con registro', ['Sí', 'No']],
+  ['arete', '🏷️ Arete SINIIGA', ['Sí', 'No'], null, 'Ganado'],
+  ['fierro', '🔥 Fierro', 'text', 'ej. "M" con media luna']];
+const SPEC_CATS = ['Caballos', 'Ganado'];
 const money = (n) => n == null ? 'Precio a tratar' : '$' + Number(n).toLocaleString('es-MX', { maximumFractionDigits: 0 });
 const isFeat = (x) => !!(x && x.featured_until && new Date(x.featured_until) > new Date());
 const feriaMissing = (e) => /listings|events|event_going|relation|schema/i.test((e && e.message) || '');
@@ -3115,22 +3352,25 @@ function dayLabel(d) {
   return `${DIAS[x.getDay()]} ${x.getDate()} de ${MESES[x.getMonth()]}`;
 }
 const hourLabel = (d) => new Date(d).toLocaleTimeString('es-MX', { hour: 'numeric', minute: '2-digit' });
-async function fetchListings({ cat, q, userId, limit = 80 } = {}) {
+async function fetchListings({ cat, q, userId, estado, limit = 80 } = {}) {
   if (!HAS_FERIA) return [];
   let qq = sb.from('listings').select(LIST_SEL).order('created_at', { ascending: false }).limit(limit);
   if (cat) qq = qq.eq('category', cat);
+  if (estado && HAS_NOV) qq = qq.eq('estado', estado);
   if (userId) qq = qq.eq('user_id', userId);
   if (q) qq = qq.ilike('title', `%${q.replace(/[%,()]/g, '')}%`);
   const { data, error } = await qq;
-  if (error) { if (feriaMissing(error)) HAS_FERIA = false; return []; }
+  if (error) { if (novMissing(error) && HAS_NOV) { noNov(); return fetchListings({ cat, q, userId, limit }); } if (feriaMissing(error)) HAS_FERIA = false; return []; }
   const b = state.blocked || new Set(), weekAgo = Date.now() - 7 * 864e5;
   return (data || []).filter(l => !b.has(l.user_id) && (l.status !== 'vendido' || new Date(l.created_at) > weekAgo))
     .sort((a, c) => (isFeat(c) - isFeat(a)) || ((a.status === 'vendido') - (c.status === 'vendido')));
 }
-async function fetchEvents({ limit = 60 } = {}) {
+async function fetchEvents({ limit = 60, estado } = {}) {
   if (!HAS_FERIA) return [];
-  const { data, error } = await sb.from('events').select(EVT_SEL).gte('starts_at', new Date(Date.now() - 6 * 36e5).toISOString()).order('starts_at', { ascending: true }).limit(limit);
-  if (error) { if (feriaMissing(error)) HAS_FERIA = false; return []; }
+  let qq = sb.from('events').select(EVT_SEL).gte('starts_at', new Date(Date.now() - 6 * 36e5).toISOString()).order('starts_at', { ascending: true }).limit(limit);
+  if (estado && HAS_NOV) qq = qq.eq('estado', estado);
+  const { data, error } = await qq;
+  if (error) { if (novMissing(error) && HAS_NOV) { noNov(); return fetchEvents({ limit }); } if (feriaMissing(error)) HAS_FERIA = false; return []; }
   const b = state.blocked || new Set();
   return (data || []).filter(e => !b.has(e.user_id));
 }
@@ -3153,13 +3393,13 @@ function renderMercado(main) {
     h('button', { class: 'chip' + ((state.feriaCat || '') === c ? ' on' : ''), onclick: () => { state.feriaCat = c; render(); } }, l)));
   const grid = h('div', { class: 'fx-grid' }, h('div', { class: 'spinner', style: 'grid-column:1/-1' }));
   const fab = h('button', { class: 'fx-fab', onclick: () => { if (!needLogin('Crea tu cuenta para vender')) listingForm(null); } }, '＋ Vender algo');
-  main.append(h('div', { style: 'padding:0 14px 10px' }, search), chips, grid, fab);
+  main.append(h('div', { class: 'fx-filters' }, search, HAS_NOV ? estadoFilter(() => load()) : null), chips, grid, fab);
   let t; search.addEventListener('input', () => { clearTimeout(t); t = setTimeout(() => { state.feriaQ = search.value.trim(); load(); }, 400); });
   const load = async () => {
-    const list = await fetchListings({ cat: state.feriaCat || '', q: state.feriaQ || '' });
+    const list = await fetchListings({ cat: state.feriaCat || '', q: state.feriaQ || '', estado: state.feriaEstado || '' });
     if (!HAS_FERIA) return grid.replaceChildren(h('div', { class: 'empty', style: 'grid-column:1/-1' }, 'La Feria se está preparando. Vuelve en un ratito.'));
     if (!list.length) return grid.replaceChildren(h('div', { class: 'fx-empty' }, h('div', { class: 'fx-empty-emo' }, '🛒'),
-      h('b', {}, state.feriaQ || state.feriaCat ? 'No encontramos nada con eso' : 'Todavía no hay nada a la venta'),
+      h('b', {}, state.feriaQ || state.feriaCat || state.feriaEstado ? 'No encontramos nada con eso' + (state.feriaEstado ? ' en ' + state.feriaEstado : '') : 'Todavía no hay nada a la venta'),
       h('span', {}, 'Sé el primero: vende un caballo, una montura, pastura o tus servicios.')));
     grid.replaceChildren(...list.map(listingCard));
   };
@@ -3172,10 +3412,18 @@ function listingCard(l) {
       isFeat(l) ? h('span', { class: 'fx-feat' }, '⭐ Destacado') : null,
       l.status === 'vendido' ? h('span', { class: 'fx-sold' }, 'VENDIDO') : null),
     h('div', { class: 'fx-info' }, h('b', { class: 'fx-price' }, money(l.price)), h('span', { class: 'fx-title' }, l.title),
-      h('small', {}, [l.location ? '📍 ' + l.location : '', timeAgo(l.created_at)].filter(Boolean).join(' · '))));
+      h('small', {}, [l.location || l.estado ? '📍 ' + (l.location || l.estado) : '', timeAgo(l.created_at)].filter(Boolean).join(' · '))));
+}
+const VIEWED = new Set();
+function placeOf(loc, est) { return [loc, est && !(loc || '').toLowerCase().includes(est.toLowerCase()) ? est : ''].filter(Boolean).join(', '); }
+function specsEl(l) {
+  const d = (l.details && typeof l.details === 'object') ? l.details : {};
+  const items = SPEC_FIELDS.filter(([k]) => d[k]).map(([k, label]) => h('div', { class: 'fx-spec' }, h('small', {}, label), h('b', {}, String(d[k]))));
+  return items.length ? h('div', { class: 'fx-specs' }, items) : null;
 }
 function openListing(l) {
   const mine = l.user_id === state.me.id;
+  if (!mine && HAS_NOV && !VIEWED.has(l.id)) { VIEWED.add(l.id); sb.rpc('listing_view', { lid: l.id }).then(() => {}, () => {}); }
   const prof = l.profiles || {};
   const photos = (l.photos || []).filter(Boolean);
   const dots = h('div', { class: 'fx-dots' }, photos.length > 1 ? photos.map((_, i) => h('i', { class: i ? '' : 'on' })) : []);
@@ -3196,8 +3444,10 @@ function openListing(l) {
     h('div', { class: 'fx-car-wrap' }, car, dots, isFeat(l) ? h('span', { class: 'fx-feat' }, '⭐ Destacado') : null, l.status === 'vendido' ? h('span', { class: 'fx-sold' }, 'VENDIDO') : null),
     h('div', { class: 'fx-d-price' }, money(l.price)),
     h('h2', { class: 'fx-d-title' }, l.title),
-    h('div', { class: 'fx-d-meta' }, `${LCAT_EMO[l.category] || ''} ${l.category}`, l.location ? ' · 📍 ' + l.location : '', ' · ' + timeAgo(l.created_at)),
-    l.description ? h('p', { class: 'fx-d-desc' }, l.description) : null,
+    h('div', { class: 'fx-d-meta' }, `${LCAT_EMO[l.category] || ''} ${l.category}`, l.location || l.estado ? ' · 📍 ' + placeOf(l.location, l.estado) : '', ' · ' + timeAgo(l.created_at)),
+    mine && HAS_NOV && l.views != null ? h('div', { class: 'fx-views' }, '👁️ ' + (l.views === 1 ? '1 persona vio tu anuncio' : Number(l.views).toLocaleString('es-MX') + ' personas vieron tu anuncio')) : null,
+    specsEl(l),
+    l.description ? h('p', { class: 'fx-d-desc' }, ...richText(l.description)) : null,
     h('button', { class: 'fx-seller', onclick: () => { close(); go('profile', { profileId: l.user_id }); } }, avatar(prof, 44),
       h('div', {}, h('small', {}, mine ? 'Tu anuncio' : 'Vendedor'), h('b', {}, prof.full_name || prof.username || '', vb(l.user_id)), prof.ubicacion ? h('small', {}, '📍 ' + prof.ubicacion) : null), h('span', { class: 'fx-chev' }, '›')),
     ...actions.filter(Boolean),
@@ -3230,11 +3480,27 @@ function listingForm(l) {
   paintPhotos();
   const title = h('input', { class: 'input', maxlength: '80', placeholder: 'ej. Yegua cuarto de milla, 5 años', value: (l && l.title) || '' });
   const catChips = h('div', { class: 'chips', style: 'padding:0 0 12px;flex-wrap:wrap' });
-  const paintCats = () => catChips.replaceChildren(...LCATS.map(([c, e]) => h('button', { type: 'button', class: 'chip' + (c === cat ? ' on' : ''), onclick: () => { cat = c; paintCats(); } }, e + ' ' + c)));
+  const paintCats = () => { catChips.replaceChildren(...LCATS.map(([c, e]) => h('button', { type: 'button', class: 'chip' + (c === cat ? ' on' : ''), onclick: () => { cat = c; paintCats(); } }, e + ' ' + c))); try { paintSpecs(); } catch (_) {} };
   paintCats();
   const price = h('input', { class: 'input', inputmode: 'numeric', placeholder: 'ej. 45000', value: l && l.price != null ? String(Math.round(l.price)) : '' });
   const nego = h('input', { type: 'checkbox' }); nego.checked = !!(l && l.price == null);
-  const loc = h('input', { class: 'input', maxlength: '60', placeholder: 'ej. León, Gto.', value: (l && l.location) || (state.me && state.me.ubicacion) || '' });
+  const loc = h('input', { class: 'input', maxlength: '60', placeholder: 'ej. León', value: (l && l.location) || (state.me && state.me.ubicacion) || '' });
+  const est = estadoSelect((l && l.estado) || (state.me && state.me.estado), 'Escoge el estado');
+  const det = Object.assign({}, (l && l.details) || {});
+  const specInputs = {};
+  const specBox = h('div', { class: 'fx-spec-form' });
+  const paintSpecs = () => {
+    if (!HAS_NOV || !SPEC_CATS.includes(cat)) { specBox.replaceChildren(); return; }
+    specBox.replaceChildren(h('div', { class: 'lbl', style: 'margin:4px 0 8px' }, cat === 'Caballos' ? '🐎 Ficha del caballo' : '🐄 Ficha del ganado', h('small', { style: 'font-weight:500;color:var(--muted)' }, ' · opcional, ayuda a vender más rápido')),
+      h('div', { class: 'fx-spec-grid' }, SPEC_FIELDS.filter(f => !f[4] || f[4] === cat).map(([k, label, type, ph]) => {
+        let inp;
+        if (Array.isArray(type)) { inp = h('select', { class: 'input' }, h('option', { value: '' }, '—'), ...type.map(o => h('option', { value: o }, o))); inp.value = det[k] || ''; }
+        else inp = h('input', { class: 'input', maxlength: '40', placeholder: ph || '', value: det[k] || '' });
+        inp.addEventListener('input', () => { det[k] = inp.value; }); inp.addEventListener('change', () => { det[k] = inp.value; });
+        specInputs[k] = inp;
+        return h('div', { class: 'field' }, h('label', {}, label), inp);
+      })));
+  };
   const desc = h('textarea', { class: 'input', maxlength: '1000', placeholder: 'Edad, raza, medidas, estado, si se entrega, forma de pago…' }); desc.value = (l && l.description) || '';
   const err = h('p', { class: 'err', role: 'alert' });
   const save = h('button', { class: 'btn', type: 'submit', style: 'width:100%' }, isNew ? 'Publicar anuncio' : 'Guardar cambios');
@@ -3256,6 +3522,11 @@ function listingForm(l) {
         urls.push(sb.storage.from('media').getPublicUrl(path).data.publicUrl);
       }
       const row = { title: tt, category: cat, price: p, location: loc.value.trim() || null, description: desc.value.trim() || null, photos: urls.slice(0, 6) };
+      if (HAS_NOV) {
+        row.estado = est.value || null;
+        const keep = SPEC_CATS.includes(cat) ? SPEC_FIELDS.filter(f => !f[4] || f[4] === cat).map(f => f[0]) : [];
+        row.details = Object.fromEntries(keep.filter(k => det[k] && String(det[k]).trim()).map(k => [k, String(det[k]).trim().slice(0, 40)]));
+      }
       const res = isNew ? await sb.from('listings').insert({ ...row, user_id: state.me.id }).select(LIST_SEL).single()
                         : await sb.from('listings').update(row).eq('id', l.id).select(LIST_SEL).single();
       if (res.error) throw res.error;
@@ -3268,9 +3539,12 @@ function listingForm(l) {
     h('div', { class: 'field' }, h('label', {}, '¿Qué vendes?'), title),
     h('div', { class: 'field' }, h('label', {}, 'Categoría')), catChips,
     h('div', { class: 'field' }, h('label', {}, 'Precio (pesos)'), price, h('label', { class: 'fx-check' }, nego, ' Precio a tratar')),
-    h('div', { class: 'field' }, h('label', {}, '📍 ¿Dónde está?'), loc),
+    specBox,
+    h('div', { class: 'field' }, h('label', {}, '📍 ¿Dónde está? (ciudad o pueblo)'), loc),
+    HAS_NOV ? h('div', { class: 'field' }, h('label', {}, '🗺️ Estado'), est) : null,
     h('div', { class: 'field' }, h('label', {}, 'Descripción'), desc),
     err, save);
+  paintSpecs();
   close = openSheet(isNew ? 'Vender en La Feria' : 'Editar anuncio', body);
 }
 
@@ -3278,11 +3552,11 @@ function listingForm(l) {
 function renderEventos(main) {
   const list = h('div', { class: 'fx-evlist' }, h('div', { class: 'spinner' }));
   const fab = h('button', { class: 'fx-fab', onclick: () => { if (!needLogin('Crea tu cuenta para publicar eventos')) eventForm(null); } }, '＋ Publicar evento');
-  main.append(list, fab);
+  main.append(...[HAS_NOV ? h('div', { class: 'fx-filters' }, estadoFilter(() => render())) : null, list, fab].filter(Boolean));
   (async () => {
-    const evs = await fetchEvents();
+    const evs = await fetchEvents({ estado: state.feriaEstado || '' });
     if (!HAS_FERIA) return list.replaceChildren(h('div', { class: 'empty' }, 'La Feria se está preparando. Vuelve en un ratito.'));
-    if (!evs.length) return list.replaceChildren(h('div', { class: 'fx-empty' }, h('div', { class: 'fx-empty-emo' }, '📅'), h('b', {}, 'No hay eventos próximos'),
+    if (!evs.length) return list.replaceChildren(h('div', { class: 'fx-empty' }, h('div', { class: 'fx-empty-emo' }, '📅'), h('b', {}, 'No hay eventos próximos' + (state.feriaEstado ? ' en ' + state.feriaEstado : '')),
       h('span', {}, '¿Sabes de un jaripeo, charreada, cabalgata o baile? Publícalo para que vaya la raza.')));
     const feat = evs.filter(isFeat), kids = [];
     if (feat.length) { kids.push(h('h3', { class: 'fx-day' }, '⭐ Promocionados')); feat.forEach(e => kids.push(eventCard(e, true))); }
@@ -3314,7 +3588,7 @@ function eventCard(ev, feat) {
   return h('div', { class: 'fx-ev' + (feat ? ' feat' : ''), role: 'button', tabindex: '0', onclick: () => openEvent(ev) },
     h('div', { class: 'fx-date' }, h('small', {}, MES3[d.getMonth()]), h('b', {}, d.getDate()), h('small', {}, DIAS[d.getDay()])),
     h('div', { class: 'fx-ev-txt' }, h('b', {}, (EKIND_EMO[ev.kind] || '🎉') + ' ' + ev.title),
-      h('small', {}, '⏰ ' + hourLabel(ev.starts_at) + (ev.place || ev.city ? ' · 📍 ' + [ev.place, ev.city].filter(Boolean).join(', ') : '')), count),
+      h('small', {}, '⏰ ' + hourLabel(ev.starts_at) + (ev.place || ev.city || ev.estado ? ' · 📍 ' + [ev.place, placeOf(ev.city, ev.estado)].filter(Boolean).join(', ') : '')), count),
     b);
 }
 function openEvent(ev) {
@@ -3322,7 +3596,7 @@ function openEvent(ev) {
   const prof = ev.profiles || {};
   const d = new Date(ev.starts_at);
   const { b, count } = goingBtn(ev);
-  const where = [ev.place, ev.city].filter(Boolean).join(', ');
+  const where = [ev.place, placeOf(ev.city, ev.estado)].filter(Boolean).join(', ');
   const link = location.origin + location.pathname + '#e=' + ev.id;
   const share = async () => { try { if (navigator.share) await navigator.share({ title: ev.title, text: `${EKIND_EMO[ev.kind] || '🎉'} ${ev.title} · ${dayLabel(ev.starts_at)} ${hourLabel(ev.starts_at)}${where ? ' · ' + where : ''}`, url: link }); else { await navigator.clipboard.writeText(link); toast('Enlace copiado'); } } catch (_) {} };
   const body = h('div', { class: 'sheet-body fx-detail' },
@@ -3332,7 +3606,7 @@ function openEvent(ev) {
     h('div', { class: 'fx-ev-when' }, h('div', {}, '📅 ', h('b', {}, dayLabel(ev.starts_at)), ` · ${d.getDate()} ${MES3[d.getMonth()]} ${d.getFullYear()}`), h('div', {}, '⏰ ' + hourLabel(ev.starts_at)),
       where ? h('a', { href: 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(where), target: '_blank', rel: 'noopener' }, '📍 ' + where + ' · Cómo llegar ›') : null),
     h('div', { class: 'fx-ev-go' }, b, count),
-    ev.description ? h('p', { class: 'fx-d-desc' }, ev.description) : null,
+    ev.description ? h('p', { class: 'fx-d-desc' }, ...richText(ev.description)) : null,
     h('button', { class: 'fx-seller', onclick: () => { close(); go('profile', { profileId: ev.user_id }); } }, avatar(prof, 40), h('div', {}, h('small', {}, 'Publicado por'), h('b', {}, prof.full_name || prof.username || '', vb(ev.user_id))), h('span', { class: 'fx-chev' }, '›')),
     h('button', { class: 'btn ghost', style: 'margin-top:8px', onclick: share }, '📤 Invitar a alguien'),
     mine ? h('div', { style: 'display:flex;gap:8px;margin-top:8px' },
@@ -3352,7 +3626,8 @@ function eventForm(ev) {
   paintK();
   const when = h('input', { class: 'input', type: 'datetime-local', value: ev ? toLocal(new Date(ev.starts_at)) : '', min: toLocal(new Date()) });
   const place = h('input', { class: 'input', maxlength: '80', placeholder: 'ej. Lienzo Charro El Herradero', value: (ev && ev.place) || '' });
-  const city = h('input', { class: 'input', maxlength: '60', placeholder: 'ej. León, Gto.', value: (ev && ev.city) || (state.me && state.me.ubicacion) || '' });
+  const city = h('input', { class: 'input', maxlength: '60', placeholder: 'ej. León', value: (ev && ev.city) || (state.me && state.me.ubicacion) || '' });
+  const est = estadoSelect((ev && ev.estado) || (state.me && state.me.estado), 'Escoge el estado');
   const desc = h('textarea', { class: 'input', maxlength: '1000', placeholder: 'Quién toca, toros, precio de la entrada, horarios…' }); desc.value = (ev && ev.description) || '';
   const prev = h('div', { class: 'fx-ph-grid' });
   const picker = h('input', { type: 'file', accept: 'image/*', hidden: true });
@@ -3369,6 +3644,7 @@ function eventForm(ev) {
     save.disabled = true; save.textContent = 'Guardando…';
     try {
       const row = { title: title.value.trim(), kind, starts_at: new Date(when.value).toISOString(), place: place.value.trim() || null, city: city.value.trim() || null, description: desc.value.trim() || null };
+      if (HAS_NOV) row.estado = est.value || null;
       if (photo) {
         const blob = await compressImage(photo, 1280);
         const path = `${state.me.id}/evento-${Date.now()}.jpg`;
@@ -3387,6 +3663,7 @@ function eventForm(ev) {
     h('div', { class: 'field' }, h('label', {}, '📅 Fecha y hora'), when),
     h('div', { class: 'field' }, h('label', {}, '📍 Lugar'), place),
     h('div', { class: 'field' }, h('label', {}, 'Ciudad o pueblo'), city),
+    HAS_NOV ? h('div', { class: 'field' }, h('label', {}, '🗺️ Estado'), est) : null,
     h('div', { class: 'field' }, h('label', {}, 'Detalles'), desc),
     picker, prev, err, save);
   close = openSheet(isNew ? 'Publicar evento' : 'Editar evento', body);
@@ -3430,15 +3707,17 @@ async function fetchNotifs(force) {
   if (!force && Date.now() - NOTIF_CACHE.at < 60000) return NOTIF_CACHE.items;
   const me = state.me.id;
   const POSTJ = 'posts!inner(id,user_id,media_url,media_type,caption,kind)';
-  const [lk, cm, sh] = await Promise.all([
+  const [lk, cm, sh, fw] = await Promise.all([
     sb.from('likes').select('created_at,user_id,post_id' + (HAS_REACT ? ',reaction' : '') + ',' + NOTIF_PROF + ',' + POSTJ).eq('posts.user_id', me).neq('user_id', me).order('created_at', { ascending: false }).limit(40),
     sb.from('comments').select('id,body,created_at,user_id,post_id,' + NOTIF_PROF + ',' + POSTJ).eq('posts.user_id', me).neq('user_id', me).order('created_at', { ascending: false }).limit(40),
-    HAS_SHARE ? sb.from('posts').select('id,created_at,user_id,caption,' + NOTIF_PROF + ',orig:shared_id!inner(id,user_id,media_url,media_type)').eq('orig.user_id', me).neq('user_id', me).order('created_at', { ascending: false }).limit(30) : Promise.resolve({ data: [] })]);
+    HAS_SHARE ? sb.from('posts').select('id,created_at,user_id,caption,' + NOTIF_PROF + ',orig:shared_id!inner(id,user_id,media_url,media_type)').eq('orig.user_id', me).neq('user_id', me).order('created_at', { ascending: false }).limit(30) : Promise.resolve({ data: [] }),
+    HAS_FOLLOW ? sb.from('follows').select('created_at,follower_id,profiles!follower_id(id,username,full_name,avatar_url)').eq('following_id', me).order('created_at', { ascending: false }).limit(40) : Promise.resolve({ data: [] })]);
   const b = state.blocked || new Set();
   const items = [];
   (lk.data || []).forEach(x => items.push({ t: 'react', at: x.created_at, who: x.profiles, uid: x.user_id, post: x.posts, react: x.reaction || 'ajua' }));
   (cm.data || []).forEach(x => items.push({ t: 'comment', at: x.created_at, who: x.profiles, uid: x.user_id, post: x.posts, body: x.body }));
   (sh.data || []).forEach(x => items.push({ t: 'share', at: x.created_at, who: x.profiles, uid: x.user_id, post: x.orig, shareId: x.id }));
+  ((fw && fw.data) || []).forEach(x => items.push({ t: 'follow', at: x.created_at, who: x.profiles, uid: x.follower_id }));
   NOTIF_CACHE = { at: Date.now(), items: items.filter(i => i.who && !b.has(i.uid)).sort((a, c) => (a.at < c.at ? 1 : -1)).slice(0, 80) };
   return NOTIF_CACHE.items;
 }
@@ -3460,9 +3739,10 @@ async function renderNotifs() {
   try { items = await fetchNotifs(true); } catch (e) { return list.replaceChildren(h('div', { class: 'empty' }, friendlyError(e))); }
   const seen = notifSeen();
   try { localStorage.setItem(notifSeenKey(), new Date().toISOString()); } catch (_) {}
-  if (!items.length) return list.replaceChildren(h('div', { class: 'dm-empty' }, h('div', { icon: 'bell' }), h('b', {}, 'Todo tranquilo por aquí'), 'Cuando alguien reaccione, comente o comparta tus publicaciones, te avisamos aquí.'));
+  if (!items.length) return list.replaceChildren(h('div', { class: 'dm-empty' }, h('div', { icon: 'bell' }), h('b', {}, 'Todo tranquilo por aquí'), 'Cuando alguien te siga, reaccione, comente o comparta tus publicaciones, te avisamos aquí.'));
   const what = (i) => i.t === 'comment' ? ['comentó: ', h('span', { class: 'n-quote' }, '“' + (i.body || '').slice(0, 90) + ((i.body || '').length > 90 ? '…' : '') + '”')]
     : i.t === 'share' ? ['compartió tu publicación']
+    : i.t === 'follow' ? ['empezó a seguirte']
     : [(REACT[i.react] || REACT.ajua).k === 'ajua' ? 'le dio ajúa a tu ' : 'reaccionó ' + REACT[i.react].e + ' a tu ', i.post && i.post.kind === 'sundown' ? 'sundown' : i.post && i.post.kind === 'ride' ? 'ride' : 'publicación'];
   const today = new Date().toDateString();
   let lastGroup = '';
@@ -3471,10 +3751,10 @@ async function renderNotifs() {
     const g = i.at > seen ? 'Nuevas' : new Date(i.at).toDateString() === today ? 'Hoy' : 'Anteriores';
     if (g !== lastGroup) { kids.push(h('h3', { class: 'n-group' }, g)); lastGroup = g; }
     const thumb = i.post && i.post.media_url ? (i.post.media_type === 'video' ? h('video', { src: i.post.media_url + '#t=0.5', muted: true, playsInline: true, preload: 'metadata' }) : h('img', { src: i.post.media_url, alt: '', loading: 'lazy' })) : null;
-    kids.push(h('button', { class: 'notif' + (i.at > seen ? ' new' : ''), onclick: () => i.t === 'share' ? openPostById(i.shareId) : i.post && openPostById(i.post.id) },
-      h('span', { class: 'av-react' }, avatar(i.who, 48), i.t === 'react' ? reactIcon(i.react, 'badge') : h('span', { class: 'n-badge' }, i.t === 'comment' ? '💬' : '🔁')),
+    kids.push(h('div', { class: 'notif' + (i.at > seen ? ' new' : ''), role: 'button', tabindex: '0', onclick: () => i.t === 'follow' ? go('profile', { profileId: i.uid }) : i.t === 'share' ? openPostById(i.shareId) : i.post && openPostById(i.post.id) },
+      h('span', { class: 'av-react' }, avatar(i.who, 48), i.t === 'react' ? reactIcon(i.react, 'badge') : h('span', { class: 'n-badge' }, i.t === 'comment' ? '💬' : i.t === 'follow' ? '🤠' : '🔁')),
       h('div', { class: 'n-txt' }, h('p', {}, h('b', {}, i.who.username || ''), ' ', ...what(i)), h('small', {}, timeAgo(i.at))),
-      thumb && h('span', { class: 'n-thumb' }, thumb)));
+      i.t === 'follow' ? (isFollowing(i.uid) ? null : followBtn(i.uid, { small: true, gold: true })) : thumb && h('span', { class: 'n-thumb' }, thumb)));
   });
   list.replaceChildren(...kids);
 }
@@ -3829,6 +4109,7 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').catch(() => {});
   // El aviso llegó con la app abierta: suena la campana aquí adentro
   navigator.serviceWorker.addEventListener('message', (e) => {
+    if (e.data && e.data.type === 'herria-notif') { NOTIF_CACHE.at = 0; const bell = document.querySelector('[aria-label="Notificaciones"]'); if (bell && state.view !== 'notifs') { const nb = bellButton(); if (nb) bell.replaceWith(nb); } return; }
     if (!e.data || e.data.type !== 'herria-msg') return;
     msgDing();
     const b = document.querySelector('.msg-count'); if (b) refreshUnread(b);
@@ -3888,6 +4169,12 @@ sb.auth.onAuthStateChange((_event, session) => {
 });
 // Enlaces a una publicación (…/#p=123): la abre al entrar
 function openDeepLink() {
+  const f = /^#f=([0-9a-f-]{36})$/.exec(location.hash || '');
+  if (f && state.me) {  // perfil de alguien (aviso de seguidor nuevo o enlace compartido)
+    history.replaceState(history.state, '', location.pathname + location.search);
+    go('profile', { profileId: f[1] });
+    return;
+  }
   const u = /^#u=([0-9a-f-]{36})$/.exec(location.hash || '');
   if (u && state.me && !isGuest()) {  // tocaste un aviso de mensaje: abre ese chat
     history.replaceState(history.state, '', location.pathname + location.search);
