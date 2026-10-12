@@ -877,6 +877,54 @@ html,body{background:#F5EFE3!important;background-image:none!important;color:#17
 .mc-msg.pend{opacity:.6}
 .mc-img{display:block;max-width:180px;max-height:200px;border-radius:12px}
 .mc-media{border:none;background:none;color:inherit;font:inherit;padding:0}
+.composer .mic[hidden],.composer .send[hidden]{display:none}
+.msg.voice{padding:8px 12px;min-width:230px}
+.vp{display:flex;align-items:center;gap:10px}
+.vp-btn{width:38px;height:38px;flex:0 0 auto;border-radius:50%;border:none;background:rgba(255,255,255,.22);color:inherit;font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.msg.them .vp-btn,.mc-msg:not(.me) .vp-btn{background:#F3BD68;color:#172531}
+.vp-wave{flex:1;display:flex;align-items:center;gap:2px;height:28px;cursor:pointer}
+.vp-wave i{flex:1;min-width:2px;border-radius:2px;background:currentColor;opacity:.35}
+.vp-wave i.on{opacity:1}
+.vp-t{font-size:12px;font-variant-numeric:tabular-nums;opacity:.85;min-width:32px;text-align:right}
+.mc-msg .vp{min-width:190px}
+.vr{max-width:520px;margin:0 auto;display:flex;align-items:center;gap:10px;padding:10px 12px calc(10px + env(safe-area-inset-bottom))}
+.vr-x{width:46px;height:46px;border-radius:23px;border:1px solid var(--line);background:var(--surface);font-size:20px;flex:0 0 auto}
+.vr-dot{width:12px;height:12px;border-radius:50%;background:#D64545;animation:vrb 1s infinite}
+@keyframes vrb{50%{opacity:.25}}
+.vr-t{font-weight:700;font-variant-numeric:tabular-nums;font-size:17px}
+.vr-hint{flex:1;color:var(--muted);font-size:14px}
+.mc-form .mic[hidden],.mc-form .send[hidden]{display:none}
+.mc-panel .vr{padding:8px 10px;border-top:1px solid #EADFCB;background:#FFFDF8;width:100%}
+.mc-panel .vr .send{width:44px;height:44px;border-radius:22px;border:none;background:linear-gradient(135deg,#F3BD68,#C7843B);color:#172531;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mc-panel .vr-x{width:44px;height:44px}
+.rt-pill{display:inline-flex;align-items:center;gap:6px;border:none;background:none;padding:2px 4px;font:inherit;color:inherit;cursor:pointer}
+.rt-stars{color:#E3A43C;letter-spacing:1px;font-size:15px}
+.rt-pill b{font-size:15px}.rt-pill small{opacity:.8;font-size:12.5px}
+.pf-rating{margin:4px 0 2px;min-height:4px}.pf-rating .rt-pill{background:rgba(255,255,255,.1);border-radius:999px;padding:4px 12px;color:#FFF6E6}
+.fx-rating{margin:-4px 0 12px 4px}
+.rv-sum{display:flex;gap:16px;align-items:center;margin-bottom:12px}
+.rv-big{display:flex;flex-direction:column;align-items:center;min-width:92px}.rv-big b{font-size:38px;line-height:1}.rv-big small{color:var(--muted);font-size:12px;text-align:center}
+.rv-dist{flex:1;display:flex;flex-direction:column;gap:3px}.rv-dist div{display:flex;align-items:center;gap:6px;font-size:12px}
+.rv-dist span{width:22px}.rv-dist i{flex:1;height:7px;border-radius:4px;background:#EADFCB;overflow:hidden}.rv-dist u{display:block;height:100%;background:#E3A43C}
+.rv-dist small{width:22px;text-align:right;color:var(--muted)}
+.rv-row{display:flex;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.rv-who{border:none;background:none;padding:0;flex:0 0 auto}
+.rv-txt{flex:1;min-width:0}.rv-txt small{color:var(--muted)}.rv-txt p{margin:4px 0 0;font-size:14.5px;line-height:1.4;white-space:pre-wrap}
+.rv-pick{display:flex;justify-content:center;gap:6px;margin:6px 0}
+.rv-pick button{border:none;background:none;font-size:42px;line-height:1;color:#D9CBB0;padding:2px;cursor:pointer;transition:transform .12s}
+.rv-pick button.on{color:#E3A43C;transform:scale(1.08)}
+.rv-lab{text-align:center;font-weight:700;margin-bottom:12px;min-height:20px}
+.mtag{color:#2C6E9B}
+.mention-box{position:fixed;z-index:200;background:#FFFDF8;border:1px solid #EADFCB;border-radius:14px;box-shadow:0 10px 30px rgba(23,37,49,.25);overflow:hidden;max-height:240px;overflow-y:auto}
+.mention-box button{display:flex;align-items:center;gap:10px;width:100%;border:none;background:none;padding:8px 12px;text-align:left;font:inherit;cursor:pointer}
+.mention-box button+button{border-top:1px solid #F0E7D6}
+.mention-box b{display:block;font-size:14px}.mention-box small{color:var(--muted);font-size:12px}
+.cmt.reply{margin-left:44px;margin-bottom:10px}
+.cmt-more{display:block;border:none;background:none;margin:-6px 0 10px 44px;padding:0;font:inherit;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer}
+.cmt-foot{display:block!important}.cmt-foot form{display:flex;gap:8px;align-items:center}
+.cmt-replying{display:flex;align-items:center;justify-content:space-between;font-size:13px;color:var(--muted);padding:0 4px 8px}
+.cmt-replying button{border:none;background:none;font-size:15px;padding:2px 6px;cursor:pointer;color:var(--muted)}
+.mi-emo{font-size:18px;width:24px;text-align:center}
 .mc-empty{text-align:center;color:var(--muted);margin:auto}
 .mc-form .send{width:44px;height:44px;border-radius:22px;border:none;background:linear-gradient(135deg,#F3BD68,#C7843B);color:#172531;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .mc-form .send:disabled{opacity:.5}
@@ -944,6 +992,7 @@ const ICONS = {
   feria: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9 5 4h14l2 5"/><path d="M3 9a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0"/><path d="M5 12v8h14v-8"/><path d="M10 20v-5h4v5"/></svg>',
   menu: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>',
   bell: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>',
+  mic: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v4"/></svg>',
   send: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>',
   pause: '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>',
   resume: '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>',
@@ -1210,11 +1259,61 @@ const SAVER = {
 };
 // ---------- #Etiquetas ----------
 const TAG_RE = /(#[0-9A-Za-zÁÉÍÓÚÜÑáéíóúüñ_]{2,30})/g;
+const RICH_RE = /(#[0-9A-Za-zÁÉÍÓÚÜÑáéíóúüñ_]{2,30}|@[A-Za-z0-9_.\-]{2,30})/g;
 function richText(text) {
   if (!text) return [];
-  return String(text).split(TAG_RE).map((part, i) => i % 2
-    ? h('button', { type: 'button', class: 'htag', onclick: (e) => { e.stopPropagation(); openTag(part.slice(1)); } }, part)
-    : part);
+  const parts = String(text).split(RICH_RE);
+  return parts.map((part, i) => {
+    if (!(i % 2)) return part;
+    if (part[0] === '#') return h('button', { type: 'button', class: 'htag', onclick: (e) => { e.stopPropagation(); openTag(part.slice(1)); } }, part);
+    // @usuario (pero no un correo como pancho@gmail.com)
+    const before = parts[i - 1] || '';
+    if (before && /[^\s(¡¿"“]$/.test(before)) return part;
+    const name = part.slice(1).replace(/[.\-]+$/, ''), tail = part.slice(1 + name.length);
+    return [h('button', { type: 'button', class: 'htag mtag', onclick: (e) => { e.stopPropagation(); openUserByName(name); } }, '@' + name), tail];
+  }).flat();
+}
+async function openUserByName(name) {
+  const { data } = await sb.from('profiles').select('id').ilike('username', name.replace(/[%_]/g, (c) => '\\' + c)).limit(1).maybeSingle();
+  if (!data) return toast('No encontramos a @' + name);
+  document.querySelectorAll('.sheet-bg').forEach(x => x.remove());
+  go('profile', { profileId: data.id });
+}
+// Sugerencias al escribir @ (para mencionar a alguien)
+function mentionAssist(el) {
+  if (!el || el._mention) return el; el._mention = true;
+  let box = null, t = null, seq = 0;
+  const hide = () => { if (box) { box.remove(); box = null; } };
+  const tokenAt = () => { const v = el.value.slice(0, el.selectionStart || 0); const m = /(^|[\s(¡¿])@([A-Za-z0-9_.\-]{0,30})$/.exec(v); return m ? { q: m[2], start: v.length - m[2].length - 1 } : null; };
+  const pick = (u) => {
+    const tk = tokenAt(); if (!tk) return hide();
+    const end = el.selectionStart;
+    el.value = el.value.slice(0, tk.start) + '@' + u.username + ' ' + el.value.slice(end);
+    const pos = tk.start + u.username.length + 2; el.setSelectionRange(pos, pos);
+    el.dispatchEvent(new Event('input', { bubbles: true })); hide(); el.focus();
+  };
+  const show = (list) => {
+    hide(); if (!list.length) return;
+    const r = el.getBoundingClientRect();
+    box = h('div', { class: 'mention-box', role: 'listbox' }, ...list.map(u => h('button', { type: 'button', role: 'option', onpointerdown: (e) => { e.preventDefault(); pick(u); } }, avatar(u, 30), h('div', {}, h('b', {}, u.full_name || u.username, vb(u.id)), h('small', {}, '@' + u.username)))));
+    const below = r.top < 260;
+    Object.assign(box.style, { left: Math.max(8, r.left) + 'px', width: Math.min(r.width, window.innerWidth - 16) + 'px' });
+    if (below) box.style.top = (r.bottom + 4) + 'px'; else box.style.bottom = (window.innerHeight - r.top + 4) + 'px';
+    document.body.append(box);
+  };
+  el.addEventListener('input', () => {
+    clearTimeout(t); const tk = tokenAt(); if (!tk) return hide();
+    const my = ++seq;
+    t = setTimeout(async () => {
+      let qy = sb.from('profiles').select(PROF_MINI).neq('id', state.me ? state.me.id : '').limit(5);
+      if (tk.q) qy = qy.or(`username.ilike.${tk.q.replace(/[%_,()]/g, '')}%,full_name.ilike.%${tk.q.replace(/[%_,()]/g, '')}%`);
+      const { data } = await qy;
+      if (my === seq && tokenAt()) show(visible((data || []).map(u => Object.assign({ user_id: u.id }, u))));
+    }, 180);
+  });
+  el.addEventListener('blur', () => setTimeout(hide, 150));
+  el.addEventListener('keydown', (e) => { if (e.key === 'Escape') hide(); });
+  return el;
 }
 function tagsIn(text) { return (String(text || '').match(TAG_RE) || []).map(t => t.slice(1).toLowerCase()); }
 function openTag(tag) {
@@ -1511,7 +1610,7 @@ function render() {
   if (!state.me) { $app.append(h('div', { class: 'spinner' })); return; }
   if (isGuest() && !['feed', 'rides', 'explore', 'profile', 'animal'].includes(state.view)) state.view = 'feed';
   if (state.view === 'welcome') return renderWelcome();
-  const views = { admin: renderAdmin, feed: renderFeed, rides: renderRides, explore: renderExplore, upload: renderUpload, profile: renderProfile, animal: renderAnimal, inbox: renderInbox, chat: renderChat, notifs: renderNotifs, feria: renderFeria };
+  const views = { saved: renderSaved, admin: renderAdmin, feed: renderFeed, rides: renderRides, explore: renderExplore, upload: renderUpload, profile: renderProfile, animal: renderAnimal, inbox: renderInbox, chat: renderChat, notifs: renderNotifs, feria: renderFeria };
   (views[state.view] || renderFeed)();
   if (state.view !== 'chat') $app.append(navBar());
   if (HEADS.size) paintHeads(); else if (!HEADS_LOADED && !isGuest()) setTimeout(loadHeads, 1500);
@@ -2002,19 +2101,34 @@ function openSheet(title, body, foot) {
 }
 
 let HAS_CRX = true;   // reacciones en comentarios
+let HAS_CREPLY = true; // responder y editar comentarios
 async function openComments(p, onChange) {
   const body = h('div', { class: 'sheet-body' }, h('div', { class: 'spinner' }));
-  const input = h('input', { class: 'input', placeholder: 'Escribe un comentario…', maxlength: '500', 'aria-label': 'Comentario' });
+  const input = mentionAssist(h('input', { class: 'input', placeholder: 'Escribe un comentario…', maxlength: '500', 'aria-label': 'Comentario' }));
   const send = h('button', { class: 'btn small', type: 'submit' }, 'Enviar');
-  const foot = h('form', { class: 'sheet-foot', onsubmit: async (e) => {
+  let replyTo = null; // { id, username }
+  const replyChip = h('div', { class: 'cmt-replying', hidden: true });
+  const setReply = (c) => {
+    replyTo = c ? { id: c.parent_id || c.id, username: (c.profiles && c.profiles.username) || '' } : null;
+    replyChip.hidden = !replyTo;
+    if (replyTo) {
+      replyChip.replaceChildren(h('span', {}, 'Respondiendo a ', h('b', {}, '@' + replyTo.username)), h('button', { type: 'button', 'aria-label': 'Cancelar respuesta', onclick: () => { setReply(null); input.value = ''; } }, '✕'));
+      if (replyTo.username && c.user_id !== state.me.id && !input.value.includes('@' + replyTo.username)) input.value = '@' + replyTo.username + ' ' + input.value;
+      input.focus(); const n = input.value.length; try { input.setSelectionRange(n, n); } catch (_) {}
+    }
+  };
+  const foot = h('div', { class: 'sheet-foot cmt-foot' }, replyChip, h('form', { onsubmit: async (e) => {
     e.preventDefault();
     const text = input.value.trim(); if (!text) return;
     send.disabled = true;
-    const { error } = await sb.from('comments').insert({ post_id: p.id, user_id: state.me.id, body: text });
+    const row = { post_id: p.id, user_id: state.me.id, body: text };
+    if (replyTo && HAS_CREPLY) row.parent_id = replyTo.id;
+    let { error } = await sb.from('comments').insert(row);
+    if (error && row.parent_id && /parent_id|column|schema/i.test(error.message || '')) { HAS_CREPLY = false; delete row.parent_id; ({ error } = await sb.from('comments').insert(row)); }
     send.disabled = false;
-    if (error) return toast('No se pudo enviar');
-    input.value = ''; changed = true; load(true);
-  } }, input, send);
+    if (error) return toast(/row-level|policy/i.test(error.message || '') && state.me.banned_until ? 'Tu cuenta está suspendida' : 'No se pudo enviar');
+    input.value = ''; const wasReply = !!replyTo; setReply(null); changed = true; load(!wasReply);
+  } }, input, send));
   let changed = false;
   const closeSheet = openSheet('Comentarios', body, isGuest() ? h('div', { class: 'sheet-foot' }, h('button', { class: 'btn', onclick: () => { document.querySelectorAll('.sheet-bg').forEach(x => x.remove()); needLogin('Crea tu cuenta para comentar'); } }, 'Entra para comentar')) : foot);
   // al cerrar, avisa a la tarjeta para que actualice el número y la vista previa
@@ -2058,21 +2172,66 @@ async function openComments(p, onChange) {
     b.addEventListener('click', () => { if (long) return; setRx(c, mine ? mine.reaction : 'ajua'); });
     return b;
   }
+  function cmtMenu(c) {
+    const close = openSheet('Tu comentario', h('div', { class: 'sheet-body menu' },
+      HAS_CREPLY ? h('button', { class: 'menu-item', onclick: () => { close(); editComment(c); } }, h('span', { icon: 'edit' }), 'Editar comentario') : null,
+      h('button', { class: 'menu-item danger', onclick: async () => {
+        close(); if (!confirm('¿Borrar este comentario?')) return;
+        const { error } = await sb.from('comments').delete().eq('id', c.id);
+        if (error) return toast('No se pudo borrar');
+        list = list.filter(x => x.id !== c.id && x.parent_id !== c.id); changed = true; paint(); toast('Comentario borrado');
+      } }, h('span', { icon: 'trash' }), 'Borrar comentario'),
+      h('button', { class: 'menu-item', onclick: () => close() }, h('span', { icon: 'close' }), 'Cancelar')));
+  }
+  function editComment(c) {
+    const ta = mentionAssist(h('textarea', { class: 'input', rows: 3, maxlength: '500' })); ta.value = c.body || '';
+    const save = h('button', { class: 'btn', style: 'width:100%;margin-top:10px', onclick: async () => {
+      const v = ta.value.trim(); if (!v) return toast('El comentario no puede quedar vacío');
+      save.disabled = true;
+      const { error } = await sb.from('comments').update({ body: v }).eq('id', c.id);
+      save.disabled = false;
+      if (error) return toast(/policy|row-level|permission/i.test(error.message || '') ? 'Falta activar "editar comentarios" en Supabase' : 'No se pudo guardar');
+      c.body = v; c.edited_at = new Date().toISOString(); changed = true; close(); paint(); toast('Comentario editado');
+    } }, 'Guardar');
+    const close = openSheet('Editar comentario', h('div', { class: 'sheet-body' }, ta, save));
+    setTimeout(() => { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }, 250);
+  }
+  function cmtEl(c, isReply) {
+    const mine = !isGuest() && c.user_id === state.me.id;
+    return h('div', { class: 'cmt' + (isReply ? ' reply' : '') }, avatar(c.profiles, isReply ? 28 : 34),
+      h('div', { style: 'flex:1;min-width:0' },
+        h('div', { class: 'cmt-bubble' }, h('b', {}, (c.profiles && c.profiles.username) || '', vb(c.user_id)), h('p', {}, ...richText(c.body)), rxSummary(c)),
+        h('div', { class: 'cmt-meta' }, h('small', {}, timeAgo(c.created_at) + (c.edited_at ? ' · editado' : '')), HAS_CRX ? rxButton(c) : null,
+          !isGuest() ? h('button', { class: 'cmt-act', type: 'button', onclick: () => setReply(c) }, 'Responder') : null,
+          mine ? h('button', { class: 'cmt-act', type: 'button', 'aria-label': 'Opciones del comentario', onclick: () => cmtMenu(c) }, '⋯') : null)));
+  }
+  const openThreads = new Set();
   function paint() {
     const top = body.scrollTop;
     body.replaceChildren();
     if (!list.length) return body.append(h('p', { class: 'empty', style: 'padding:30px 10px' }, 'Sé el primero en comentar.'));
-    list.forEach(c => body.append(h('div', { class: 'cmt' }, avatar(c.profiles, 34),
-      h('div', { style: 'flex:1;min-width:0' },
-        h('div', { class: 'cmt-bubble' }, h('b', {}, (c.profiles && c.profiles.username) || '', vb(c.user_id)), h('p', {}, ...richText(c.body)), rxSummary(c)),
-        h('div', { class: 'cmt-meta' }, h('small', {}, timeAgo(c.created_at)), HAS_CRX ? rxButton(c) : null)))));
+    const ids = new Set(list.map(c => c.id));
+    const roots = list.filter(c => !c.parent_id || !ids.has(c.parent_id));
+    const kids = new Map(); list.forEach(c => { if (c.parent_id && ids.has(c.parent_id)) { if (!kids.has(c.parent_id)) kids.set(c.parent_id, []); kids.get(c.parent_id).push(c); } });
+    roots.forEach(c => {
+      body.append(cmtEl(c, false));
+      const rs = kids.get(c.id) || [];
+      if (!rs.length) return;
+      const showAll = rs.length <= 2 || openThreads.has(c.id);
+      const shown = showAll ? rs : rs.slice(-1);
+      if (!showAll) body.append(h('button', { class: 'cmt-more', type: 'button', onclick: () => { openThreads.add(c.id); paint(); } }, `↳ Ver ${rs.length - 1} respuestas más`));
+      shown.forEach(r => body.append(cmtEl(r, true)));
+    });
     body.scrollTop = top;
   }
   async function load(toBottom) {
-    const { data, error } = await sb.from('comments').select('id,body,created_at,user_id,profiles!user_id(username,full_name,avatar_url)').eq('post_id', p.id).order('created_at');
+    let res = await sb.from('comments').select('id,body,created_at,user_id,' + (HAS_CREPLY ? 'parent_id,edited_at,' : '') + 'profiles!user_id(username,full_name,avatar_url)').eq('post_id', p.id).order('created_at');
+    if (res.error && HAS_CREPLY && /parent_id|edited_at|column/i.test(res.error.message || '')) { HAS_CREPLY = false; return load(toBottom); }
+    const { data, error } = res;
     if (error) return body.replaceChildren(h('p', { class: 'err' }, friendlyError(error)));
     list = visible(data || []);
-    paint(); body.scrollTop = body.scrollHeight;
+    const keep = body.scrollTop;
+    paint(); body.scrollTop = toBottom === false ? keep : body.scrollHeight;
     loadRx();
   }
   load();
@@ -2242,6 +2401,43 @@ async function renderWelcome() {
 
 // ---------- Reportar, bloquear, borrar ----------
 const REPORT_REASONS = ['Contenido sexual o desnudos', 'Violencia o maltrato animal', 'Acoso o insultos', 'Spam, estafa o venta ilegal', 'Algo más'];
+// ---------- Publicaciones guardadas ----------
+let HAS_SAVED = true;
+let SAVED = null; // Set de ids
+async function loadSaved() {
+  if (SAVED || !HAS_SAVED || isGuest()) return SAVED || new Set();
+  const { data, error } = await sb.from('saved_posts').select('post_id').eq('user_id', state.me.id).limit(1000);
+  if (error) { if (/saved_posts|relation|schema/i.test(error.message || '')) HAS_SAVED = false; return new Set(); }
+  SAVED = new Set((data || []).map(x => x.post_id)); return SAVED;
+}
+async function toggleSave(p) {
+  await loadSaved();
+  if (!HAS_SAVED) return toast('Falta activar "guardar publicaciones" en Supabase');
+  const on = SAVED.has(p.id);
+  const res = on ? await sb.from('saved_posts').delete().eq('user_id', state.me.id).eq('post_id', p.id)
+    : await sb.from('saved_posts').insert({ user_id: state.me.id, post_id: p.id });
+  if (res.error && !/duplicate/i.test(res.error.message || '')) return toast(/saved_posts|relation|schema/i.test(res.error.message || '') ? 'Falta activar "guardar publicaciones" en Supabase' : 'No se pudo guardar');
+  if (on) SAVED.delete(p.id); else SAVED.add(p.id);
+  try { navigator.vibrate && navigator.vibrate(12); } catch (_) {}
+  toast(on ? 'Se quitó de tus guardados' : '🔖 Guardada. La encuentras en Menú › Guardados');
+  if (on && state.view === 'saved') render();
+}
+async function renderSaved() {
+  const main = h('main', { style: 'padding-bottom:90px' });
+  $app.append(h('header', { class: 'topbar' },
+    h('button', { class: 'iconbtn plain', 'aria-label': 'Regresar', icon: 'back', onclick: () => go('feed') }),
+    h('b', { style: 'font-size:18px' }, '🔖 Guardados'), h('div', { style: 'width:44px' })), main);
+  main.append(h('div', { class: 'spinner' }));
+  const { data, error } = await sb.from('saved_posts').select('post_id,created_at').eq('user_id', state.me.id).order('created_at', { ascending: false }).limit(300);
+  if (error) return main.replaceChildren(h('div', { class: 'empty' }, /saved_posts|relation|schema/i.test(error.message || '') ? 'Falta activar "guardar publicaciones" en Supabase.' : friendlyError(error)));
+  const ids = (data || []).map(x => x.post_id);
+  SAVED = new Set(ids);
+  const posts = await postsByIds(ids);
+  const order = new Map(ids.map((id, i) => [id, i]));
+  const list = visible(posts).sort((a, b) => order.get(a.id) - order.get(b.id));
+  main.replaceChildren(list.length ? h('p', { class: 'hint', style: 'margin:12px 16px' }, 'Solo tú ves lo que guardas.') : '',
+    gridOf(list, h('div', { class: 'dm-empty' }, h('div', { style: 'font-size:46px' }, '🔖'), h('b', {}, 'Todavía no guardas nada'), 'Toca ⋯ en cualquier publicación y escoge "Guardar publicación" para verla después aquí.')));
+}
 function postMenu(p, onGone, onEdit) {
   if (needLogin('Crea tu cuenta para reportar o bloquear')) return;
   const mine = p.user_id === state.me.id;
@@ -2249,6 +2445,11 @@ function postMenu(p, onGone, onEdit) {
   const body = h('div', { class: 'sheet-body menu' });
   let close;
   const item = (icon, label, fn, danger) => h('button', { class: 'menu-item' + (danger ? ' danger' : ''), onclick: fn }, h('span', { icon }), label);
+  if (p.kind !== 'sundown' && HAS_SAVED) {
+    const sv = h('button', { class: 'menu-item', onclick: () => { close(); toggleSave(p); } }, h('span', { class: 'mi-emo' }, '🔖'), h('span', {}, SAVED && SAVED.has(p.id) ? 'Quitar de guardados' : 'Guardar publicación'));
+    body.append(sv);
+    if (!SAVED) loadSaved().then(set => { sv.lastChild.textContent = set.has(p.id) ? 'Quitar de guardados' : 'Guardar publicación'; if (!HAS_SAVED) sv.remove(); });
+  }
   if (mine) {
     if (p.kind !== 'sundown') body.append(item('edit', 'Editar descripción', () => { close(); editCaption(p, onEdit); }));
     body.append(item('trash', 'Borrar publicación', async () => { close(); if (await deletePost(p)) onGone && onGone(); }, true));
@@ -2261,7 +2462,7 @@ function postMenu(p, onGone, onEdit) {
   close = openSheet('Opciones', body);
 }
 function editCaption(p, onSaved) {
-  const ta = h('textarea', { class: 'input', maxlength: '1000', rows: '5', placeholder: 'Escribe algo… usa #etiquetas como #charreada o #cuartodemilla' }); ta.value = p.caption || '';
+  const ta = mentionAssist(h('textarea', { class: 'input', maxlength: '1000', rows: '5', placeholder: 'Escribe algo… usa #etiquetas y menciona con @' })); ta.value = p.caption || '';
   const err = h('p', { class: 'err', role: 'alert' });
   const save = h('button', { class: 'btn', type: 'submit', style: 'width:100%' }, 'Guardar');
   let close;
@@ -3026,7 +3227,7 @@ function renderUpload() {
   };
   songInput.addEventListener('input', () => { clearTimeout(songTimer); songTimer = setTimeout(searchSongs, 450); });
   const songField = HAS_SONG ? h('div', { class: 'field' }, h('label', { for: 'song' }, '🎵 Canción (opcional)'), songInput, songHelp, songList, songPick) : null;
-  const caption = h('textarea', { class: 'input', name: 'caption', id: 'cap', maxlength: '1000', placeholder: '¿Qué está pasando en el rancho?' });
+  const caption = mentionAssist(h('textarea', { class: 'input', name: 'caption', id: 'cap', maxlength: '1000', placeholder: '¿Qué está pasando en el rancho? Menciona a tus compas con @' }));
   if (state.presetCaption) { caption.value = state.presetCaption; state.presetCaption = null; }
   const catField = h('div', {}, h('div', { class: 'field' }, h('label', {}, 'Sección')), catChips);
   let animalId = state.tagAnimal || null;
@@ -3127,6 +3328,74 @@ function badgesFor(prof, posts, animals, totalLikes, hadSundown) {
 }
 const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
 
+// ---------- Calificaciones a vendedores ----------
+let HAS_REV = true;
+const RATING_CACHE = new Map(); // id -> { avg, n }
+async function sellerRating(id) {
+  if (!HAS_REV) return null;
+  if (RATING_CACHE.has(id)) return RATING_CACHE.get(id);
+  const { data, error } = await sb.rpc('seller_ratings', { ids: [id] });
+  if (error) { if (/seller_ratings|function|schema/i.test(error.message || '')) HAS_REV = false; return null; }
+  const r = data && data[0] ? { avg: Number(data[0].avg), n: Number(data[0].n) } : { avg: 0, n: 0 };
+  RATING_CACHE.set(id, r); return r;
+}
+const starsTxt = (v) => { const f = Math.round(v); return '★'.repeat(f) + '☆'.repeat(5 - f); };
+function ratingPill(r, onclick) {
+  const txt = r && r.n ? [h('span', { class: 'rt-stars' }, starsTxt(r.avg)), h('b', {}, r.avg.toFixed(1)), h('small', {}, `(${r.n} ${r.n === 1 ? 'calificación' : 'calificaciones'})`)]
+    : [h('span', { class: 'rt-stars' }, '☆☆☆☆☆'), h('small', {}, 'Sin calificaciones todavía')];
+  return h(onclick ? 'button' : 'span', Object.assign({ class: 'rt-pill' }, onclick ? { type: 'button', onclick } : {}), ...txt);
+}
+async function openReviews(seller, onChange) {
+  const body = h('div', { class: 'sheet-body rv' }, h('div', { class: 'spinner' }));
+  const close = openSheet('Calificaciones de @' + (seller.username || ''), body);
+  const paint = async () => {
+    const { data, error } = await sb.from('seller_reviews').select('stars,body,created_at,updated_at,reviewer_id,profiles!reviewer_id(' + PROF_MINI + ')').eq('seller_id', seller.id).order('updated_at', { ascending: false }).limit(100);
+    if (error) return body.replaceChildren(h('div', { class: 'empty' }, /seller_reviews|relation|schema/i.test(error.message || '') ? 'Falta activar las calificaciones en Supabase' : friendlyError(error)));
+    const list = data || [];
+    const n = list.length, avg = n ? list.reduce((s, r) => s + r.stars, 0) / n : 0;
+    RATING_CACHE.set(seller.id, { avg: Math.round(avg * 10) / 10, n });
+    const dist = [5, 4, 3, 2, 1].map(k => [k, list.filter(r => r.stars === k).length]);
+    const mineR = !isGuest() && list.find(r => r.reviewer_id === state.me.id);
+    const canRate = !isGuest() && state.me && state.me.id !== seller.id;
+    body.replaceChildren(...[
+      h('div', { class: 'rv-sum' },
+        h('div', { class: 'rv-big' }, h('b', {}, n ? avg.toFixed(1) : '–'), h('span', { class: 'rt-stars' }, starsTxt(avg)), h('small', {}, n ? `${n} ${n === 1 ? 'calificación' : 'calificaciones'}` : 'Nadie lo ha calificado')),
+        h('div', { class: 'rv-dist' }, ...dist.map(([k, c]) => h('div', {}, h('span', {}, k + '★'), h('i', {}, h('u', { style: `width:${n ? Math.round(c / n * 100) : 0}%` })), h('small', {}, String(c)))))),
+      canRate ? h('button', { class: 'btn fx-gold', style: 'margin:4px 0 14px', onclick: () => rateSeller(seller, mineR, () => { paint(); onChange && onChange(); }) }, mineR ? '✏️ Cambiar mi calificación' : '⭐ Calificar a este vendedor') : null,
+      ...(list.length ? list.map(r => h('div', { class: 'rv-row' },
+        h('button', { class: 'rv-who', onclick: () => { close(); go('profile', { profileId: r.reviewer_id }); } }, avatar(r.profiles || {}, 36)),
+        h('div', { class: 'rv-txt' },
+          h('div', {}, h('b', {}, (r.profiles && (r.profiles.full_name || r.profiles.username)) || 'Ranchero'), h('small', {}, ' · ' + timeAgo(r.updated_at || r.created_at))),
+          h('span', { class: 'rt-stars' }, starsTxt(r.stars)),
+          r.body ? h('p', {}, r.body) : null))) : [h('p', { class: 'hint', style: 'text-align:center;margin:10px 0' }, 'Si ya le compraste o vendiste algo, cuéntale a los demás cómo te fue.')])].filter(Boolean));
+  };
+  paint();
+}
+function rateSeller(seller, prev, onSaved) {
+  if (needLogin('Crea tu cuenta para calificar')) return;
+  let stars = (prev && prev.stars) || 0;
+  const labels = ['', 'Muy mal', 'Mal', 'Regular', 'Bien', '¡Excelente!'];
+  const lab = h('div', { class: 'rv-lab' }, stars ? labels[stars] : 'Toca las estrellas');
+  const row = h('div', { class: 'rv-pick' });
+  const paintS = () => { row.replaceChildren(...[1, 2, 3, 4, 5].map(k => h('button', { type: 'button', class: k <= stars ? 'on' : '', 'aria-label': k + ' estrellas', onclick: () => { stars = k; paintS(); try { navigator.vibrate && navigator.vibrate(10); } catch (_) {} } }, '★'))); lab.textContent = stars ? labels[stars] : 'Toca las estrellas'; save.disabled = !stars; };
+  const ta = h('textarea', { class: 'input', rows: 3, maxlength: '500', placeholder: '¿Cómo te fue con este vendedor? (opcional)' });
+  ta.value = (prev && prev.body) || '';
+  const save = h('button', { class: 'btn fx-gold', onclick: async () => {
+    save.disabled = true;
+    const row = { seller_id: seller.id, reviewer_id: state.me.id, stars, body: ta.value.trim() || null, updated_at: new Date().toISOString() };
+    const { error } = await sb.from('seller_reviews').upsert(row, { onConflict: 'seller_id,reviewer_id' });
+    save.disabled = false;
+    if (error) return toast(/row-level|policy/i.test(error.message || '') ? 'Solo puedes calificar a vendedores con los que ya platicaste por mensaje' : /seller_reviews|relation|schema/i.test(error.message || '') ? 'Falta activar las calificaciones en Supabase' : 'No se pudo guardar');
+    RATING_CACHE.delete(seller.id); close(); toast('¡Gracias por calificar! ⭐'); SFX.play('ajua'); onSaved && onSaved();
+  } }, 'Guardar calificación');
+  const del = prev ? h('button', { class: 'btn ghost', style: 'margin-top:8px;color:#C2183A', onclick: async () => {
+    const { error } = await sb.from('seller_reviews').delete().eq('seller_id', seller.id).eq('reviewer_id', state.me.id);
+    if (error) return toast('No se pudo borrar'); RATING_CACHE.delete(seller.id); close(); toast('Calificación borrada'); onSaved && onSaved();
+  } }, 'Borrar mi calificación') : null;
+  const close = openSheet('Calificar a @' + (seller.username || ''), h('div', { class: 'sheet-body' }, row, lab, ta, h('div', { style: 'height:12px' }), save, del,
+    h('p', { class: 'hint', style: 'margin-top:10px' }, 'Tu calificación y tu nombre se ven en su perfil. Sé honesto y respetuoso.')));
+  paintS();
+}
 async function renderProfile() {
   const id = state.profileId || state.me.id;
   const isMe = id === state.me.id;
@@ -3160,11 +3429,19 @@ async function renderProfile() {
   let followersN = nFollowers || 0;
   const followersStat = hasF ? stat(followersN, followersN === 1 ? 'Seguidor' : 'Seguidores', () => openFollowList(id, 'followers')) : null;
   const bumpFollowers = (on) => { followersN += on ? 1 : -1; if (followersStat) { followersStat.firstChild.textContent = Number(followersN).toLocaleString('es-MX'); followersStat.lastChild.textContent = followersN === 1 ? 'Seguidor' : 'Seguidores'; } };
+  const ratingSlot = h('div', { class: 'pf-rating' });
+  if (HAS_REV) sellerRating(id).then(r => {
+    if (!r || (!r.n && isMe)) return;
+    const refresh = () => { RATING_CACHE.delete(id); sellerRating(id).then(x => { if (x) ratingSlot.replaceChildren(ratingPill(x, open)); }); };
+    const open = () => openReviews(prof, refresh);
+    ratingSlot.replaceChildren(ratingPill(r, open));
+  });
   const hero = h('section', { class: 'pf-hero' },
     h('button', { class: 'pf-av', 'aria-label': sd ? 'Ver sundown' : 'Foto de perfil', onclick: () => { if (sd) openSundowns([sd], 0, () => render()); } },
       h('div', { class: 'ring' + (sd ? (sd.unseen ? ' new' : ' seen') : '') }, h('div', {}, avatar(prof, 96)))),
     h('h1', {}, prof.full_name || prof.username, vb(prof.id)),
     h('div', { class: 'pf-sub' }, '@' + prof.username + (prof.ubicacion || prof.estado ? ' · 📍 ' + [prof.ubicacion, prof.estado && !(prof.ubicacion || '').toLowerCase().includes(prof.estado.toLowerCase()) ? prof.estado : ''].filter(Boolean).join(', ') : '')),
+    ratingSlot,
     hasF ? h('div', { class: 'pf-stats' },
       stat(posts.length, posts.length === 1 ? 'Publicación' : 'Publicaciones'), followersStat,
       stat(nFollowing, 'Siguiendo', () => openFollowList(id, 'following')), stat(totalLikes, 'Ajúas'))
@@ -3527,6 +3804,7 @@ function openMenu() {
     tile('🎪', 'La Feria', () => { state.feriaTab = 'mercado'; go('feria'); }),
     tile('📅', 'Eventos', () => { state.feriaTab = 'eventos'; go('feria'); }),
     tile('🔍', 'Explorar', () => go('explore')),
+    tile('🔖', 'Guardados', () => go('saved')),
     tile('🤝', 'Invitar compas', inviteFriends),
     state.isAdmin ? tile('🛡️', 'Administrar', () => go('admin')) : null,
     tile('🐴', 'Mis animales', () => go('profile', { profileId: state.me.id }))];
@@ -3727,6 +4005,13 @@ function openListing(l) {
       h('button', { class: 'btn ghost', style: 'flex:1;color:#C2183A', onclick: async () => { if (!confirm('¿Borrar este anuncio?')) return; const { error } = await sb.from('listings').delete().eq('id', l.id); if (error) return toast('No se pudo borrar'); const paths = photos.map(u => u.split('/media/')[1]).filter(Boolean).map(decodeURIComponent); if (paths.length) sb.storage.from('media').remove(paths); close(); toast('Anuncio borrado'); if (state.view === 'feria') render(); } }, '🗑️'))] : [
     l.status !== 'vendido' && h('button', { class: 'btn fx-gold', onclick: () => interested(l) }, '💬 Me interesa'),
     h('button', { class: 'btn ghost', style: 'margin-top:8px', onclick: share }, '📤 Compartir anuncio')];
+  const sellerRow = h('div', { class: 'fx-rating' });
+  if (HAS_REV) sellerRating(l.user_id).then(r => {
+    if (!r) return;
+    const seller = Object.assign({ id: l.user_id }, prof);
+    const open = () => openReviews(seller, () => { RATING_CACHE.delete(l.user_id); sellerRating(l.user_id).then(x => x && sellerRow.replaceChildren(ratingPill(x, open))); });
+    sellerRow.replaceChildren(ratingPill(r, open));
+  });
   const body = h('div', { class: 'sheet-body fx-detail' },
     h('div', { class: 'fx-car-wrap' }, car, dots, isFeat(l) ? h('span', { class: 'fx-feat' }, '⭐ Destacado') : null, l.status === 'vendido' ? h('span', { class: 'fx-sold' }, 'VENDIDO') : null),
     h('div', { class: 'fx-d-price' }, money(l.price)),
@@ -3737,6 +4022,7 @@ function openListing(l) {
     l.description ? h('p', { class: 'fx-d-desc' }, ...richText(l.description)) : null,
     h('button', { class: 'fx-seller', onclick: () => { close(); go('profile', { profileId: l.user_id }); } }, avatar(prof, 44),
       h('div', {}, h('small', {}, mine ? 'Tu anuncio' : 'Vendedor'), h('b', {}, prof.full_name || prof.username || '', vb(l.user_id)), prof.ubicacion ? h('small', {}, '📍 ' + prof.ubicacion) : null), h('span', { class: 'fx-chev' }, '›')),
+    sellerRow,
     ...actions.filter(Boolean),
     !mine ? h('p', { class: 'fx-tip' }, '🤝 Consejo: vean el animal o el producto en persona antes de pagar y no manden anticipos a desconocidos.') : null);
   const close = openSheet(l.category, body);
@@ -3996,15 +4282,25 @@ async function fetchNotifs(force) {
   if (!force && Date.now() - NOTIF_CACHE.at < 60000) return NOTIF_CACHE.items;
   const me = state.me.id;
   const POSTJ = 'posts!inner(id,user_id,media_url,media_type,caption,kind)';
-  const [lk, cm, sh, fw] = await Promise.all([
+  const uname = (state.me && state.me.username) || '';
+  const esc = (x) => x.replace(/[%_\\]/g, (c) => '\\' + c);
+  const mentionOk = (txt) => uname && new RegExp('(^|[\\s(¡¿"“])@' + uname.replace(/[.*+?^${}()|[\]\\\-]/g, '\\$&') + '(?![A-Za-z0-9_])', 'i').test(txt || '');
+  const [lk, cm, sh, fw, rp, mc, mp] = await Promise.all([
     sb.from('likes').select('created_at,user_id,post_id' + (HAS_REACT ? ',reaction' : '') + ',' + NOTIF_PROF + ',' + POSTJ).eq('posts.user_id', me).neq('user_id', me).order('created_at', { ascending: false }).limit(40),
     sb.from('comments').select('id,body,created_at,user_id,post_id,' + NOTIF_PROF + ',' + POSTJ).eq('posts.user_id', me).neq('user_id', me).order('created_at', { ascending: false }).limit(40),
     HAS_SHARE ? sb.from('posts').select('id,created_at,user_id,caption,' + NOTIF_PROF + ',orig:shared_id!inner(id,user_id,media_url,media_type)').eq('orig.user_id', me).neq('user_id', me).order('created_at', { ascending: false }).limit(30) : Promise.resolve({ data: [] }),
-    HAS_FOLLOW ? sb.from('follows').select('created_at,follower_id,profiles!follower_id(id,username,full_name,avatar_url)').eq('following_id', me).order('created_at', { ascending: false }).limit(40) : Promise.resolve({ data: [] })]);
+    HAS_FOLLOW ? sb.from('follows').select('created_at,follower_id,profiles!follower_id(id,username,full_name,avatar_url)').eq('following_id', me).order('created_at', { ascending: false }).limit(40) : Promise.resolve({ data: [] }),
+    HAS_CREPLY ? sb.from('comments').select('id,body,created_at,user_id,post_id,' + NOTIF_PROF + ',' + POSTJ + ',parent:parent_id!inner(user_id)').eq('parent.user_id', me).neq('user_id', me).order('created_at', { ascending: false }).limit(30).then(r => r, () => ({ data: [] })) : Promise.resolve({ data: [] }),
+    uname ? sb.from('comments').select('id,body,created_at,user_id,post_id,' + NOTIF_PROF + ',' + POSTJ).ilike('body', '%@' + esc(uname) + '%').neq('user_id', me).order('created_at', { ascending: false }).limit(30).then(r => r, () => ({ data: [] })) : Promise.resolve({ data: [] }),
+    uname ? sb.from('posts').select('id,created_at,user_id,caption,media_url,media_type,kind,' + NOTIF_PROF).ilike('caption', '%@' + esc(uname) + '%').neq('user_id', me).order('created_at', { ascending: false }).limit(20).then(r => r, () => ({ data: [] })) : Promise.resolve({ data: [] })]);
   const b = state.blocked || new Set();
   const items = [];
   (lk.data || []).forEach(x => items.push({ t: 'react', at: x.created_at, who: x.profiles, uid: x.user_id, post: x.posts, react: x.reaction || 'ajua' }));
-  (cm.data || []).forEach(x => items.push({ t: 'comment', at: x.created_at, who: x.profiles, uid: x.user_id, post: x.posts, body: x.body }));
+  const cSeen = new Set();
+  ((rp && rp.data) || []).forEach(x => { cSeen.add(x.id); items.push({ t: 'reply', at: x.created_at, who: x.profiles, uid: x.user_id, post: x.posts, body: x.body }); });
+  ((mc && mc.data) || []).forEach(x => { if (cSeen.has(x.id) || !mentionOk(x.body)) return; cSeen.add(x.id); items.push({ t: 'mention', at: x.created_at, who: x.profiles, uid: x.user_id, post: x.posts, body: x.body }); });
+  ((mp && mp.data) || []).forEach(x => { if (!mentionOk(x.caption)) return; items.push({ t: 'pmention', at: x.created_at, who: x.profiles, uid: x.user_id, post: x, body: x.caption }); });
+  (cm.data || []).forEach(x => { if (cSeen.has(x.id)) return; items.push({ t: 'comment', at: x.created_at, who: x.profiles, uid: x.user_id, post: x.posts, body: x.body }); });
   (sh.data || []).forEach(x => items.push({ t: 'share', at: x.created_at, who: x.profiles, uid: x.user_id, post: x.orig, shareId: x.id }));
   ((fw && fw.data) || []).forEach(x => items.push({ t: 'follow', at: x.created_at, who: x.profiles, uid: x.follower_id }));
   NOTIF_CACHE = { at: Date.now(), items: items.filter(i => i.who && !b.has(i.uid)).sort((a, c) => (a.at < c.at ? 1 : -1)).slice(0, 80) };
@@ -4036,8 +4332,12 @@ async function renderNotifs() {
   try { items = await fetchNotifs(true); } catch (e) { return list.replaceChildren(h('div', { class: 'empty' }, friendlyError(e))); }
   const seen = notifSeen();
   try { localStorage.setItem(notifSeenKey(), new Date().toISOString()); } catch (_) {}
-  if (!items.length) return list.replaceChildren(h('div', { class: 'dm-empty' }, h('div', { icon: 'bell' }), h('b', {}, 'Todo tranquilo por aquí'), 'Cuando alguien te siga, reaccione, comente o comparta tus publicaciones, te avisamos aquí.'));
-  const what = (i) => i.t === 'comment' ? ['comentó: ', h('span', { class: 'n-quote' }, '“' + (i.body || '').slice(0, 90) + ((i.body || '').length > 90 ? '…' : '') + '”')]
+  if (!items.length) return list.replaceChildren(h('div', { class: 'dm-empty' }, h('div', { icon: 'bell' }), h('b', {}, 'Todo tranquilo por aquí'), 'Cuando alguien te siga, te mencione, te responda, reaccione o comparta tus publicaciones, te avisamos aquí.'));
+  const quote = (i) => h('span', { class: 'n-quote' }, '“' + (i.body || '').slice(0, 90) + ((i.body || '').length > 90 ? '…' : '') + '”');
+  const what = (i) => i.t === 'comment' ? ['comentó: ', quote(i)]
+    : i.t === 'reply' ? ['respondió tu comentario: ', quote(i)]
+    : i.t === 'mention' ? ['te mencionó en un comentario: ', quote(i)]
+    : i.t === 'pmention' ? ['te mencionó en ' + (i.post && i.post.kind === 'ride' ? 'un ride' : i.post && i.post.kind === 'sundown' ? 'un sundown' : 'una publicación') + ': ', quote(i)]
     : i.t === 'share' ? ['compartió tu publicación']
     : i.t === 'follow' ? ['empezó a seguirte']
     : [(REACT[i.react] || REACT.ajua).k === 'ajua' ? 'le dio ajúa a tu ' : 'reaccionó ' + REACT[i.react].e + ' a tu ', i.post && i.post.kind === 'sundown' ? 'sundown' : i.post && i.post.kind === 'ride' ? 'ride' : 'publicación'];
@@ -4049,7 +4349,7 @@ async function renderNotifs() {
     if (g !== lastGroup) { kids.push(h('h3', { class: 'n-group' }, g)); lastGroup = g; }
     const thumb = i.post && i.post.media_url ? (i.post.media_type === 'video' ? h('video', { src: i.post.media_url + '#t=0.5', muted: true, playsInline: true, preload: 'metadata' }) : h('img', { src: i.post.media_url, alt: '', loading: 'lazy' })) : null;
     kids.push(h('div', { class: 'notif' + (i.at > seen ? ' new' : ''), role: 'button', tabindex: '0', onclick: () => i.t === 'follow' ? go('profile', { profileId: i.uid }) : i.t === 'share' ? openPostById(i.shareId) : i.post && openPostById(i.post.id) },
-      h('span', { class: 'av-react' }, avatar(i.who, 48), i.t === 'react' ? reactIcon(i.react, 'badge') : h('span', { class: 'n-badge' }, i.t === 'comment' ? '💬' : i.t === 'follow' ? '🤠' : '🔁')),
+      h('span', { class: 'av-react' }, avatar(i.who, 48), i.t === 'react' ? reactIcon(i.react, 'badge') : h('span', { class: 'n-badge' }, i.t === 'comment' ? '💬' : i.t === 'reply' ? '↩️' : i.t === 'mention' || i.t === 'pmention' ? '@' : i.t === 'follow' ? '🤠' : '🔁')),
       h('div', { class: 'n-txt' }, h('p', {}, h('b', {}, i.who.username || ''), ' ', ...what(i)), h('small', {}, timeAgo(i.at))),
       i.t === 'follow' ? (isFollowing(i.uid) ? null : followBtn(i.uid, { small: true, gold: true })) : thumb && h('span', { class: 'n-thumb' }, thumb)));
   });
@@ -4125,7 +4425,7 @@ function listenInbox() {
       const b = document.querySelector('.msg-count'); if (b) refreshUnread(b);
       const inThisChat = state.view === 'chat' && state.chat && state.chat.id === m.conversation_id;
       if (MINI && MINI.conv === m.conversation_id) { MINI.add(m); return; }
-      if (!inThisChat && state.view !== 'inbox') addHead(m.sender_id, m.body ? String(m.body).replace(/#[pleu]=[\w-]+/g, '').trim() : (m.media_type === 'video' ? '🎥 Video' : '📷 Foto'));
+      if (!inThisChat && state.view !== 'inbox') addHead(m.sender_id, m.body ? String(m.body).replace(/#[pleu]=[\w-]+/g, '').trim() : msgLabel(m));
     }).subscribe();
   } catch (_) { INBOX_CH = null; }
 }
@@ -4262,17 +4562,20 @@ async function openMiniChat(prof) {
   const input = h('textarea', { class: 'input', rows: 1, maxlength: '2000', placeholder: 'Escribe un mensaje…', 'aria-label': 'Mensaje' });
   const send = h('button', { class: 'send', type: 'submit', 'aria-label': 'Enviar', icon: 'send', disabled: true });
   const blockedNow = state.blocked && state.blocked.has(prof.id);
-  if (blockedNow) { input.disabled = true; input.placeholder = 'Bloqueaste a esta persona'; }
-  const grow = () => { input.style.height = 'auto'; input.style.height = Math.min(96, input.scrollHeight) + 'px'; send.disabled = !input.value.trim() || blockedNow; };
+  const mic = h('button', { class: 'send mic', type: 'button', 'aria-label': 'Grabar nota de voz', icon: 'mic', onclick: () => { if (mini.conv) recordVoice(form, sendVoice); } });
+  if (blockedNow) { input.disabled = true; mic.disabled = true; input.placeholder = 'Bloqueaste a esta persona'; }
+  const grow = () => { input.style.height = 'auto'; input.style.height = Math.min(96, input.scrollHeight) + 'px'; const has = !!input.value.trim(); send.disabled = !has || blockedNow; send.hidden = !has; mic.hidden = has; };
+  send.hidden = true;
   input.addEventListener('input', grow);
   input.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && !('ontouchstart' in window)) { e.preventDefault(); submit(); } });
+  const form = h('form', { class: 'mc-form', onsubmit: (e) => { e.preventDefault(); submit(); } }, input, send, mic);
   const full = () => { const conv = mini.conv; close(true); HEADS.delete(prof.id); paintHeads(); state.chat = { id: conv, other: prof }; go('chat'); };
   const panel = h('div', { class: 'mc-panel', role: 'dialog', 'aria-label': 'Chat con ' + (prof.username || '') },
     h('div', { class: 'mc-head' },
       h('button', { class: 'mc-who', onclick: full }, h('span', { class: 'mc-av' }, h('span', { class: 'head-hat', icon: 'hatmini' }), avatar(prof, 38)), h('div', {}, h('b', {}, prof.full_name || prof.username || '', vb(prof.id)), h('small', {}, 'Toca para abrir el chat completo'))),
       h('button', { class: 'iconbtn plain', 'aria-label': 'Cerrar', icon: 'close', onclick: () => close() })),
     list,
-    h('form', { class: 'mc-form', onsubmit: (e) => { e.preventDefault(); submit(); } }, input, send));
+    form);
   const bg = h('div', { class: 'mc-bg', onclick: (e) => { if (e.target === bg) close(); } }, panel);
   document.body.append(bg);
   let msgs = [];
@@ -4283,7 +4586,7 @@ async function openMiniChat(prof) {
       let content;
       if (m.media_path || m.localUrl) {
         const u = m.localUrl || (DM_SIGNED.get(m.media_path) || {}).url;
-        content = m.media_type === 'video' ? h('button', { class: 'mc-media', onclick: full }, '🎥 Video') : u ? h('img', { class: 'mc-img', src: u, alt: 'Foto', onclick: () => openMediaViewer(u, 'image') }) : h('span', {}, '📷 Foto');
+        content = isAudioMsg(m) ? voicePlayer(u, voiceDur(m.media_path)) : m.media_type === 'video' ? h('button', { class: 'mc-media', onclick: full }, '🎥 Video') : u ? h('img', { class: 'mc-img', src: u, alt: 'Foto', onclick: () => openMediaViewer(u, 'image') }) : h('span', {}, '📷 Foto');
       } else content = String(m.body || '').replace(/#[pleu]=[\w-]+/g, '').trim();
       return h('div', { class: 'mc-msg' + (mine ? ' me' : '') + (m.pending ? ' pend' : '') }, content);
     }) : [h('p', { class: 'mc-empty' }, '¡Salúdalo! 🤠')]));
@@ -4302,7 +4605,23 @@ async function openMiniChat(prof) {
     if (data && !seen.has(data.id)) { seen.add(data.id); msgs.push(data); }
     SFX.play('sent'); paint();
   }
+  async function sendVoice(blob, secs) {
+    if (blockedNow || !mini.conv) return;
+    const localUrl = URL.createObjectURL(blob);
+    const tmp = { id: 'tmp' + Date.now(), sender_id: state.me.id, media_type: 'audio', localUrl, pending: true };
+    msgs.push(tmp); paint();
+    const path = `${mini.conv}/${state.me.id}-${Date.now()}-d${secs}.${voiceExt(blob)}`;
+    const up = await sb.storage.from('dm').upload(path, blob, { contentType: blob.type || 'audio/webm', upsert: false });
+    let data = null, error = up.error;
+    if (!error) { const r = await sb.from('messages').insert({ conversation_id: mini.conv, sender_id: state.me.id, media_path: path, media_type: 'audio' }).select(COLS).single(); data = r.data; error = r.error; }
+    msgs = msgs.filter(m => m !== tmp);
+    if (error) { paint(); return toast('No se pudo mandar la nota de voz'); }
+    DM_SIGNED.set(path, { url: localUrl, exp: Date.now() + 3500e3 });
+    if (data && !seen.has(data.id)) { seen.add(data.id); msgs.push(data); }
+    SFX.play('sent'); paint();
+  }
   function close(silent) {
+    if (VOICE_NOW) VOICE_NOW.pause();
     bg.classList.add('out'); setTimeout(() => bg.remove(), 180);
     if (MINI === mini) MINI = null;
     if (!silent) paintHeads();
@@ -4439,7 +4758,7 @@ async function renderInbox() {
     h('b', {}, '¡Salud! Aquí van tus mensajes'), 'Busca a alguien arriba o entra a su perfil y toca "Mensaje".'));
   list.replaceChildren(...rows.map(({ c, other, m, n }) => h('button', { class: 'inbox-row' + (n ? ' unread' : ''), onclick: () => { state.chat = { id: c.id, other }; go('chat'); } },
     avatar(other, 52),
-    h('div', { class: 'who' }, h('b', {}, other.username), h('span', {}, (m.sender_id === state.me.id ? 'Tú: ' : '') + ((m.body || '').replace(/\s*https?:\S+#[ple]=\d+/, '') || (m.media_type === 'video' ? '🎥 Video' : '📷 Foto')))),
+    h('div', { class: 'who' }, h('b', {}, other.username), h('span', {}, (m.sender_id === state.me.id ? 'Tú: ' : '') + ((m.body || '').replace(/\s*https?:\S+#[ple]=\d+/, '') || msgLabel(m)))),
     h('small', {}, shortTime(m.created_at)), n ? h('span', { class: 'inbox-dot', 'aria-label': n + ' sin leer' }) : null)));
 }
 const DM_SIGNED = new Map(); // ruta -> { url, exp }
@@ -4452,6 +4771,74 @@ async function signDm(paths) {
     (data || []).forEach(d => { if (d && d.signedUrl) DM_SIGNED.set(d.path || need[data.indexOf(d)], { url: d.signedUrl, exp: now + 3500e3 }); });
   } catch (_) {}
 }
+// ---------- Notas de voz ----------
+const VOICE_MAX = 180; // segundos
+const isAudioMsg = (m) => m && (m.media_type === 'audio');
+const voiceDur = (path) => { const r = /-d(\d+)\.\w+$/.exec(path || ''); return r ? Number(r[1]) : 0; };
+const mmss = (s) => { s = Math.max(0, Math.round(s || 0)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+const msgLabel = (m) => m.media_type === 'video' ? '🎥 Video' : m.media_type === 'audio' ? '🎤 Nota de voz' : '📷 Foto';
+let VOICE_NOW = null; // el audio que está sonando (solo uno a la vez)
+function voicePlayer(src, dur) {
+  const bars = 28, seed = (src || '').length;
+  const wave = h('span', { class: 'vp-wave' }, ...Array.from({ length: bars }, (_, i) => { const v = 0.3 + 0.7 * Math.abs(Math.sin((i + 1) * 1.7 + seed)); return h('i', { style: 'height:' + Math.round(v * 100) + '%' }); }));
+  const time = h('span', { class: 'vp-t' }, mmss(dur));
+  const btn = h('button', { class: 'vp-btn', type: 'button', 'aria-label': 'Escuchar nota de voz' }, '▶');
+  const el = h('div', { class: 'vp' }, btn, wave, time);
+  if (!src) { btn.disabled = true; return el; }
+  let a = null;
+  const paintP = () => {
+    const d = (a && isFinite(a.duration) && a.duration) || dur || 1, t = a ? a.currentTime : 0;
+    const on = Math.round(bars * Math.min(1, t / d));
+    [...wave.children].forEach((b, i) => b.classList.toggle('on', i < on));
+    time.textContent = mmss(a && !a.paused ? t : dur || (a && isFinite(a.duration) ? a.duration : 0));
+  };
+  btn.onclick = (e) => {
+    e.stopPropagation();
+    if (!a) {
+      a = new Audio(src); a.preload = 'auto';
+      a.addEventListener('timeupdate', paintP);
+      a.addEventListener('ended', () => { btn.textContent = '▶'; a.currentTime = 0; paintP(); });
+      a.addEventListener('pause', () => { btn.textContent = '▶'; });
+      a.addEventListener('play', () => { btn.textContent = '❚❚'; });
+      a.addEventListener('error', () => toast('No se pudo reproducir la nota de voz'));
+    }
+    if (a.paused) { if (VOICE_NOW && VOICE_NOW !== a) VOICE_NOW.pause(); VOICE_NOW = a; a.play().catch(() => {}); } else a.pause();
+  };
+  wave.onclick = (e) => { e.stopPropagation(); if (!a || !isFinite(a.duration)) return; const r = wave.getBoundingClientRect(); a.currentTime = a.duration * Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)); paintP(); };
+  return el;
+}
+// Barra de grabación: reemplaza al cuadro de texto mientras grabas
+async function recordVoice(host, onDone) {
+  if (!navigator.mediaDevices || !window.MediaRecorder) return toast('Tu teléfono no permite grabar notas de voz aquí');
+  let stream;
+  try { stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); }
+  catch (_) { return toast('Necesitas dar permiso al micrófono para mandar notas de voz'); }
+  const type = ['audio/webm;codecs=opus', 'audio/mp4', 'audio/webm', 'audio/ogg;codecs=opus'].find(t => MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) || '';
+  let rec;
+  try { rec = new MediaRecorder(stream, type ? { mimeType: type, audioBitsPerSecond: 32000 } : {}); } catch (_) { stream.getTracks().forEach(t => t.stop()); return toast('No se pudo empezar a grabar'); }
+  const chunks = []; let cancelled = false; const t0 = Date.now();
+  rec.ondataavailable = (e) => { if (e.data && e.data.size) chunks.push(e.data); };
+  const clock = h('span', { class: 'vr-t' }, '0:00');
+  const bar = h('div', { class: 'vr' },
+    h('button', { class: 'vr-x', type: 'button', 'aria-label': 'Cancelar nota de voz', onclick: () => { cancelled = true; stop(); } }, '🗑️'),
+    h('span', { class: 'vr-dot' }), clock, h('span', { class: 'vr-hint' }, 'Grabando…'),
+    h('button', { class: 'send', type: 'button', 'aria-label': 'Mandar nota de voz', icon: 'send', onclick: () => stop() }));
+  host.hidden = true; host.after(bar);
+  try { navigator.vibrate && navigator.vibrate(20); } catch (_) {}
+  const tick = setInterval(() => { const s = (Date.now() - t0) / 1000; clock.textContent = mmss(s); if (s >= VOICE_MAX) stop(); }, 250);
+  function stop() { clearInterval(tick); if (rec.state !== 'inactive') rec.stop(); }
+  rec.onstop = () => {
+    stream.getTracks().forEach(t => t.stop());
+    bar.remove(); host.hidden = false;
+    const secs = Math.round((Date.now() - t0) / 1000);
+    if (cancelled) return;
+    if (secs < 1 || !chunks.length) return toast('Deja grabando un poco más para mandar la nota');
+    const blob = new Blob(chunks, { type: (rec.mimeType || type || 'audio/webm').split(';')[0] });
+    onDone(blob, secs);
+  };
+  rec.start(250);
+}
+const voiceExt = (blob) => /mp4|aac|m4a/.test(blob.type) ? 'm4a' : /ogg/.test(blob.type) ? 'ogg' : 'webm';
 function openMediaViewer(src, type) {
   const close = () => { bg.remove(); document.removeEventListener('keydown', onKey); };
   const onKey = (e) => { if (e.key === 'Escape') close(); };
@@ -4473,12 +4860,14 @@ async function renderChat() {
   const send = h('button', { class: 'send', type: 'submit', 'aria-label': 'Enviar', icon: 'send', disabled: true });
   const picker = h('input', { type: 'file', accept: 'image/*,video/*', hidden: true });
   const attach = h('button', { class: 'attach', type: 'button', 'aria-label': 'Mandar foto o video', icon: 'camera', onclick: () => picker.click() });
-  const form = h('form', { onsubmit: (e) => { e.preventDefault(); submit(); } }, attach, picker, input, send);
+  const mic = h('button', { class: 'send mic', type: 'button', 'aria-label': 'Grabar nota de voz', icon: 'mic', onclick: () => recordVoice(form, sendVoice) });
+  const form = h('form', { onsubmit: (e) => { e.preventDefault(); submit(); } }, attach, picker, input, send, mic);
   $app.append(box, h('div', { class: 'composer' }, form));
   const blockedNow = state.blocked && state.blocked.has(other.id);
-  if (blockedNow) { input.disabled = true; attach.disabled = true; input.placeholder = 'Bloqueaste a esta persona'; }
+  if (blockedNow) { input.disabled = true; attach.disabled = true; mic.disabled = true; input.placeholder = 'Bloqueaste a esta persona'; }
 
-  const grow = () => { input.style.height = 'auto'; input.style.height = Math.min(130, input.scrollHeight) + 'px'; send.disabled = !input.value.trim() || blockedNow; };
+  const grow = () => { input.style.height = 'auto'; input.style.height = Math.min(130, input.scrollHeight) + 'px'; const has = !!input.value.trim(); send.disabled = !has || blockedNow; send.hidden = !has; mic.hidden = has; };
+  send.hidden = true;
   input.addEventListener('input', grow);
   input.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && !('ontouchstart' in window)) { e.preventDefault(); submit(); } });
   picker.addEventListener('change', () => { const f = picker.files && picker.files[0]; picker.value = ''; if (f) sendMedia(f); });
@@ -4527,7 +4916,7 @@ async function renderChat() {
     if (!HAS_MSG_RX || m.pending) return;
     let t = null, fired = false, lastTap = 0;
     const open = () => { const cur = (rx.get(m.id) || []).find(r => r.user_id === state.me.id); openReactPicker(el, cur ? cur.reaction : null, (k) => setRx(m, k)); };
-    el.addEventListener('pointerdown', (e) => { if (e.target.closest('.msg-rx,.msg-post,video')) return; fired = false; clearTimeout(t); t = setTimeout(() => { fired = true; try { navigator.vibrate && navigator.vibrate(15); } catch (_) {} open(); }, 420); });
+    el.addEventListener('pointerdown', (e) => { if (e.target.closest('.msg-rx,.msg-post,video,.vp')) return; fired = false; clearTimeout(t); t = setTimeout(() => { fired = true; try { navigator.vibrate && navigator.vibrate(15); } catch (_) {} open(); }, 420); });
     ['pointerup', 'pointerleave', 'pointercancel', 'pointermove'].forEach(ev => el.addEventListener(ev, (e) => { if (ev !== 'pointermove' || Math.abs(e.movementY) > 4) clearTimeout(t); }));
     el.addEventListener('contextmenu', (e) => e.preventDefault());
     el.addEventListener('click', (e) => {
@@ -4536,7 +4925,7 @@ async function renderChat() {
       if (now - lastTap < 300) { lastTap = 0; e.stopPropagation(); e.preventDefault(); clearTimeout(el._tapT); setRx(m, 'love'); el.classList.remove('rx-pop'); void el.offsetWidth; el.classList.add('rx-pop'); return; }
       lastTap = now;
     }, true);
-    if (m.media_path || m.localUrl) el.append(h('button', { class: 'msg-rx-add', type: 'button', 'aria-label': 'Reaccionar a esta ' + (m.media_type === 'video' ? 'video' : 'foto'), onclick: (e) => { e.stopPropagation(); open(); } }, '☺'));
+    if ((m.media_path || m.localUrl) && !isAudioMsg(m)) el.append(h('button', { class: 'msg-rx-add', type: 'button', 'aria-label': 'Reaccionar a esta ' + (m.media_type === 'video' ? 'video' : 'foto'), onclick: (e) => { e.stopPropagation(); open(); } }, '☺'));
   }
   const nodes = new Map(); // id -> elemento (para que los videos no se reinicien)
   function bubble(m) {
@@ -4544,7 +4933,12 @@ async function renderChat() {
     if (nodes.has(key)) return nodes.get(key);
     const mine = m.sender_id === state.me.id;
     let el;
-    if (m.media_path || m.localUrl) {
+    if (isAudioMsg(m)) {
+      const src = m.localUrl || (DM_SIGNED.get(m.media_path) || {}).url;
+      el = h('div', { class: 'msg voice ' + (mine ? 'me' : 'them') + (m.pending ? ' pending' : '') }, voicePlayer(src, m.dur || voiceDur(m.media_path)),
+        m.pending ? h('span', { class: 'msg-up' }, 'Enviando…') : null);
+      if (!src) return el;
+    } else if (m.media_path || m.localUrl) {
       const src = m.localUrl || (DM_SIGNED.get(m.media_path) || {}).url;
       const media = !src ? h('div', { class: 'msg-media-ph' }, 'Cargando…')
         : m.media_type === 'video' ? h('video', { src, controls: true, playsinline: true, preload: 'metadata' })
@@ -4634,13 +5028,27 @@ async function renderChat() {
     if (data) { DM_SIGNED.set(path, { url: localUrl, exp: Date.now() + 3500e3 }); if (!seen.has(data.id)) { seen.add(data.id); msgs.push(data); } SFX.play('sent'); }
     paint();
   }
+  async function sendVoice(blob, secs) {
+    if (blockedNow) return;
+    const localUrl = URL.createObjectURL(blob);
+    const tmp = { id: 'tmp' + Date.now(), sender_id: state.me.id, media_type: 'audio', localUrl, dur: secs, created_at: new Date().toISOString(), pending: true };
+    msgs.push(tmp); paint();
+    const path = `${chat.id}/${state.me.id}-${Date.now()}-d${secs}.${voiceExt(blob)}`;
+    const up = await sb.storage.from('dm').upload(path, blob, { contentType: blob.type || 'audio/webm', upsert: false });
+    let data = null, error = up.error;
+    if (!error) { const r = await sb.from('messages').insert({ conversation_id: chat.id, sender_id: state.me.id, media_path: path, media_type: 'audio' }).select(COLS).single(); data = r.data; error = r.error; }
+    msgs = msgs.filter(m => m !== tmp);
+    if (error) { paint(); URL.revokeObjectURL(localUrl); return toast(/mime|type|check|contenido/i.test(error.message || '') ? 'Falta activar las notas de voz en Supabase' : failMsg(error)); }
+    if (data) { DM_SIGNED.set(path, { url: localUrl, exp: Date.now() + 3500e3 }); if (!seen.has(data.id)) { seen.add(data.id); msgs.push(data); } SFX.play('sent'); }
+    paint();
+  }
   let channel = null;
   try {
     if (sb.channel) channel = sb.channel('dm-' + chat.id).on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: 'conversation_id=eq.' + chat.id }, () => load())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'message_reactions' }, (pl) => { const id = (pl.new && pl.new.message_id) || (pl.old && pl.old.message_id); if (!id || seen.has(id)) loadRx(); }).subscribe();
   } catch (_) { channel = null; }
   const poll = setInterval(() => { if (!document.hidden) load(); }, channel ? 15000 : 4000);
-  state.cleanup = () => { alive = false; clearInterval(poll); if (channel) try { sb.removeChannel(channel); } catch (_) {} };
+  state.cleanup = () => { alive = false; if (VOICE_NOW) VOICE_NOW.pause(); clearInterval(poll); if (channel) try { sb.removeChannel(channel); } catch (_) {} };
   await load();
   input.focus({ preventScroll: true });
 }
