@@ -809,6 +809,24 @@ html,body{background:#F5EFE3!important;background-image:none!important;color:#17
 .fx-spec-grid .field{margin-bottom:10px}
 .notif .btn.small{flex:0 0 auto;height:34px;font-size:13px}
 .notif{cursor:pointer}
+.msg-ico{width:30px;height:30px;object-fit:contain;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}
+#heads{position:fixed;right:10px;top:150px;z-index:40;display:flex;flex-direction:column;gap:14px;touch-action:none;user-select:none;-webkit-user-select:none}
+#heads[hidden]{display:none}
+#heads.left{right:auto;left:10px}
+#heads.dragging{transition:none;opacity:.92}
+#heads.pop .head:first-child{animation:headpop .45s cubic-bezier(.3,1.6,.5,1)}
+@keyframes headpop{0%{transform:scale(.3)}100%{transform:scale(1)}}
+.head{position:relative;width:62px;height:72px;border:none;background:none;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.head-av{position:absolute;left:3px;bottom:0;width:56px;height:56px;border-radius:50%;box-shadow:0 0 0 3px #F3BD68,0 6px 16px rgba(23,37,49,.45);overflow:hidden;display:block}
+.head-av .avatar{width:56px!important;height:56px!important}
+.head-hat{position:absolute;left:4px;top:-9px;width:56px;z-index:2;transform:rotate(-10deg);filter:drop-shadow(0 2px 2px rgba(0,0,0,.35));pointer-events:none}
+.head-hat svg{display:block;width:100%;height:auto}
+.head-n{position:absolute;right:-2px;bottom:-2px;z-index:3;min-width:22px;height:22px;padding:0 6px;border-radius:11px;background:#E8172E;color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid #FFF7E8}
+.head-tip{position:absolute;right:70px;bottom:10px;max-width:200px;width:max-content;padding:9px 12px;border-radius:16px 16px 4px 16px;background:#FFFDF8;color:#172531;font-size:13.5px;font-weight:600;line-height:1.3;text-align:left;box-shadow:0 6px 18px rgba(23,37,49,.25);border:1px solid #EADFCB;transition:opacity .4s,transform .4s}
+#heads.left .head-tip{right:auto;left:70px;border-radius:16px 16px 16px 4px}
+.head-tip.out{opacity:0;transform:translateY(4px);pointer-events:none}
+.heads-drop{position:fixed;left:50%;bottom:110px;z-index:39;width:64px;height:64px;margin-left:-32px;border-radius:50%;background:rgba(23,37,49,.75);color:#fff;font-size:26px;display:flex;align-items:center;justify-content:center;transition:transform .15s,background .15s}
+.heads-drop.on{transform:scale(1.25);background:#C2183A}
 .nav button{flex:1 1 0;min-width:0;width:auto}
 .nav .plus{flex:0 0 52px;width:52px}
 .nav button{font-size:10.5px}
@@ -1383,6 +1401,7 @@ function render() {
   const views = { feed: renderFeed, rides: renderRides, explore: renderExplore, upload: renderUpload, profile: renderProfile, animal: renderAnimal, inbox: renderInbox, chat: renderChat, notifs: renderNotifs, feria: renderFeria };
   (views[state.view] || renderFeed)();
   if (state.view !== 'chat') $app.append(navBar());
+  if (HEADS.size) paintHeads(); else if (!HEADS_LOADED && !isGuest()) setTimeout(loadHeads, 1500);
 }
 
 // ---------- Olvidé mi contraseña ----------
@@ -3807,7 +3826,7 @@ const PROF_MINI = 'id,username,full_name,avatar_url';
 function dmButton() {
   if (isGuest()) return h('button', { class: 'btn small', style: 'height:40px;padding:0 18px', onclick: () => { state.authMode = 'login'; go('auth'); } }, 'Entrar');
   const badge = h('span', { class: 'dm-badge msg-count', hidden: true });
-  const btn = h('button', { class: 'iconbtn dm-btn', 'aria-label': 'Mensajes', onclick: () => go('inbox') }, h('span', { icon: 'shots', style: 'display:flex' }), badge);
+  const btn = h('button', { class: 'iconbtn dm-btn', 'aria-label': 'Mensajes', onclick: () => go('inbox') }, h('img', { class: 'msg-ico', src: 'icon-msg.png', alt: '' }), badge);
   refreshUnread(badge);
   return HAS_DM ? btn : h('div');
 }
@@ -3867,8 +3886,100 @@ function listenInbox() {
       const m = pl.new || {}; if (!state.me || m.sender_id === state.me.id) return;
       msgDing(); LAST_UNREAD = (LAST_UNREAD || 0) + 1;
       const b = document.querySelector('.msg-count'); if (b) refreshUnread(b);
+      const inThisChat = state.view === 'chat' && state.chat && state.chat.id === m.conversation_id;
+      if (!inThisChat && state.view !== 'inbox') addHead(m.sender_id, m.body ? String(m.body).replace(/#[pleu]=[\w-]+/g, '').trim() : (m.media_type === 'video' ? '🎥 Video' : '📷 Foto'));
     }).subscribe();
   } catch (_) { INBOX_CH = null; }
+}
+// ---------- Burbujas de chat (como Messenger, pero con sombrero) ----------
+const HAT_SVG = '<svg viewBox="0 0 64 40" aria-hidden="true"><path d="M3 27c6 7 18 10 29 10s23-3 29-10c-7 2.5-17 3.6-29 3.6S10 29.5 3 27z" fill="#7A3E1A" stroke="#3A1C0A" stroke-width="1.2"/><path d="M17 27.5c.2-8 2.3-17.5 7.5-20.5 2.2-1.2 4.4-.4 5.6.8 1 1 1.6 1.2 1.9 1.2s.9-.2 1.9-1.2c1.2-1.2 3.4-2 5.6-.8 5.2 3 7.3 12.5 7.5 20.5-4.2-1.2-9.4-1.9-15-1.9s-10.8.7-15 1.9z" fill="#A0602D" stroke="#3A1C0A" stroke-width="1.2"/><path d="M17.6 22.6c4.2-1.1 9.2-1.7 14.4-1.7s10.2.6 14.4 1.7l.3 3.2c-4.3-1.1-9.3-1.7-14.7-1.7s-10.4.6-14.7 1.7z" fill="#F3BD68"/></svg>';
+ICONS.hatmini = HAT_SVG;
+const HEADS = new Map();   // persona -> { prof, n, last }
+let HEADS_LOADED = false;
+let HEADS_POS = (() => { try { return JSON.parse(localStorage.getItem('rf_heads_pos')) || null; } catch (_) { return null; } })();
+function headsHost() {
+  let host = document.getElementById('heads');
+  if (!host) {
+    host = h('div', { id: 'heads', 'aria-label': 'Chats abiertos' });
+    document.body.append(host);
+    dragHeads(host);
+  }
+  return host;
+}
+function headsVisible() { return !isGuest() && !['inbox', 'chat', 'upload', 'welcome', 'auth'].includes(state.view); }
+function paintHeads(previewFor, previewText) {
+  const host = headsHost();
+  const list = [...HEADS.entries()].map(([k, v]) => Object.assign(v, { key: k })).sort((a, b) => b.last - a.last).slice(0, 4);
+  host.hidden = !list.length || !headsVisible();
+  if (HEADS_POS) { host.style.top = HEADS_POS.y + 'px'; host.classList.toggle('left', HEADS_POS.side === 'left'); }
+  host.replaceChildren(...list.map((x, i) => {
+    const btn = h('button', { class: 'head', 'aria-label': 'Chat con ' + (x.prof.username || ''), style: `z-index:${10 - i}` },
+      h('span', { class: 'head-hat', icon: 'hatmini' }),
+      h('span', { class: 'head-av' }, avatar(x.prof, 56)),
+      x.n ? h('span', { class: 'head-n' }, x.n > 9 ? '9+' : String(x.n)) : null,
+      previewFor === x.key && previewText ? h('span', { class: 'head-tip' }, previewText.slice(0, 70)) : null);
+    btn.addEventListener('click', (e) => { if (host._dragged) return; e.stopPropagation(); HEADS.delete(x.key); paintHeads(); openChatWith(x.prof); });
+    return btn;
+  }));
+  if (previewFor) setTimeout(() => host.querySelectorAll('.head-tip').forEach(t => t.classList.add('out')), 3800);
+}
+async function addHead(senderId, text) {
+  if (!senderId || (state.blocked && state.blocked.has(senderId))) return;
+  let x = HEADS.get(senderId);
+  if (!x) {
+    const { data } = await sb.from('profiles').select(PROF_MINI).eq('id', senderId).maybeSingle();
+    if (!data) return;
+    x = { prof: data, n: 0, last: 0 };
+    HEADS.set(senderId, x);
+  }
+  x.n += 1; x.last = Date.now();
+  paintHeads(senderId, text);
+  const host = document.getElementById('heads'); if (host) { host.classList.remove('pop'); void host.offsetWidth; host.classList.add('pop'); }
+}
+// Al abrir la app: burbujas de quienes te escribieron y no has leído
+async function loadHeads() {
+  if (HEADS_LOADED || isGuest() || !HAS_DM) return; HEADS_LOADED = true;
+  const { data } = await sb.from('messages').select('sender_id,created_at').is('read_at', null).neq('sender_id', state.me.id).order('created_at', { ascending: false }).limit(60);
+  if (!data || !data.length) return;
+  const by = {};
+  data.forEach(m => { by[m.sender_id] = by[m.sender_id] || { n: 0, last: new Date(m.created_at).getTime() }; by[m.sender_id].n++; });
+  const ids = Object.keys(by).filter(id => !(state.blocked && state.blocked.has(id))).slice(0, 4);
+  if (!ids.length) return;
+  const { data: profs } = await sb.from('profiles').select(PROF_MINI).in('id', ids);
+  (profs || []).forEach(p => HEADS.set(p.id, { prof: p, n: by[p.id].n, last: by[p.id].last }));
+  paintHeads();
+}
+// Arrastrar las burbujas: se pegan a la orilla; si las sueltas en la ✕ se cierran
+function dragHeads(host) {
+  let sx, sy, ox, oy, moving = false, drop = null;
+  host.addEventListener('pointerdown', (e) => {
+    sx = e.clientX; sy = e.clientY; const r = host.getBoundingClientRect(); ox = r.left; oy = r.top; moving = false; host._dragged = false; host._pid = e.pointerId;
+  });
+  host.addEventListener('pointermove', (e) => {
+    if (sx == null) return;
+    const dx = e.clientX - sx, dy = e.clientY - sy;
+    if (!moving && Math.hypot(dx, dy) < 8) return;
+    if (!moving) { moving = true; host._dragged = true; try { host.setPointerCapture(host._pid); } catch (_) {} host.classList.add('dragging'); drop = h('div', { class: 'heads-drop' }, '✕'); document.body.append(drop); }
+    host.style.left = (ox + dx) + 'px'; host.style.right = 'auto'; host.style.top = (oy + dy) + 'px';
+    const over = e.clientY > window.innerHeight - 150 && Math.abs(e.clientX - window.innerWidth / 2) < 90;
+    drop.classList.toggle('on', over);
+  });
+  const end = (e) => {
+    if (sx == null) return; sx = null;
+    if (!moving) return;
+    host.classList.remove('dragging');
+    const over = drop && drop.classList.contains('on');
+    if (drop) { drop.remove(); drop = null; }
+    if (over) { HEADS.clear(); host.hidden = true; host.style.left = ''; host.style.right = ''; setTimeout(() => { host._dragged = false; }, 50); return; }
+    const r = host.getBoundingClientRect();
+    const side = r.left + r.width / 2 < window.innerWidth / 2 ? 'left' : 'right';
+    const y = Math.max(70, Math.min(window.innerHeight - 220, r.top));
+    HEADS_POS = { side, y };
+    try { localStorage.setItem('rf_heads_pos', JSON.stringify(HEADS_POS)); } catch (_) {}
+    host.style.left = ''; host.style.right = ''; host.style.top = y + 'px'; host.classList.toggle('left', side === 'left');
+    setTimeout(() => { host._dragged = false; }, 50);
+  };
+  host.addEventListener('pointerup', end); host.addEventListener('pointercancel', end);
 }
 function stopInbox() { if (INBOX_CH) { try { sb.removeChannel(INBOX_CH); } catch (_) {} INBOX_CH = null; } LAST_UNREAD = null; }
 async function refreshUnread(badge) {
@@ -3881,6 +3992,7 @@ async function refreshUnread(badge) {
   if (badge) { badge.hidden = !n; badge.textContent = n > 9 ? '9+' : String(n); }
 }
 async function openChatWith(prof) {
+  if (prof && HEADS.has(prof.id)) { HEADS.delete(prof.id); }
   const { data, error } = await sb.rpc('open_conversation', { other: prof.id });
   if (error) return toast(/function|open_conversation/i.test(error.message || '') ? 'Falta activar los mensajes en Supabase' : 'No se pudo abrir el chat');
   state.chat = { id: data, other: prof };
