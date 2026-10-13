@@ -67,6 +67,23 @@ main{flex:1;padding-bottom:calc(104px + env(safe-area-inset-bottom))}
 .tag{font-size:12px;font-weight:700;color:var(--ink);background:var(--grad);padding:5px 11px;border-radius:12px}
 .media{position:relative;background:#000;width:100%;aspect-ratio:4/5;overflow:hidden;user-select:none;-webkit-user-select:none}
 .media img,.media video{width:100%;height:100%;object-fit:cover}
+.media.is-ride{cursor:pointer;aspect-ratio:4/5}
+.ride-badge{position:absolute;left:10px;top:10px;z-index:2;display:flex;align-items:center;gap:5px;background:rgba(0,0,0,.55);color:#fff;font-size:13px;font-weight:700;padding:4px 10px 4px 7px;border-radius:999px;pointer-events:none}
+.ride-badge [icon],.ride-badge svg{width:16px;height:16px}
+.ride-go{position:absolute;right:10px;bottom:10px;z-index:2;width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,.5);color:#fff;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.ride-go svg{width:20px;height:20px}
+.reels-ov{position:fixed;inset:0;z-index:35;background:#000;animation:up .18s ease-out}
+.reels-ov .rides{z-index:1}
+.reels-ov .ride-info{bottom:calc(28px + env(safe-area-inset-bottom))}
+.reels-ov .rides-top{z-index:4}
+.up-status{position:absolute;left:10px;right:10px;bottom:10px;z-index:3;display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.62);color:#fff;font-size:13px;font-weight:600;padding:7px 12px;border-radius:12px;pointer-events:none}
+.up-status i{flex:1;height:5px;border-radius:3px;background:rgba(255,255,255,.25);overflow:hidden;font-style:normal}
+.up-status i b{display:block;height:100%;background:#F3BD68;transition:width .3s}
+.up-status.ok{background:rgba(30,110,60,.88)}
+.picker .up-status span{color:#fff;font-weight:700}
+.picker{position:relative}
+@keyframes pulse{50%{opacity:.45}}
+.reels-ov .ride-side{bottom:calc(32px + env(safe-area-inset-bottom))}
 .burst{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;opacity:0}
 .burst.go{animation:burst .9s ease-out}
 .burst b{font-family:Rye,serif;font-size:42px;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 3px 14px rgba(0,0,0,.7))}
@@ -1206,7 +1223,7 @@ async function shrinkVideo(file, onProgress, o = {}) {
   if (!mime) return file;
   const side = o.side || 720, vbps = o.vbps || 1500000;
   // Que los otros videos de la pantalla no se peleen por el procesador del teléfono
-  document.querySelectorAll('video').forEach(x => { try { x.pause(); } catch (_) {} });
+  document.querySelectorAll('video').forEach(x => { if (x.closest('.picker')) return; try { x.pause(); } catch (_) {} });
   const url = URL.createObjectURL(file);
   const v = document.createElement('video');
   let actx = null, raf = null, lock = null;
@@ -1672,9 +1689,11 @@ function openSong(url, title, after) {
 }
 let HAS_ANIMALS = true;
 const ANIMAL_EMBED = ',animal_id,animals!animal_id(id,name,species,photo_url)';
-async function fetchPosts({ category, userId, userIds, tag, text, kinds = ['post', 'ride'], since, animalId } = {}) {
+async function fetchPosts({ category, userId, userIds, tag, text, kinds = ['post', 'ride'], since, animalId, before, limit = 60, exclude } = {}) {
   const build = () => {
-    let q = sb.from('posts').select(postSelect()).order('created_at', { ascending: false }).limit(60);
+    let q = sb.from('posts').select(postSelect()).order('created_at', { ascending: false }).limit(limit);
+    if (before) q = q.lt('created_at', before);
+    if (exclude) q = q.neq('id', exclude);
     if (category && category !== 'Todo') q = q.eq('category', category);
     if (userId) q = q.eq('user_id', userId);
     if (userIds) q = q.in('user_id', userIds.slice(0, 300));
@@ -1758,6 +1777,7 @@ async function fetchSundownGroups(userId) {
 
 // ---------- navegación ----------
 function go(view, extra) {
+  document.querySelectorAll('.reels-ov').forEach(x => x._close ? x._close(true) : x.remove());
   if (view !== state.view) state.prevView = state.view;
   state.view = view;
   if (extra && 'profileId' in extra) state.profileId = extra.profileId;
@@ -1930,7 +1950,9 @@ async function renderFeed() {
         h('div', { style: 'padding:6px 16px 24px;text-align:center' }, h('button', { class: 'btn wa-btn', onclick: inviteFriends }, '💬 Invitar a mis compas')));
       return;
     }
-    const posts = await fetchPosts(mode === 'following' ? { category: state.category, userIds: [...state.following, state.me.id] } : { category: state.category });
+    const FEED_PAGE = 12;
+    const q = mode === 'following' ? { category: state.category, userIds: [...state.following, state.me.id] } : { category: state.category };
+    const posts = await fetchPosts({ ...q, limit: FEED_PAGE });
     list.replaceChildren();
     if (!posts.length && mode === 'following') {
       list.append(h('div', { class: 'empty' }, 'La gente que sigues no ha subido nada' + (state.category !== 'Todo' ? ' de ' + state.category : '') + ' todavía.'), suggestionsCard() || '');
@@ -1943,6 +1965,12 @@ async function renderFeed() {
         h('div', { style: 'margin-top:18px' }, h('button', { class: 'btn small', onclick: () => go('upload') }, 'Subir algo'))));
     }
     posts.forEach((p, i) => { list.append(postCard(p)); if (i === 2 && mode === 'all' && state.following.size < 15) { const sc = suggestionsCard(); if (sc) list.append(sc); } });
+    // Scroll infinito: cuando vas llegando al final, se cargan más solitas
+    if (posts.length >= FEED_PAGE) infiniteList(list, posts[posts.length - 1].created_at, async (before) => {
+      const more = await fetchPosts({ ...q, limit: FEED_PAGE, before });
+      more.forEach(p => list.insertBefore(postCard(p), list.lastChild));
+      return more.length >= FEED_PAGE ? more[more.length - 1].created_at : null;
+    });
   } catch (e) { list.replaceChildren(h('div', { class: 'empty' }, friendlyError(e))); }
 }
 
@@ -2139,6 +2167,55 @@ async function openReactions(p) {
   paint();
   body.replaceChildren(tabs, list);
 }
+// ---------- Videos ligeros: cargan cuando ya casi los ves, se reproducen solo en pantalla ----------
+const NEAR_IO = 'IntersectionObserver' in window ? new IntersectionObserver((es) => es.forEach(e => {
+  if (!e.isIntersecting) return;
+  const v = e.target; NEAR_IO.unobserve(v);
+  if (v.dataset.src && !v.getAttribute('src')) { v.preload = SAVER.on ? 'none' : 'metadata'; v.src = v.dataset.src; if (v._inView) autoPlay(v); }
+}), { rootMargin: '700px 0px' }) : null;
+const autoPlay = (v) => { if (SAVER.on || document.querySelector('.reels-ov,.sd-viewer')) return; if (!v.getAttribute('src') && v.dataset.src) { v.preload = 'metadata'; v.src = v.dataset.src; } v.muted = true; v.play().catch(() => {}); };
+const VIEW_IO = 'IntersectionObserver' in window ? new IntersectionObserver((es) => es.forEach(e => {
+  const v = e.target;
+  v._inView = e.isIntersecting && e.intersectionRatio >= 0.6;
+  if (v._inView) autoPlay(v);
+  else { try { v.pause(); } catch (_) {} }
+}), { threshold: [0, 0.6] }) : null;
+function lazyVideo(src, o = {}) {
+  const v = h('video', { playsInline: true, preload: 'none', class: o.class || null, controls: !!o.controls, loop: !!o.loop, muted: !!o.muted });
+  if (o.muted) v.muted = true;
+  v.dataset.src = src;
+  if (NEAR_IO) NEAR_IO.observe(v); else { v.preload = 'metadata'; v.src = src; }
+  if (o.auto && VIEW_IO) VIEW_IO.observe(v);
+  keepWhenWatched(v, src);
+  return v;
+}
+// Caché en el teléfono: cuando terminas de ver un video, se guarda para que la próxima vez no gaste datos
+const KEPT = new Set();
+function keepWhenWatched(v, url) {
+  if (!url || !('serviceWorker' in navigator)) return;
+  const keep = () => {
+    if (KEPT.has(url) || !(v.duration > 0) || v.currentTime < v.duration * 0.8) return;
+    KEPT.add(url);
+    navigator.serviceWorker.ready.then(r => r.active && r.active.postMessage({ type: 'rf-keep', url })).catch(() => {});
+  };
+  v.addEventListener('timeupdate', keep);
+  v.addEventListener('ended', keep);
+}
+// Scroll infinito para listas: un "sensor" al final que pide más cuando te vas acercando
+function infiniteList(list, cursor, loadMore) {
+  const sensor = h('div', { class: 'more-sensor' }, h('div', { class: 'spinner', style: 'margin:18px auto' }));
+  list.append(sensor);
+  let busy = false;
+  const io = new IntersectionObserver(async (es) => {
+    if (busy || !es.some(e => e.isIntersecting) || !document.body.contains(sensor)) return;
+    busy = true;
+    try { cursor = await loadMore(cursor); } catch (_) { cursor = cursor; }
+    busy = false;
+    if (!cursor) { io.disconnect(); sensor.remove(); }
+    else { io.unobserve(sensor); io.observe(sensor); }   // si sigue a la vista, que pida otra tanda
+  }, { rootMargin: '1200px 0px' });
+  io.observe(sensor);
+}
 function burstEl() { return h('div', { class: 'burst', 'aria-hidden': 'true' }, h('span', { class: 'burst-horse', icon: 'horse' }), h('b', {}, '¡AJÚA!')); }
 function fireBurst(b) { b.classList.remove('go'); void b.offsetWidth; b.classList.add('go'); }
 async function sharePost(p) {
@@ -2233,10 +2310,19 @@ function postCard(p) {
   paintCount();
   if (commentCount) queueCommentPreview(p.id, fillPrev);
   const burst = burstEl();
-  const mediaEl = p.media_type === 'video'
-    ? h('video', { src: p.media_url, controls: true, playsInline: true, preload: SAVER.on ? 'none' : 'metadata' })
+  const isRide = p.media_type === 'video' && p.kind === 'ride';
+  const mediaEl = isRide
+    ? lazyVideo(p.media_url, { auto: true, muted: true, loop: true, class: 'ride-prev' })
+    : p.media_type === 'video'
+    ? lazyVideo(p.media_url, { controls: true })
     : h('img', { src: p.media_url, alt: p.caption ? p.caption.slice(0, 120) : 'Foto de ' + (prof.username || '') , loading: 'lazy' });
-  const media = h('div', { class: 'media' }, mediaEl, burst);
+  const media = h('div', { class: 'media' + (isRide ? ' is-ride' : '') }, mediaEl, burst,
+    isRide ? h('span', { class: 'ride-badge' }, h('span', { icon: 'horseshoe' }), 'Ride') : null,
+    isRide ? h('span', { class: 'ride-go', 'aria-hidden': 'true' }, h('span', { icon: 'playbig' })) : null);
+  if (isRide) {
+    media.setAttribute('role', 'button'); media.setAttribute('aria-label', 'Ver ride en pantalla completa');
+    media.addEventListener('click', () => openReels(p));
+  }
   if (p.media_type !== 'video') {
     let last = 0;
     media.addEventListener('click', () => {
@@ -3325,22 +3411,69 @@ async function renderRides() {
   if (!rides.length) return wrap.replaceChildren(h('div', { class: 'empty', style: 'margin-top:30vh' },
     h('span', { class: 'logo', style: 'font-size:34px' }, 'Rides'), 'Videos cortos y verticales del rancho. ¡Sube el primero!',
     h('div', { style: 'margin-top:18px' }, h('button', { class: 'btn small', onclick: () => { state.uploadKind = 'ride'; go('upload'); } }, 'Subir mi ride'))));
-  const cards = rides.map(rideCard);
-  wrap.replaceChildren(...cards.map(c => c.el));
+  ridesScroller(wrap, rides, (before) => fetchPosts({ kinds: ['ride'], limit: RIDE_PAGE, before }));
+}
+const RIDE_PAGE = 8;
+// Lista de rides tipo reels: se reproduce el que está en pantalla, se precargan los 2 que siguen
+// y, al ir llegando al final, se cargan más solitos.
+function ridesScroller(wrap, first, loadMore, o = {}) {
+  const cards = [];
+  let busy = false, done = !o.keepGoing && first.length < RIDE_PAGE, last = first.length ? first[first.length - 1].created_at : null;
+  const seen = new Set();
   const io = new IntersectionObserver((entries) => {
     entries.forEach(en => {
-      const c = cards.find(x => x.el === en.target); if (!c) return;
-      if (en.isIntersecting && en.intersectionRatio > 0.6) c.play(); else c.pause();
+      const i = cards.findIndex(x => x.el === en.target); if (i < 0) return;
+      if (en.isIntersecting && en.intersectionRatio > 0.6) {
+        cards[i].play();
+        // Precarga: los siguientes dos empiezan a bajar en segundo plano para que no se trabe al deslizar
+        if (!SAVER.on) cards.slice(i + 1, i + 3).forEach((c, k) => c.warm(k === 0 ? 'auto' : 'metadata'));
+        if (i >= cards.length - 3) more();
+      } else cards[i].pause();
     });
   }, { root: wrap, threshold: [0, 0.6, 1] });
-  cards.forEach(c => io.observe(c.el));
+  const add = (list) => list.forEach(p => {
+    if (seen.has(p.id)) return; seen.add(p.id);
+    const c = rideCard(p, cards.length < 2 && !SAVER.on ? 'metadata' : 'none');
+    cards.push(c); wrap.append(c.el); io.observe(c.el);
+  });
+  async function more() {
+    if (busy || done || !loadMore) return; busy = true;
+    try { const list = await loadMore(last); add(list); if (list.length) last = list[list.length - 1].created_at; if (list.length < RIDE_PAGE) done = true; }
+    catch (_) {} finally { busy = false; }
+  }
+  wrap.replaceChildren(); add(first);
+  if (o.keepGoing) more();
+  return { stop: () => { io.disconnect(); cards.forEach(c => c.pause()); wrap.querySelectorAll('video').forEach(v => { try { v.pause(); v.removeAttribute('src'); v.load(); } catch (_) {} }); } };
+}
+// Tocas un ride en el inicio y se abre en pantalla completa, como los reels; deslizas para ver los demás
+function openReels(start) {
+  if (document.querySelector('.reels-ov')) return;
+  document.querySelectorAll('video').forEach(v => { try { v.pause(); } catch (_) {} });
+  const wrap = h('div', { class: 'rides' });
+  let sc = null;
+  const close = (silent) => {
+    if (sc) sc.stop(); ov.remove();
+    if (!silent && typeof syncBack === 'function') syncBack();
+  };
+  const ov = h('div', { class: 'reels-ov', role: 'dialog', 'aria-label': 'Rides' },
+    h('div', { class: 'rides-top' },
+      h('button', { class: 'iconbtn', 'aria-label': 'Cerrar', icon: 'back', style: 'color:#fff;background:rgba(0,0,0,.35)', onclick: () => ARMED ? history.back() : close() }),
+      h('div', { class: 'logo', style: 'font-size:22px;color:#fff' }, 'Rides'),
+      h('span', { style: 'width:40px' })),
+    wrap);
+  ov._close = close;
+  document.body.append(ov);
+  // Primero el ride que tocaste; abajo siguen los demás, del más nuevo al más viejo
+  sc = ridesScroller(wrap, [start], (before) => fetchPosts({ kinds: ['ride'], limit: RIDE_PAGE, before: before || start.created_at, exclude: start.id }), { keepGoing: true });
 }
 
-function rideCard(p) {
+function rideCard(p, preload) {
   const prof = p.profiles || {};
   const commentCount = (p.comments && p.comments[0] && p.comments[0].count) || 0;
   const { likeBtn, countEl, setLike } = likeControls(p, true);
-  const video = h('video', { src: p.media_url, loop: true, playsInline: true, muted: state.ridesMuted, preload: SAVER.on ? 'none' : 'metadata' });
+  const video = h('video', { src: p.media_url, loop: true, playsInline: true, muted: state.ridesMuted, preload: preload || (SAVER.on ? 'none' : 'metadata') });
+  keepWhenWatched(video, p.media_url);
+  const warm = (lvl) => { const order = { none: 0, metadata: 1, auto: 2 }; if ((order[lvl] || 0) > (order[video.preload] || 0)) video.preload = lvl; };
   let allowed = !SAVER.on;  // con ahorro de datos, el video espera a que lo toques
   video.muted = state.ridesMuted;
   const burst = burstEl();
@@ -3380,7 +3513,7 @@ function rideCard(p) {
       h('button', { class: 'iconbtn', 'aria-label': 'Compartir', icon: 'share', onclick: () => sharePost(p) }), h('span', {}, ' '),
       muteBtn,
       h('button', { class: 'iconbtn', 'aria-label': 'Más opciones', icon: 'more', style: 'margin-top:6px', onclick: () => { pause(); postMenu(p, () => el.remove(), () => render()); } })))
-  return { el, play, pause };
+  return { el, play, pause, warm };
 }
 
 async function renderExplore() {
@@ -3467,13 +3600,56 @@ function renderUpload() {
     h('b', { style: 'color:var(--text)' }, kind === 'ride' ? 'Toca para elegir un video' : 'Toca para elegir foto o video'),
     h('span', {}, 'De tu galería o la cámara')];
   const picker = h('label', { class: 'picker', for: 'pick' }, ...pickerEmpty());
+  // Subida en segundo plano (como Instagram o TikTok): en cuanto eliges la foto o el video, se empieza
+  // a preparar y a subir mientras escribes la descripción. Al darle "Publicar" ya casi está listo.
+  let bg = null;
+  const upStatus = h('div', { class: 'up-status', hidden: true });
+  const paintUp = () => {
+    if (!bg || bg.dead) { upStatus.hidden = true; return; }
+    upStatus.hidden = false;
+    upStatus.classList.toggle('ok', bg.stage === 'ok');
+    const pct = bg.stage === 'prep' ? bg.pct : bg.stage === 'up' ? 100 : 100;
+    upStatus.replaceChildren(h('span', {}, bg.stage === 'ok' ? '✓ Listo para publicar' : bg.stage === 'err' ? '⚠️ Se intentará otra vez al publicar' : bg.stage === 'up' ? 'Subiendo…' : bg.isVideo ? `Preparando video… ${bg.pct}%` : 'Preparando foto…'),
+      ...(bg.stage === 'ok' || bg.stage === 'err' ? [] : [h('i', {}, h('b', { style: `width:${bg.stage === 'up' ? 100 : Math.max(4, pct)}%` }))]));
+    if (bg.stage === 'up') upStatus.querySelector('b').style.animation = 'pulse 1s infinite';
+  };
+  const forgetPending = () => { try { localStorage.removeItem('rf_pending_up'); } catch (_) {} };
+  const dropBg = () => {
+    if (!bg) return;
+    const old = bg; old.dead = true; bg = null; paintUp();
+    old.promise.then(r => { if (r && r.path) { sb.storage.from('media').remove([r.path]).catch(() => {}); forgetPending(); } }).catch(() => {});
+  };
+  const startBg = (f) => {
+    dropBg();
+    const job = { file: f, isVideo: f.type.startsWith('video/'), pct: 0, stage: 'prep', dead: false };
+    job.promise = (async () => {
+      const blob = job.isVideo ? await prepVideo(f, (n) => { job.pct = n; if (bg === job) paintUp(); }, 0) : await compressImage(f);
+      if (job.dead) return null;
+      if (job.isVideo && tooBig(blob)) throw new Error('El video es muy largo. Prueba con uno más corto (menos de 3 minutos).');
+      job.stage = 'up'; if (bg === job) paintUp();
+      const ext = job.isVideo ? videoExt(blob, f) : (blob.type === 'image/gif' ? 'gif' : (blob.type === 'image/png' ? 'png' : 'jpg'));
+      const path = `${state.me.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+      const up = await sb.storage.from('media').upload(path, blob, { contentType: blob.type || f.type, cacheControl: '31536000' });
+      if (up.error) throw up.error;
+      // Por si cierras sin publicar: la próxima vez se borra ese archivo que quedó suelto
+      try { localStorage.setItem('rf_pending_up', path); } catch (_) {}
+      if (job.dead) { sb.storage.from('media').remove([path]).catch(() => {}); forgetPending(); return null; }
+      job.stage = 'ok'; if (bg === job) paintUp();
+      return { path, url: sb.storage.from('media').getPublicUrl(path).data.publicUrl, isVideo: job.isVideo };
+    })();
+    job.promise.catch(() => { job.stage = 'err'; if (bg === job) paintUp(); });
+    bg = job; paintUp();
+  };
+  // Si quedó un archivo de una vez que no se publicó, se limpia
+  try { const left = localStorage.getItem('rf_pending_up'); if (left && left.startsWith(state.me.id + '/')) { sb.storage.from('media').remove([left]).catch(() => {}); forgetPending(); } } catch (_) {}
   fileInput.addEventListener('change', () => {
     const f = fileInput.files[0]; if (!f) return;
     if (f.type.startsWith('video/') && f.size > MAX_VIDEO_MB * 1048576) { file = null; return toast(`El video pesa mucho (máx. ${MAX_VIDEO_MB} MB). Prueba uno más corto.`); }
     if (kind === 'ride' && !f.type.startsWith('video/')) { file = null; return toast('Los rides son videos. Elige un video.'); }
     file = f;
     const url = URL.createObjectURL(f);
-    picker.replaceChildren(f.type.startsWith('video/') ? h('video', { src: url, muted: true, playsInline: true, autoplay: true, loop: true }) : h('img', { src: url, alt: 'Vista previa' }));
+    picker.replaceChildren(f.type.startsWith('video/') ? h('video', { src: url, muted: true, playsInline: true, autoplay: true, loop: true }) : h('img', { src: url, alt: 'Vista previa' }), upStatus);
+    startBg(f);
   });
 
   const shopBox = h('div', { class: 'shop', style: 'margin:0 0 14px;display:none' },
@@ -3598,7 +3774,7 @@ function renderUpload() {
     kindBar.replaceChildren(...KINDS.map(([k, label, icon]) => h('button', { type: 'button', role: 'tab', 'aria-selected': String(k === kind), class: k === kind ? 'on' : '', onclick: () => {
       if (k === 'sundown') return openSundownCreator(() => go('feed'));
       kind = k; state.uploadKind = k;
-      if (k === 'ride' && file && !file.type.startsWith('video/')) { file = null; fileInput.value = ''; picker.replaceChildren(...pickerEmpty()); }
+      if (k === 'ride' && file && !file.type.startsWith('video/')) { file = null; fileInput.value = ''; dropBg(); picker.replaceChildren(...pickerEmpty()); }
       paintKind();
     } }, h('span', { icon }), label)));
     hint.textContent = HINTS[kind];
@@ -3619,14 +3795,16 @@ function renderUpload() {
     btn.disabled = true; btn.textContent = 'Subiendo…';
     stopSong(); const endTrot = SFX.startUpload();
     try {
-      const isVideo = file.type.startsWith('video/');
-      const blob = isVideo ? await prepVideo(file, (n) => { btn.textContent = `Preparando video… ${n}%`; }, kind === 'sundown' ? SD_MAX_SEC : 0) : await compressImage(file);
-      if (isVideo) { btn.textContent = 'Subiendo…'; if (tooBig(blob)) throw new Error('El video es muy largo. Prueba con uno más corto (menos de 3 minutos).'); }
-      const ext = isVideo ? videoExt(blob, file) : (blob.type === 'image/gif' ? 'gif' : (blob.type === 'image/png' ? 'png' : 'jpg'));
-      const path = `${state.me.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-      const up = await sb.storage.from('media').upload(path, blob, { contentType: blob.type || file.type, cacheControl: '31536000' });
-      if (up.error) throw up.error;
-      const { data: pub } = sb.storage.from('media').getPublicUrl(path);
+      // Si la subida en segundo plano falló (o no empezó), se intenta otra vez aquí mismo
+      if (!bg || bg.file !== file || bg.stage === 'err') startBg(file);
+      const job = bg;
+      const tick = setInterval(() => { btn.textContent = job.stage === 'prep' ? (job.isVideo ? `Preparando video… ${job.pct}%` : 'Preparando…') : job.stage === 'up' ? 'Subiendo…' : 'Publicando…'; }, 250);
+      let res;
+      try { res = await job.promise; } finally { clearInterval(tick); }
+      if (!res) throw new Error('Algo salió mal con el archivo. Elígelo otra vez.');
+      btn.textContent = 'Publicando…';
+      const { path, isVideo } = res;
+      const pub = { publicUrl: res.url };
       const fd = new FormData(form);
       const shop_links = kind !== 'sundown' && category === 'Outfits' ? [0, 1, 2].map(i => ({ name: String(fd.get('shop_name_' + i) || '').trim(), url: String(fd.get('shop_url_' + i) || '').trim() })).filter(l => safeUrl(l.url)) : [];
       const row = { user_id: state.me.id, media_url: pub.publicUrl, media_type: isVideo ? 'video' : 'image', caption: caption.value.trim() || null, category: kind === 'sundown' ? null : category, shop_links };
@@ -3635,7 +3813,8 @@ function renderUpload() {
       if (HAS_SONG && picked) { row.song_url = picked.url; row.song_title = picked.title || null; if (picked.preview) { row.song_preview = picked.preview; row.song_art = picked.art || null; row.song_start = picked.start || 0; } else if (picked.yt) row.song_start = picked.start || 0; }
       stopSong();
       const ins = await sb.from('posts').insert(row);
-      if (ins.error) { sb.storage.from('media').remove([path]); throw ins.error; }
+      if (ins.error) { bg = null; forgetPending(); sb.storage.from('media').remove([path]); throw ins.error; }
+      forgetPending(); bg = null;
       endTrot(true);
       toast(kind === 'sundown' ? 'Sundown publicado. Se va con el sol en 24 h' : kind === 'ride' ? '¡Ride publicado! ¡Ajúa!' : '¡Publicado! ¡Ajúa!');
       state.category = 'Todo'; state.uploadKind = 'post'; go(kind === 'ride' ? 'rides' : 'feed');
@@ -5796,7 +5975,7 @@ let ARMED = false;
 try { history.scrollRestoration = 'manual'; } catch (_) {}
 function armBack() { if (ARMED) return; try { history.pushState({ yh: 1 }, ''); ARMED = true; } catch (_) {} }
 function backNeeded() {
-  const overlay = document.querySelector('.sd-viewer,.sheet-bg,.react-pick-bg,.sdc,.menu-bg');
+  const overlay = document.querySelector('.sd-viewer,.sheet-bg,.react-pick-bg,.sdc,.menu-bg,.reels-ov');
   return !!overlay || state.view !== 'feed' || window.scrollY > 120;
 }
 function syncBack() { if (backNeeded()) armBack(); }
@@ -5818,6 +5997,8 @@ window.addEventListener('popstate', () => {
   if (viewerClose) { viewerClose.click(); return syncBack(); }
   const sheets = document.querySelectorAll('.sheet-bg');
   if (sheets.length) { const c = sheets[sheets.length - 1].querySelector('.sheet-head [aria-label="Cerrar"]'); c ? c.click() : sheets[sheets.length - 1].remove(); return syncBack(); }
+  const reels = document.querySelector('.reels-ov');
+  if (reels) { reels._close(); return syncBack(); }
   if (state.view === 'auth') { go('feed'); return syncBack(); }
   if (!state.me || state.view === 'welcome') return syncBack();
   if (state.view === 'chat') { go('inbox'); return syncBack(); }
