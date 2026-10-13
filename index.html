@@ -1118,55 +1118,77 @@ function friendlyError(e) {
 }
 // ---------- Comprimir videos (720p, ~1.5 Mbps) antes de subirlos, como Facebook o TikTok ----------
 // Se reproduce el video en silencio por dentro y se vuelve a grabar más ligero. Tarda lo que dura el video.
-async function shrinkVideo(file, onProgress) {
+async function shrinkVideo(file, onProgress, o = {}) {
   if (!file || !(file.type || '').startsWith('video/')) return file;
   if (!window.MediaRecorder || !HTMLCanvasElement.prototype.captureStream) return file;
   const mime = ['video/mp4;codecs=avc1.42E01E,mp4a.40.2', 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'].find(t => { try { return MediaRecorder.isTypeSupported(t); } catch (_) { return false; } });
   if (!mime) return file;
+  const side = o.side || 720, vbps = o.vbps || 1500000;
+  // Que los otros videos de la pantalla no se peleen por el procesador del teléfono
+  document.querySelectorAll('video').forEach(x => { try { x.pause(); } catch (_) {} });
   const url = URL.createObjectURL(file);
   const v = document.createElement('video');
-  let actx = null, raf = null;
-  const cleanup = () => { try { v.pause(); } catch (_) {} try { actx && actx.close(); } catch (_) {} URL.revokeObjectURL(url); };
+  let actx = null, raf = null, lock = null;
+  const cleanup = () => { try { v.pause(); v.removeAttribute('src'); v.load(); } catch (_) {} try { actx && actx.close(); } catch (_) {} try { lock && lock.release(); } catch (_) {} URL.revokeObjectURL(url); };
   try {
+    try { if (navigator.wakeLock) lock = await navigator.wakeLock.request('screen'); } catch (_) {}   // que la pantalla no se apague a medias
     v.src = url; v.playsInline = true; v.preload = 'auto';
-    await new Promise((ok, no) => { v.onloadedmetadata = ok; v.onerror = no; setTimeout(no, 15000); });
-    const W = v.videoWidth, H = v.videoHeight, dur = v.duration;
-    if (!W || !H || !isFinite(dur) || dur <= 0) { cleanup(); return file; }
-    const sc = Math.min(1, 720 / Math.min(W, H));
-    const kbps = file.size * 8 / dur / 1000;
-    if (sc === 1 && (kbps < 2200 || file.size < 6 * 1048576)) { cleanup(); return file; }   // ya viene ligero
+    await new Promise((ok, no) => { v.onloadedmetadata = ok; v.onerror = no; setTimeout(no, 20000); });
+    const W = v.videoWidth, H = v.videoHeight, full = v.duration;
+    if (!W || !H || !isFinite(full) || full <= 0) { cleanup(); return file; }
+    const dur = o.maxSec ? Math.min(full, o.maxSec) : full;
+    const trimming = dur < full - 0.5;
+    const sc = Math.min(1, side / Math.min(W, H));
+    const kbps = file.size * 8 / full / 1000;
+    if (!o.force && !trimming && sc === 1 && (kbps < 2200 || file.size < 6 * 1048576)) { cleanup(); return file; }   // ya viene ligero
     const cw = Math.round(W * sc / 2) * 2, ch = Math.round(H * sc / 2) * 2;
     const c = document.createElement('canvas'); c.width = cw; c.height = ch;
     const g = c.getContext('2d');
     const stream = c.captureStream(30);
+    let withAudio = false;
     try {
       actx = new (window.AudioContext || window.webkitAudioContext)();
       const src = actx.createMediaElementSource(v), dest = actx.createMediaStreamDestination();
       src.connect(dest);   // el audio va a la grabación, no a la bocina
       dest.stream.getAudioTracks().forEach(t => stream.addTrack(t));
+      withAudio = true;
     } catch (_) {}
-    const rec = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 1500000, audioBitsPerSecond: 96000 });
+    if (actx && actx.state === 'suspended') await actx.resume().catch(() => {});
+    try { await v.play(); }
+    catch (_) { v.muted = true; await v.play(); }   // si no deja con sonido, al menos sin sonido
+    const rec = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: vbps, audioBitsPerSecond: withAudio ? 96000 : undefined });
     const chunks = [];
     rec.ondataavailable = (e) => { if (e.data && e.data.size) chunks.push(e.data); };
     const stopped = new Promise(r => { rec.onstop = r; });
+    let finish;
+    const done = new Promise(r => { finish = r; });
     const draw = () => {
       try { g.drawImage(v, 0, 0, cw, ch); } catch (_) {}
       if (onProgress) onProgress(Math.min(99, Math.round(v.currentTime / dur * 100)));
-      if (!v.ended) raf = v.requestVideoFrameCallback ? v.requestVideoFrameCallback(draw) : requestAnimationFrame(draw);
+      if (v.ended || v.currentTime >= dur) return finish(true);
+      raf = v.requestVideoFrameCallback ? v.requestVideoFrameCallback(draw) : requestAnimationFrame(draw);
     };
-    if (actx && actx.state === 'suspended') await actx.resume().catch(() => {});
-    await v.play();   // si el teléfono no deja reproducir, se sube el original
+    v.onended = () => finish(true);
     rec.start(1000);
     draw();
-    const ok = await Promise.race([new Promise(r => { v.onended = () => r(true); }), new Promise(r => setTimeout(() => r(false), dur * 1000 * 2.5 + 15000))]);
+    const ok = await Promise.race([done, new Promise(r => setTimeout(() => r(false), dur * 1000 * 3 + 20000))]);
+    try { v.pause(); } catch (_) {}
     rec.stop(); await stopped; cleanup();
     if (!ok) return file;
     const out = new Blob(chunks, { type: mime.split(';')[0] });
-    if (!out.size || out.size >= file.size * 0.9) return file;
+    if (!out.size || (!trimming && !o.force && out.size >= file.size * 0.9)) return file;
     if (onProgress) onProgress(100);
     return out;
   } catch (_) { cleanup(); return file; }
 }
+// Prepara un video para subirlo: lo achica y, si todavía pesa mucho, lo vuelve a achicar más
+async function prepVideo(file, onProgress, maxSec) {
+  let blob = await shrinkVideo(file, onProgress, { maxSec });
+  if (tooBig(blob)) blob = await shrinkVideo(file, onProgress, { maxSec, side: 480, vbps: 700000, force: true });
+  if (tooBig(blob) && !maxSec) blob = await shrinkVideo(file, onProgress, { maxSec: 90, side: 480, vbps: 600000, force: true });
+  return blob;
+}
+const SD_MAX_SEC = 60; // los sundowns duran hasta 1 minuto
 const videoExt = (blob, file) => blob !== file ? ((blob.type || '').includes('mp4') ? 'mp4' : 'webm') : (((file.name || '').split('.').pop() || 'mp4').toLowerCase().replace(/[^a-z0-9]/g, '') || 'mp4');
 function tooBig(blob) { return blob.size > MAX_UP_MB * 1048576; }
 async function compressImage(file, max = 1440) {
@@ -2939,8 +2961,8 @@ function startCreator(file, onDone, opts = {}) {
     shareBtn.disabled = true; shareBtn.textContent = 'Subiendo…';
     stopSong(); const endTrot = SFX.startUpload();
     try {
-      const blob = isVideo ? await shrinkVideo(file, (n) => { shareBtn.textContent = `Preparando video… ${n}%`; }) : await compressImage(file);
-      if (isVideo) { shareBtn.textContent = 'Subiendo…'; if (tooBig(blob)) throw new Error('El video es muy largo. Prueba con uno más corto.'); }
+      const blob = isVideo ? await prepVideo(file, (n) => { shareBtn.textContent = `Preparando video… ${n}%`; }, SD_MAX_SEC) : await compressImage(file);
+      if (isVideo) { shareBtn.textContent = 'Subiendo…'; if (tooBig(blob)) throw new Error('Tu teléfono no pudo achicar este video. Prueba con uno más corto (menos de 1 minuto).'); }
       const ext = isVideo ? videoExt(blob, file) : (blob.type === 'image/png' ? 'png' : 'jpg');
       const path = `${state.me.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
       const up = await sb.storage.from('media').upload(path, blob, { contentType: blob.type || file.type, cacheControl: '31536000' });
@@ -3436,7 +3458,7 @@ function renderUpload() {
     stopSong(); const endTrot = SFX.startUpload();
     try {
       const isVideo = file.type.startsWith('video/');
-      const blob = isVideo ? await shrinkVideo(file, (n) => { btn.textContent = `Preparando video… ${n}%`; }) : await compressImage(file);
+      const blob = isVideo ? await prepVideo(file, (n) => { btn.textContent = `Preparando video… ${n}%`; }, kind === 'sundown' ? SD_MAX_SEC : 0) : await compressImage(file);
       if (isVideo) { btn.textContent = 'Subiendo…'; if (tooBig(blob)) throw new Error('El video es muy largo. Prueba con uno más corto (menos de 3 minutos).'); }
       const ext = isVideo ? videoExt(blob, file) : (blob.type === 'image/gif' ? 'gif' : (blob.type === 'image/png' ? 'png' : 'jpg'));
       const path = `${state.me.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
@@ -5251,7 +5273,7 @@ async function renderChat() {
     if (!isVideo && !(file.type || '').startsWith('image/')) return toast('Solo se pueden mandar fotos o videos');
     if (file.size > MAX_VIDEO_MB * 1024 * 1024) return toast(`El video es muy pesado (máx. ${MAX_VIDEO_MB} MB)`);
     if (isVideo) toast('Preparando el video para mandarlo… no salgas del chat');
-    const blob = isVideo ? await shrinkVideo(file) : await compressImage(file, 1600);
+    const blob = isVideo ? await prepVideo(file) : await compressImage(file, 1600);
     if (isVideo && tooBig(blob)) return toast('El video es muy largo. Prueba con uno más corto.');
     const localUrl = URL.createObjectURL(blob);
     const tmp = { id: 'tmp' + Date.now(), sender_id: state.me.id, media_type: isVideo ? 'video' : 'image', localUrl, created_at: new Date().toISOString(), pending: true };
