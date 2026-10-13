@@ -166,6 +166,7 @@ textarea.input{min-height:90px;resize:vertical}
 .sd-head b{font-size:15px}
 .sd-head small{color:rgba(255,255,255,.75);font-size:13px;white-space:nowrap}
 .sd-head .sp{flex:1}
+.sd-who{display:flex;align-items:center;gap:10px;border:none;background:none;padding:0;color:inherit;font:inherit;text-align:left;cursor:pointer}
 .sd-zone{position:absolute;top:80px;bottom:90px;z-index:2;border:none;background:none;padding:0}
 .sd-zone.prev{left:0;width:33%}
 .sd-zone.next{right:0;width:67%}
@@ -424,7 +425,16 @@ textarea.input{min-height:90px;resize:vertical}
 .pf-apic{height:100px;background:#EFE6D4;display:flex;align-items:center;justify-content:center;font-size:44px}
 .pf-apic img{width:100%;height:100%;object-fit:cover}
 .pf-atxt{padding:8px 10px}.pf-atxt b{display:block;font-size:15px}.pf-atxt small{color:#4D6473;font-size:12px}
-.pf-tabs{display:flex;gap:8px;padding:10px 14px}
+.pf-tabs{display:flex;gap:8px;padding:10px 14px;position:sticky;top:calc(58px + env(safe-area-inset-top));z-index:3;background:var(--bg,#F5EFE3)}
+.pf-compose{margin:4px 14px 10px;background:#FFFDF8;border:1px solid #E8DCC6;border-radius:18px;padding:12px}
+.pf-compose-row{display:flex;align-items:center;gap:10px}
+.pf-think{flex:1;text-align:left;border:1px solid #E3D6BE;background:#F5EFE3;border-radius:22px;height:42px;padding:0 16px;font:inherit;font-size:15px;color:var(--muted);cursor:pointer}
+.pf-think-ph{border:none;background:none;font-size:24px;cursor:pointer;padding:4px}
+.pf-compose-acts{display:flex;gap:8px;margin-top:10px}
+.pf-compose-acts button{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;height:36px;border-radius:18px;border:1px solid #E3D6BE;background:#FFFDF8;font:inherit;font-size:13.5px;font-weight:700;color:var(--text);cursor:pointer}
+.pf-compose-acts svg{width:18px;height:18px}
+.pf-h2{display:flex;align-items:baseline;justify-content:space-between;padding:6px 16px 8px}.pf-h2 b{font-size:18px}.pf-h2 small{color:var(--muted)}
+.pf-feed .card{margin-left:0;margin-right:0}
 .pf-agrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 14px 20px}.pf-agrid .pf-acard{width:auto}
 .pf-pick{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;max-height:46vh;overflow-y:auto}
 .pf-pick-it{position:relative;aspect-ratio:9/16;border:none;padding:0;border-radius:8px;overflow:hidden;background:#000}
@@ -3148,8 +3158,9 @@ function openSundowns(groups, gi, onClose) {
       viewer.classList.toggle('sd-muted', SD_MUTED);
     } }) : null;
     viewer.classList.toggle('sd-muted', SD_MUTED && hasSound);
-    head.replaceChildren(...[avatar(g.user, 36),
-      h('div', {}, h('b', {}, g.user.username || ''), h('br'), h('small', {}, timeAgo(it.created_at))),
+    const toProfile = () => { const uid = g.user.id || it.user_id; close(); go('profile', { profileId: uid }); };
+    head.replaceChildren(...[h('button', { class: 'sd-who', 'aria-label': 'Ver perfil de ' + (g.user.username || ''), onclick: (e) => { e.stopPropagation(); toProfile(); } }, avatar(g.user, 36),
+      h('div', {}, h('b', {}, g.user.username || ''), h('br'), h('small', {}, timeAgo(it.created_at)))),
       h('div', { class: 'sp' }),
       muteBtn,
       pauseBtn,
@@ -3794,13 +3805,33 @@ async function renderProfile() {
     h('div', { class: 'pf-arow' }, ...animals.map(card),
       isMe && h('button', { class: 'pf-acard add', onclick: () => editAnimal(null) }, h('div', { class: 'pf-apic' }, h('span', {}, '＋')), h('div', { class: 'pf-atxt' }, h('b', {}, 'Agregar'), h('small', {}, 'caballo, vaca…'))))) : null;
 
-  // Pestañas
+  // Pestañas (como Facebook: Todo muestra las publicaciones completas, para reaccionar y comentar ahí mismo)
   const box = h('div');
-  let tab = 'post';
+  let tab = state.pfTab && state.pfTabFor === id ? state.pfTab : 'all';
   const tabsEl = h('div', { class: 'pf-tabs' });
+  const composer = isMe ? h('div', { class: 'pf-compose' },
+    h('div', { class: 'pf-compose-row' }, avatar(prof, 40),
+      h('button', { class: 'pf-think', onclick: () => { state.uploadKind = 'post'; go('upload'); } }, '¿Qué está pasando en el rancho?'),
+      h('button', { class: 'pf-think-ph', 'aria-label': 'Subir foto', onclick: () => { state.uploadKind = 'post'; go('upload'); } }, '🖼️')),
+    h('div', { class: 'pf-compose-acts' },
+      h('button', { onclick: () => { state.uploadKind = 'ride'; go('upload'); } }, h('span', { icon: 'horseshoe' }), 'Ride'),
+      h('button', { onclick: () => openSundownCreator(() => render()) }, '🌅 Sundown'),
+      HAS_ANIMALS ? h('button', { onclick: () => editAnimal(null) }, '🐴 Animal') : null)) : null;
   const paintTabs = () => {
-    tabsEl.replaceChildren(...[['post', 'Publicaciones'], ['ride', 'Rides'], ['animals', 'Animales']].filter(([k]) => k !== 'animals' || HAS_ANIMALS).map(([k, l]) =>
+    state.pfTab = tab; state.pfTabFor = id;
+    tabsEl.replaceChildren(...[['all', 'Todo'], ['post', 'Fotos'], ['ride', 'Rides'], ['animals', 'Animales']].filter(([k]) => k !== 'animals' || HAS_ANIMALS).map(([k, l]) =>
       h('button', { class: 'chip' + (tab === k ? ' on' : ''), onclick: () => { tab = k; paintTabs(); } }, l)));
+    if (tab === 'all') {
+      const list = posts.filter(p => (p.kind || 'post') !== 'sundown');
+      if (!list.length) return box.replaceChildren(composer || '', h('div', { class: 'empty' }, isMe ? 'Aún no subes nada. Escribe arriba tu primera publicación.' : 'Todavía no ha publicado nada.'));
+      const feed = h('div', { class: 'pf-feed' });
+      let shown = 0;
+      const more = h('button', { class: 'btn ghost', style: 'width:calc(100% - 28px);margin:6px 14px 18px' }, 'Ver más publicaciones');
+      const page = () => { list.slice(shown, shown + 8).forEach(p => feed.append(postCard(p, () => render()))); shown += 8; more.hidden = shown >= list.length; };
+      more.onclick = page;
+      page();
+      return box.replaceChildren(composer || '', h('div', { class: 'pf-h2' }, h('b', {}, 'Todas las publicaciones'), h('small', {}, list.length + (list.length === 1 ? ' publicación' : ' publicaciones'))), feed, more);
+    }
     if (tab === 'animals') box.replaceChildren(animals.length ? h('div', { class: 'pf-agrid' }, animals.map(card)) : h('div', { class: 'empty' }, isMe ? 'Agrega a tus animales con el botón de arriba.' : 'Todavía no tiene animales.'));
     else box.replaceChildren(gridOf(posts.filter(p => (p.kind || 'post') === tab), tab === 'ride'
       ? (isMe ? 'Aún no subes Rides. Toca el + y elige "Ride".' : 'Todavía no tiene Rides.')
