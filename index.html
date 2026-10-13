@@ -996,6 +996,10 @@ form.locked .vr{right:0}
 .vr-lock{position:fixed;z-index:80;width:44px;height:84px;border-radius:22px;background:#FFFDF8;border:1px solid #E3D6BE;box-shadow:0 6px 20px rgba(23,37,49,.25);display:flex;flex-direction:column;align-items:center;justify-content:space-around;font-size:18px;animation:mcup .2s ease}
 .vr-lock i{font-style:normal;color:var(--muted);animation:vrb 1s infinite}
 .vr-lock.near{background:#F3E4C6;transform:translateY(-8px)}
+.ph-lead{margin:0 0 12px;line-height:1.45}
+.ph-step{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px}
+.ph-step span{flex:0 0 28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#F3BD68,#C7843B);color:#172531;font-weight:800;display:flex;align-items:center;justify-content:center}
+.ph-step p{margin:3px 0 0;line-height:1.4;font-size:15px}
 .mc-empty{text-align:center;color:var(--muted);margin:auto}
 .mc-form .send{width:44px;height:44px;border-radius:22px;border:none;background:linear-gradient(135deg,#F3BD68,#C7843B);color:#172531;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .mc-form .send:disabled{opacity:.5}
@@ -4722,8 +4726,9 @@ async function enablePush(quiet) {
   try {
     if (Notification.permission !== 'granted') {
       if (quiet) return false;
+      if (Notification.permission === 'denied') { permHelp('push', () => enablePush()); return false; }
       const r = await Notification.requestPermission();
-      if (r !== 'granted') { toast(r === 'denied' ? 'Bloqueaste los avisos. Actívalos en los ajustes del navegador.' : 'No se activaron los avisos'); return false; }
+      if (r !== 'granted') { if (r === 'denied') permHelp('push', () => enablePush()); else toast('No se activaron los avisos'); return false; }
     }
     const reg = await navigator.serviceWorker.ready;
     let sub = await reg.pushManager.getSubscription();
@@ -5252,6 +5257,46 @@ function voicePlayer(src, dur) {
   return el;
 }
 // Barra de grabación: reemplaza al cuadro de texto mientras grabas
+// ---------- Si alguien dijo "No permitir" y luego sí quiere ----------
+// El teléfono ya no vuelve a preguntar, así que explicamos cómo activarlo a mano según el teléfono.
+function permHelp(kind, retry) {
+  const isMic = kind === 'mic';
+  const what = isMic ? 'Micrófono' : 'Notificaciones';
+  const ua = navigator.userAgent || '';
+  const ios = /iPhone|iPad|iPod/i.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+  const installed = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone;
+  const step = (n, txt) => h('div', { class: 'ph-step' }, h('span', {}, String(n)), h('p', {}, ...txt));
+  const B = (t) => h('b', {}, t);
+  const steps = ios ? (isMic ? [
+      step(1, ['Abre ', B('Ajustes'), ' del iPhone (el engrane ⚙️).']),
+      step(2, ['Baja y toca ', B('Safari'), '.']),
+      step(3, ['Toca ', B('Micrófono'), ' y escoge ', B('Preguntar'), ' o ', B('Permitir'), '.']),
+      step(4, ['Cierra Ranchfolk por completo y vuelve a abrirla.'])] : [
+      step(1, ['Abre ', B('Ajustes'), ' del iPhone (el engrane ⚙️).']),
+      step(2, ['Baja hasta ', B('Notificaciones'), ' y busca ', B('Ranchfolk'), '.']),
+      step(3, ['Activa ', B('Permitir notificaciones'), '.'])])
+    : installed ? [
+      step(1, ['Sal de Ranchfolk y ', B('deja presionado el ícono'), ' de la app en tu pantalla.']),
+      step(2, ['Toca ', B('Información de la app'), ' (la ⓘ).']),
+      step(3, ['Entra a ', B('Permisos'), ' (o ', B('Configuración del sitio'), ').']),
+      step(4, ['Toca ', B(what), ' y escoge ', B('Permitir'), '.']),
+      step(5, ['Vuelve a abrir Ranchfolk.'])]
+    : [
+      step(1, ['Arriba, junto a la dirección de la página, toca el ', B('candadito 🔒'), ' o el ícono de ajustes.']),
+      step(2, ['Toca ', B('Permisos'), ' (o ', B('Configuración del sitio'), ').']),
+      step(3, ['Busca ', B(what), ' y escoge ', B('Permitir'), '.']),
+      step(4, ['Recarga la página.'])];
+  const close = openSheet(isMic ? '🎤 Activa el micrófono' : '🔔 Activa los avisos', h('div', { class: 'sheet-body ph' },
+    h('p', { class: 'ph-lead' }, isMic ? 'Le dijiste al teléfono que no usara el micrófono, por eso no se pueden grabar notas de voz. Se arregla así:' : 'Le dijiste al teléfono que no mostrara avisos de Ranchfolk. Se arregla así:'),
+    ...steps,
+    !ios && installed ? h('p', { class: 'hint', style: 'margin:4px 0 12px' }, 'Si no aparece ahí: abre ', B('Chrome'), ' › ⋮ › ', B('Configuración'), ' › ', B('Configuración de sitios'), ' › ', B(what), ' y quita a ', B('jaibo2026.github.io'), ' de la lista de bloqueados.') : null,
+    h('button', { class: 'btn pf-gold', style: 'width:100%;margin-top:6px', onclick: async () => { close(); if (retry) retry(); } }, 'Ya lo activé, probar otra vez'),
+    h('button', { class: 'btn ghost', style: 'width:100%;margin-top:8px', onclick: () => close() }, 'Ahora no')));
+}
+async function micBlocked() {
+  try { if (navigator.permissions) { const st = await navigator.permissions.query({ name: 'microphone' }); return st.state === 'denied'; } } catch (_) {}
+  return false;
+}
 // Notas de voz como WhatsApp: mantén presionado el micrófono para grabar, suelta para enviar,
 // desliza a la izquierda para cancelar o hacia arriba para dejarlo grabando sin el dedo (🔒).
 let MIC_OK = false; // ya dieron permiso del micrófono en esta sesión
@@ -5264,7 +5309,14 @@ function holdToRecord(mic, host, onDone, canStart) {
     if (!navigator.mediaDevices || !window.MediaRecorder) { toast('Tu teléfono no permite grabar notas de voz aquí'); return null; }
     let stream;
     try { stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); }
-    catch (_) { toast('Necesitas dar permiso al micrófono para mandar notas de voz'); return null; }
+    catch (err) {
+      downAt = 0;
+      const name = (err && err.name) || '';
+      if (name === 'NotAllowedError' || name === 'SecurityError' || await micBlocked()) permHelp('mic', () => toast('Ahora mantén presionado 🎤 para grabar'));
+      else if (name === 'NotFoundError') toast('No encontramos el micrófono del teléfono');
+      else toast('No se pudo usar el micrófono. Cierra otras apps que lo estén usando.');
+      return null;
+    }
     const firstTime = !MIC_OK; MIC_OK = true;
     // La primera vez el teléfono pregunta el permiso: si ya soltaste el dedo, no grabamos todavía
     if (firstTime && !downAt) { stream.getTracks().forEach(t => t.stop()); toast('¡Listo! Ahora mantén presionado 🎤 para grabar'); return null; }
