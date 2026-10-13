@@ -977,6 +977,25 @@ html,body{background:#F5EFE3!important;background-image:none!important;color:#17
 .emo-grid button{border:none;background:none;font-size:26px;line-height:1;padding:6px 0;border-radius:10px;cursor:pointer}.emo-grid button:active{background:#F3E4C6;transform:scale(1.15)}
 .mc-panel .emo-grid{max-height:150px;grid-template-columns:repeat(7,1fr)}
 .cmt-foot .emo-wrap .input{width:100%}
+.vp-mid{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.vp-mid .vp-wave{flex:0 0 28px}.vp-mid .vp-t{text-align:left;font-size:11.5px}
+.vp-sp{flex:0 0 auto;border:none;border-radius:12px;padding:3px 8px;font:inherit;font-size:12px;font-weight:800;background:rgba(255,255,255,.2);color:inherit;cursor:pointer}
+.msg.them .vp-sp,.mc-msg:not(.me) .vp-sp{background:#F3E4C6;color:#172531}
+.send.mic{touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;transition:transform .15s}
+.send.mic.rec{transform:scale(1.35);background:#C2183A!important;color:#fff!important;box-shadow:0 0 0 8px rgba(194,24,58,.18)}
+form.recording{position:relative}
+form.recording>*:not(.mic):not(.vr){visibility:hidden}
+form.recording .mic{display:flex!important}
+form.recording .vr .vr-t{position:relative;z-index:1;background:inherit;padding-right:8px}
+.vr.hold{overflow:hidden}
+form.recording .vr{position:absolute;left:0;top:0;bottom:0;right:64px;margin:0;max-width:none;padding:0 10px;background:#F5EFE3;border-radius:0;z-index:2}
+.mc-form.recording .vr{background:#FFFDF8}
+form.locked .mic{visibility:hidden}
+form.locked .vr{right:0}
+.vr [hidden]{display:none!important}
+.vr .vr-hint{transition:transform .05s}
+.vr-lock{position:fixed;z-index:80;width:44px;height:84px;border-radius:22px;background:#FFFDF8;border:1px solid #E3D6BE;box-shadow:0 6px 20px rgba(23,37,49,.25);display:flex;flex-direction:column;align-items:center;justify-content:space-around;font-size:18px;animation:mcup .2s ease}
+.vr-lock i{font-style:normal;color:var(--muted);animation:vrb 1s infinite}
+.vr-lock.near{background:#F3E4C6;transform:translateY(-8px)}
 .mc-empty{text-align:center;color:var(--muted);margin:auto}
 .mc-form .send{width:44px;height:44px;border-radius:22px;border:none;background:linear-gradient(135deg,#F3BD68,#C7843B);color:#172531;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .mc-form .send:disabled{opacity:.5}
@@ -4888,7 +4907,7 @@ async function openMiniChat(prof) {
   const input = h('textarea', { class: 'input', rows: 1, maxlength: '2000', placeholder: 'Escribe un mensaje…', 'aria-label': 'Mensaje' });
   const send = h('button', { class: 'send', type: 'submit', 'aria-label': 'Enviar', icon: 'send', disabled: true });
   const blockedNow = state.blocked && state.blocked.has(prof.id);
-  const mic = h('button', { class: 'send mic', type: 'button', 'aria-label': 'Grabar nota de voz', icon: 'mic', onclick: () => { if (mini.conv) recordVoice(form, sendVoice); } });
+  const mic = h('button', { class: 'send mic', type: 'button', 'aria-label': 'Mantén presionado para grabar una nota de voz', icon: 'mic' });
   if (blockedNow) { input.disabled = true; mic.disabled = true; input.placeholder = 'Bloqueaste a esta persona'; }
   const grow = () => { input.style.height = 'auto'; input.style.height = Math.min(96, input.scrollHeight) + 'px'; const has = !!input.value.trim(); send.disabled = !has || blockedNow; send.hidden = !has; mic.hidden = has; };
   send.hidden = true;
@@ -4896,6 +4915,7 @@ async function openMiniChat(prof) {
   input.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && !('ontouchstart' in window)) { e.preventDefault(); submit(); } });
   const memo = emojiButton(input);
   const form = h('form', { class: 'mc-form', onsubmit: (e) => { e.preventDefault(); submit(); } }, h('div', { class: 'emo-wrap' }, input, memo), send, mic);
+  holdToRecord(mic, form, (b, sec) => sendVoice(b, sec), () => !!mini.conv);
   const full = () => { const conv = mini.conv; close(true); HEADS.delete(prof.id); paintHeads(); state.chat = { id: conv, other: prof }; go('chat'); };
   const panel = h('div', { class: 'mc-panel', role: 'dialog', 'aria-label': 'Chat con ' + (prof.username || '') },
     h('div', { class: 'mc-head' },
@@ -5205,7 +5225,9 @@ function voicePlayer(src, dur) {
   const wave = h('span', { class: 'vp-wave' }, ...Array.from({ length: bars }, (_, i) => { const v = 0.3 + 0.7 * Math.abs(Math.sin((i + 1) * 1.7 + seed)); return h('i', { style: 'height:' + Math.round(v * 100) + '%' }); }));
   const time = h('span', { class: 'vp-t' }, mmss(dur));
   const btn = h('button', { class: 'vp-btn', type: 'button', 'aria-label': 'Escuchar nota de voz' }, '▶');
-  const el = h('div', { class: 'vp' }, btn, wave, time);
+  const SPEEDS = [1, 1.5, 2]; let sp = 0;
+  const speed = h('button', { class: 'vp-sp', type: 'button', 'aria-label': 'Velocidad', onclick: (e) => { e.stopPropagation(); sp = (sp + 1) % SPEEDS.length; speed.textContent = SPEEDS[sp] + '×'; if (a) a.playbackRate = SPEEDS[sp]; } }, '1×');
+  const el = h('div', { class: 'vp' }, btn, h('div', { class: 'vp-mid' }, wave, time), speed);
   if (!src) { btn.disabled = true; return el; }
   let a = null;
   const paintP = () => {
@@ -5224,41 +5246,97 @@ function voicePlayer(src, dur) {
       a.addEventListener('play', () => { btn.textContent = '❚❚'; });
       a.addEventListener('error', () => toast('No se pudo reproducir la nota de voz'));
     }
-    if (a.paused) { if (VOICE_NOW && VOICE_NOW !== a) VOICE_NOW.pause(); VOICE_NOW = a; a.play().catch(() => {}); } else a.pause();
+    if (a.paused) { if (VOICE_NOW && VOICE_NOW !== a) VOICE_NOW.pause(); VOICE_NOW = a; a.playbackRate = SPEEDS[sp]; a.play().catch(() => {}); } else a.pause();
   };
   wave.onclick = (e) => { e.stopPropagation(); if (!a || !isFinite(a.duration)) return; const r = wave.getBoundingClientRect(); a.currentTime = a.duration * Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)); paintP(); };
   return el;
 }
 // Barra de grabación: reemplaza al cuadro de texto mientras grabas
-async function recordVoice(host, onDone) {
-  if (!navigator.mediaDevices || !window.MediaRecorder) return toast('Tu teléfono no permite grabar notas de voz aquí');
-  let stream;
-  try { stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); }
-  catch (_) { return toast('Necesitas dar permiso al micrófono para mandar notas de voz'); }
-  const type = ['audio/webm;codecs=opus', 'audio/mp4', 'audio/webm', 'audio/ogg;codecs=opus'].find(t => MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) || '';
-  let rec;
-  try { rec = new MediaRecorder(stream, type ? { mimeType: type, audioBitsPerSecond: 32000 } : {}); } catch (_) { stream.getTracks().forEach(t => t.stop()); return toast('No se pudo empezar a grabar'); }
-  const chunks = []; let cancelled = false; const t0 = Date.now();
-  rec.ondataavailable = (e) => { if (e.data && e.data.size) chunks.push(e.data); };
-  const clock = h('span', { class: 'vr-t' }, '0:00');
-  const bar = h('div', { class: 'vr' },
-    h('button', { class: 'vr-x', type: 'button', 'aria-label': 'Cancelar nota de voz', onclick: () => { cancelled = true; stop(); } }, '🗑️'),
-    h('span', { class: 'vr-dot' }), clock, h('span', { class: 'vr-hint' }, 'Grabando…'),
-    h('button', { class: 'send', type: 'button', 'aria-label': 'Mandar nota de voz', icon: 'send', onclick: () => stop() }));
-  host.hidden = true; host.after(bar);
-  try { navigator.vibrate && navigator.vibrate(20); } catch (_) {}
-  const tick = setInterval(() => { const s = (Date.now() - t0) / 1000; clock.textContent = mmss(s); if (s >= VOICE_MAX) stop(); }, 250);
-  function stop() { clearInterval(tick); if (rec.state !== 'inactive') rec.stop(); }
-  rec.onstop = () => {
-    stream.getTracks().forEach(t => t.stop());
-    bar.remove(); host.hidden = false;
-    const secs = Math.round((Date.now() - t0) / 1000);
-    if (cancelled) return;
-    if (secs < 1 || !chunks.length) return toast('Deja grabando un poco más para mandar la nota');
-    const blob = new Blob(chunks, { type: (rec.mimeType || type || 'audio/webm').split(';')[0] });
-    onDone(blob, secs);
+// Notas de voz como WhatsApp: mantén presionado el micrófono para grabar, suelta para enviar,
+// desliza a la izquierda para cancelar o hacia arriba para dejarlo grabando sin el dedo (🔒).
+let MIC_OK = false; // ya dieron permiso del micrófono en esta sesión
+const VOICE_TYPE = () => ['audio/webm;codecs=opus', 'audio/mp4', 'audio/webm', 'audio/ogg;codecs=opus'].find(t => window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) || '';
+function holdToRecord(mic, host, onDone, canStart) {
+  let session = null; // grabación en curso
+  let downAt = 0, sx = 0, sy = 0, pid = null;
+  const vib = (n) => { try { navigator.vibrate && navigator.vibrate(n); } catch (_) {} };
+  async function begin() {
+    if (!navigator.mediaDevices || !window.MediaRecorder) { toast('Tu teléfono no permite grabar notas de voz aquí'); return null; }
+    let stream;
+    try { stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); }
+    catch (_) { toast('Necesitas dar permiso al micrófono para mandar notas de voz'); return null; }
+    const firstTime = !MIC_OK; MIC_OK = true;
+    // La primera vez el teléfono pregunta el permiso: si ya soltaste el dedo, no grabamos todavía
+    if (firstTime && !downAt) { stream.getTracks().forEach(t => t.stop()); toast('¡Listo! Ahora mantén presionado 🎤 para grabar'); return null; }
+    const type = VOICE_TYPE();
+    let rec;
+    try { rec = new MediaRecorder(stream, type ? { mimeType: type, audioBitsPerSecond: 32000 } : {}); } catch (_) { stream.getTracks().forEach(t => t.stop()); toast('No se pudo empezar a grabar'); return null; }
+    const chunks = [], t0 = Date.now();
+    rec.ondataavailable = (e) => { if (e.data && e.data.size) chunks.push(e.data); };
+    const clock = h('span', { class: 'vr-t' }, '0:00');
+    const slide = h('span', { class: 'vr-hint' }, '‹ Desliza para cancelar');
+    const lockHint = h('div', { class: 'vr-lock' }, h('span', {}, '🔒'), h('i', {}, '⌃'));
+    const trash = h('button', { class: 'vr-x', type: 'button', 'aria-label': 'Cancelar nota de voz', hidden: true, onclick: () => end('cancel') }, '🗑️');
+    const sendB = h('button', { class: 'send', type: 'button', 'aria-label': 'Mandar nota de voz', icon: 'send', hidden: true, onclick: () => end('send') });
+    const bar = h('div', { class: 'vr hold' }, trash, h('span', { class: 'vr-dot' }), clock, slide, sendB);
+    host.classList.add('recording'); host.append(bar); document.body.append(lockHint);
+    const r = mic.getBoundingClientRect();
+    Object.assign(lockHint.style, { left: (r.left + r.width / 2 - 22) + 'px', top: (r.top - 92) + 'px' });
+    vib(30);
+    const tick = setInterval(() => { const sec = (Date.now() - t0) / 1000; clock.textContent = mmss(sec); if (sec >= VOICE_MAX) end('send'); }, 200);
+    let finished = false;
+    function end(how) {
+      if (finished) return; finished = true;
+      clearInterval(tick); lockHint.remove();
+      rec.onstop = () => {
+        stream.getTracks().forEach(t => t.stop());
+        bar.remove(); host.classList.remove('recording', 'locked'); mic.classList.remove('rec');
+        const secs = Math.round((Date.now() - t0) / 1000);
+        if (how === 'cancel') { vib([20, 40, 20]); return; }
+        if (secs < 1 || !chunks.length) return toast('Mantén presionado 🎤 para grabar y suelta para enviar');
+        onDone(new Blob(chunks, { type: (rec.mimeType || type || 'audio/webm').split(';')[0] }), secs);
+      };
+      if (rec.state !== 'inactive') rec.stop(); else rec.onstop();
+    }
+    function lock() {
+      if (session.locked) return; session.locked = true; vib(25);
+      lockHint.remove(); slide.textContent = 'Grabando…'; slide.style.transform = ''; slide.style.opacity = ''; trash.hidden = false; sendB.hidden = false; bar.classList.remove('hold'); mic.classList.remove('rec'); host.classList.add('locked');
+    }
+    function drag(dx, dy) {
+      if (session.locked) return;
+      slide.style.transform = `translateX(${Math.max(-90, Math.min(0, dx))}px)`; slide.style.opacity = String(Math.max(0.2, 1 + dx / 140));
+      lockHint.classList.toggle('near', dy < -40);
+      if (dx < -120) end('cancel');
+      else if (dy < -80) lock();
+    }
+    rec.start(250);
+    mic.classList.add('rec');
+    return (session = { end, lock, drag, locked: false, get done() { return finished; } });
+  }
+  mic.addEventListener('contextmenu', (e) => e.preventDefault());
+  mic.addEventListener('pointerdown', async (e) => {
+    if (mic.disabled || (canStart && !canStart())) return;
+    e.preventDefault();
+    if (session && !session.done) return;
+    downAt = Date.now(); sx = e.clientX; sy = e.clientY; pid = e.pointerId;
+    try { mic.setPointerCapture(pid); } catch (_) {}
+    session = null;
+    const sess = await begin();
+    if (sess && !downAt && !sess.locked) {  // soltaste antes de que empezara: si fue un toquecito, avisamos
+      sess.end('cancel'); toast('Mantén presionado 🎤 para grabar y suelta para enviar');
+    }
+  });
+  mic.addEventListener('pointermove', (e) => { if (session && downAt && !session.done) session.drag(e.clientX - sx, e.clientY - sy); });
+  const up = () => {
+    const held = Date.now() - downAt; downAt = 0;
+    try { pid != null && mic.releasePointerCapture(pid); } catch (_) {}
+    if (!session || session.done || session.locked) return;
+    if (held < 350) { session.end('cancel'); toast('Mantén presionado 🎤 para grabar y suelta para enviar'); return; }
+    session.end('send');
   };
-  rec.start(250);
+  mic.addEventListener('pointerup', up);
+  mic.addEventListener('pointercancel', () => { downAt = 0; if (session && !session.done && !session.locked) session.end('cancel'); });
+  mic.addEventListener('click', (e) => e.preventDefault());
 }
 const voiceExt = (blob) => /mp4|aac|m4a/.test(blob.type) ? 'm4a' : /ogg/.test(blob.type) ? 'ogg' : 'webm';
 function openMediaViewer(src, type) {
@@ -5282,9 +5360,10 @@ async function renderChat() {
   const send = h('button', { class: 'send', type: 'submit', 'aria-label': 'Enviar', icon: 'send', disabled: true });
   const picker = h('input', { type: 'file', accept: 'image/*,video/*', hidden: true });
   const attach = h('button', { class: 'attach', type: 'button', 'aria-label': 'Mandar foto o video', icon: 'camera', onclick: () => picker.click() });
-  const mic = h('button', { class: 'send mic', type: 'button', 'aria-label': 'Grabar nota de voz', icon: 'mic', onclick: () => recordVoice(form, sendVoice) });
+  const mic = h('button', { class: 'send mic', type: 'button', 'aria-label': 'Mantén presionado para grabar una nota de voz', icon: 'mic' });
   const emo = emojiButton(input);
   const form = h('form', { onsubmit: (e) => { e.preventDefault(); submit(); } }, attach, picker, h('div', { class: 'emo-wrap' }, input, emo), send, mic);
+  holdToRecord(mic, form, (b, sec) => sendVoice(b, sec));
   $app.append(box, h('div', { class: 'composer' }, form));
   const blockedNow = state.blocked && state.blocked.has(other.id);
   if (blockedNow) { input.disabled = true; attach.disabled = true; mic.disabled = true; emo.disabled = true; input.placeholder = 'Bloqueaste a esta persona'; }
