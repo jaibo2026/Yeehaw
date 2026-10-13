@@ -935,6 +935,48 @@ html,body{background:#F5EFE3!important;background-image:none!important;color:#17
 .cmt-replying{display:flex;align-items:center;justify-content:space-between;font-size:13px;color:var(--muted);padding:0 4px 8px}
 .cmt-replying button{border:none;background:none;font-size:15px;padding:2px 6px;cursor:pointer;color:var(--muted)}
 .mi-emo{font-size:18px;width:24px;text-align:center}
+.ib{background:#F5EFE3}
+.ib-top .ib-title{display:flex;flex-direction:column;align-items:center;line-height:1.1}
+.ib-title b{font-family:Rye,serif;font-size:22px;color:#F3BD68;font-weight:400}.ib-title small{font-size:12px;color:#C9D3DA}
+.ib-sbox{padding:12px 14px 6px}
+.ib-search{width:100%;height:44px;border-radius:22px;border:1px solid #E3D6BE;background:#FFFDF8;padding:0 18px;font:inherit;font-size:15px;color:var(--text);outline:none}
+.ib-search:focus{border-color:#C7843B;box-shadow:0 0 0 3px rgba(243,189,104,.25)}
+.ib-people{display:flex;gap:14px;overflow-x:auto;padding:10px 14px 14px;scrollbar-width:none}
+.ib-people::-webkit-scrollbar{display:none}
+.ib-person{flex:0 0 auto;width:72px;border:none;background:none;padding:0;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer}
+.ib-person small{font-size:12.5px;color:var(--text);max-width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ib-ring{position:relative;display:flex;padding:3px;border-radius:50%;border:2.5px solid #E3D6BE;background:#FFFDF8}
+.ib-ring.new{border-color:transparent;background:linear-gradient(#FFFDF8,#FFFDF8) padding-box,conic-gradient(#F3BD68,#C7843B,#C2183A,#F3BD68) border-box}
+.ib-plus{position:absolute;right:-2px;bottom:-2px;width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#F3BD68,#C7843B);color:#172531;font-weight:800;font-size:18px;line-height:20px;text-align:center;border:2.5px solid #F5EFE3}
+.ib-on{position:absolute;right:2px;bottom:2px;width:15px;height:15px;border-radius:50%;background:#2FBF4F;border:2.5px solid #F5EFE3}
+.av-act{position:relative;display:inline-flex;flex:0 0 auto}.av-act .ib-on{right:0;bottom:0}
+.ib-head{display:flex;align-items:center;justify-content:space-between;padding:6px 16px 4px;border-top:1px solid #E8DCC6}
+.ib-head b{font-size:18px}
+.ib-chips{display:flex;gap:6px}.ib-chips button{border:1px solid #E3D6BE;background:#FFFDF8;border-radius:16px;padding:5px 12px;font:inherit;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer}
+.ib-chips button.on{background:#172531;border-color:#172531;color:#F3BD68}
+.ib-row{width:100%;display:flex;align-items:center;gap:13px;padding:10px 16px;border:none;background:none;text-align:left;cursor:pointer}
+.ib-row:active{background:#EFE5D3}
+.ib-row .who{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.ib-row .who b{font-size:15.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ib-row .who span{color:var(--muted);font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ib-row.unread .who b{font-weight:800}.ib-row.unread .who span{color:var(--text);font-weight:700}
+.ib-n{min-width:22px;height:22px;padding:0 6px;border-radius:11px;background:#C2183A;color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ib-cam{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--muted);flex-shrink:0}.ib-cam svg{width:22px;height:22px}
+.ib-go{font-size:13px;font-weight:800;color:#C7843B;flex-shrink:0}
+.chat-who{display:flex;flex-direction:column;line-height:1.15;text-align:left}.chat-who b{font-size:15.5px}.chat-who small{font-size:12px;color:#9FE0AE;font-weight:600}
+/* Emojis */
+.emo-wrap{flex:1;min-width:0;position:relative;display:flex}
+.emo-wrap textarea,.emo-wrap input{flex:1;width:100%;padding-right:46px!important}
+.emo-btn{position:absolute;right:4px;bottom:50%;transform:translateY(50%);width:38px;height:38px;border:none;background:none;border-radius:50%;font-size:22px;line-height:1;cursor:pointer;filter:grayscale(.15)}
+.composer .emo-btn{bottom:4px;transform:none}
+.emo-btn.on{background:rgba(243,189,104,.25)}
+.emo-panel{background:#FFFDF8;border-top:1px solid #E3D6BE;max-width:520px;margin:0 auto}
+.emo-tabs{display:flex;gap:2px;padding:6px 8px 2px;border-bottom:1px solid #F0E7D6;overflow-x:auto}
+.emo-tabs button{border:none;background:none;font-size:20px;padding:6px 10px;border-radius:12px;cursor:pointer}.emo-tabs button.on{background:#F3E4C6}
+.emo-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:2px;padding:6px 8px 8px;max-height:200px;overflow-y:auto}
+.emo-grid button{border:none;background:none;font-size:26px;line-height:1;padding:6px 0;border-radius:10px;cursor:pointer}.emo-grid button:active{background:#F3E4C6;transform:scale(1.15)}
+.mc-panel .emo-grid{max-height:150px;grid-template-columns:repeat(7,1fr)}
+.cmt-foot .emo-wrap .input{width:100%}
 .mc-empty{text-align:center;color:var(--muted);margin:auto}
 .mc-form .send{width:44px;height:44px;border-radius:22px;border:none;background:linear-gradient(135deg,#F3BD68,#C7843B);color:#172531;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .mc-form .send:disabled{opacity:.5}
@@ -1232,7 +1274,27 @@ async function loadMe() {
   try { await loadFollowing(); } catch (_) {}
   state.isAdmin = false;
   sb.rpc('is_admin').then(({ data }) => { state.isAdmin = data === true; }, () => {});
+  heartbeat();
 }
+// "Activo(a) ahora": cada pocos minutos avisamos que sigues en la app
+let HAS_SEEN = true, LAST_BEAT = 0;
+function heartbeat() {
+  if (!HAS_SEEN || !state.me || isGuest() || document.hidden || Date.now() - LAST_BEAT < 240000) return;
+  LAST_BEAT = Date.now();
+  sb.from('profiles').update({ last_seen: new Date().toISOString() }).eq('id', state.me.id).then(({ error }) => { if (error && /last_seen|column/i.test(error.message || '')) HAS_SEEN = false; }, () => {});
+}
+setInterval(heartbeat, 60000);
+document.addEventListener('visibilitychange', heartbeat);
+function activeLabel(ts) {
+  if (!ts) return null;
+  const m = (Date.now() - new Date(ts).getTime()) / 60000;
+  if (m < 6) return 'Activo(a) ahora';
+  if (m < 60) return `Activo(a) hace ${Math.round(m)} min`;
+  if (m < 24 * 60) return `Activo(a) hace ${Math.round(m / 60)} h`;
+  if (m < 48 * 60) return 'Activo(a) ayer';
+  return null;
+}
+const isOnline = (ts) => ts && Date.now() - new Date(ts).getTime() < 6 * 60000;
 // ---------- Seguir a personas ----------
 let HAS_FOLLOW = true;
 state.following = new Set();
@@ -2207,6 +2269,7 @@ async function openComments(p, onChange) {
       input.focus(); const n = input.value.length; try { input.setSelectionRange(n, n); } catch (_) {}
     }
   };
+  const cemo = emojiButton(input);
   const foot = h('div', { class: 'sheet-foot cmt-foot' }, replyChip, h('form', { onsubmit: async (e) => {
     e.preventDefault();
     const text = input.value.trim(); if (!text) return;
@@ -2217,8 +2280,8 @@ async function openComments(p, onChange) {
     if (error && row.parent_id && /parent_id|column|schema/i.test(error.message || '')) { HAS_CREPLY = false; delete row.parent_id; ({ error } = await sb.from('comments').insert(row)); }
     send.disabled = false;
     if (error) return toast(/row-level|policy/i.test(error.message || '') && state.me.banned_until ? 'Tu cuenta está suspendida' : 'No se pudo enviar');
-    input.value = ''; const wasReply = !!replyTo; setReply(null); changed = true; load(!wasReply);
-  } }, input, send));
+    input.value = ''; cemo._close(); const wasReply = !!replyTo; setReply(null); changed = true; load(!wasReply);
+  } }, h('div', { class: 'emo-wrap' }, input, cemo), send));
   let changed = false;
   const closeSheet = openSheet('Comentarios', body, isGuest() ? h('div', { class: 'sheet-foot' }, h('button', { class: 'btn', onclick: () => { document.querySelectorAll('.sheet-bg').forEach(x => x.remove()); needLogin('Crea tu cuenta para comentar'); } }, 'Entra para comentar')) : foot);
   // al cerrar, avisa a la tarjeta para que actualice el número y la vista previa
@@ -4831,7 +4894,8 @@ async function openMiniChat(prof) {
   send.hidden = true;
   input.addEventListener('input', grow);
   input.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && !('ontouchstart' in window)) { e.preventDefault(); submit(); } });
-  const form = h('form', { class: 'mc-form', onsubmit: (e) => { e.preventDefault(); submit(); } }, input, send, mic);
+  const memo = emojiButton(input);
+  const form = h('form', { class: 'mc-form', onsubmit: (e) => { e.preventDefault(); submit(); } }, h('div', { class: 'emo-wrap' }, input, memo), send, mic);
   const full = () => { const conv = mini.conv; close(true); HEADS.delete(prof.id); paintHeads(); state.chat = { id: conv, other: prof }; go('chat'); };
   const panel = h('div', { class: 'mc-panel', role: 'dialog', 'aria-label': 'Chat con ' + (prof.username || '') },
     h('div', { class: 'mc-head' },
@@ -4971,14 +5035,21 @@ function shortTime(iso) {
   return timeAgo(iso).replace('hace ', '');
 }
 async function renderInbox() {
-  const main = h('main');
-  $app.append(h('header', { class: 'topbar' },
+  const main = h('main', { class: 'ib' });
+  const PROF_IB = PROF_MINI + ',last_seen';
+  const compose = () => { search.focus(); search.scrollIntoView({ block: 'center', behavior: 'smooth' }); };
+  $app.append(h('header', { class: 'topbar ib-top' },
     h('button', { class: 'iconbtn plain', 'aria-label': 'Regresar', icon: 'back', onclick: () => go('feed') }),
-    h('b', { style: 'font-size:18px' }, 'Mensajes'), h('div', { style: 'width:44px' })), main);
-  const search = h('input', { class: 'input', type: 'search', placeholder: 'Buscar a alguien para escribirle…', 'aria-label': 'Buscar persona' });
+    h('div', { class: 'ib-title' }, h('b', {}, 'Mensajes'), h('small', {}, '@' + (state.me.username || ''))),
+    h('button', { class: 'iconbtn plain', 'aria-label': 'Mensaje nuevo', icon: 'edit', onclick: compose })), main);
+  const search = h('input', { class: 'ib-search', type: 'search', placeholder: '🔍  Buscar o escribirle a alguien…', 'aria-label': 'Buscar persona' });
   const found = h('div');
+  const people = h('div', { class: 'ib-people' });
+  let filter = 'all';
+  const chips = h('div', { class: 'ib-chips' });
   const list = h('div', {}, h('div', { class: 'spinner' }));
-  main.append(pushCard() || '', h('div', { style: 'padding:12px 16px 4px' }, search), found, list);
+  main.append(pushCard() || '', h('div', { class: 'ib-sbox' }, search), found, people,
+    h('div', { class: 'ib-head' }, h('b', {}, 'Chats'), chips), list);
 
   let timer;
   search.addEventListener('input', () => {
@@ -4986,17 +5057,22 @@ async function renderInbox() {
     timer = setTimeout(async () => {
       const q = search.value.trim().replace(/[%,()]/g, '');
       if (!q) return found.replaceChildren();
-      const { data } = await sb.from('profiles').select(PROF_MINI + ',rancho').or(`username.ilike.%${q}%,full_name.ilike.%${q}%`).neq('id', state.me.id).limit(8);
+      let { data, error } = await sb.from('profiles').select(PROF_IB + ',rancho').or(`username.ilike.%${q}%,full_name.ilike.%${q}%`).neq('id', state.me.id).limit(8);
+      if (error) ({ data } = await sb.from('profiles').select(PROF_MINI + ',rancho').or(`username.ilike.%${q}%,full_name.ilike.%${q}%`).neq('id', state.me.id).limit(8));
       const b = state.blocked || new Set();
-      found.replaceChildren(...(data || []).filter(p => !b.has(p.id)).map(p => h('button', { class: 'inbox-row', onclick: () => openChatWith(p) },
-        avatar(p, 48), h('div', { class: 'who' }, h('b', {}, p.username), h('span', {}, [p.full_name, p.rancho].filter(Boolean).join(' · ') || 'Escribirle')))));
-      if (data && !data.length) found.append(h('p', { style: 'color:var(--muted);padding:0 16px' }, 'No encontramos a nadie con ese nombre.'));
+      found.replaceChildren(...(data || []).filter(p => !b.has(p.id)).map(p => h('button', { class: 'ib-row', onclick: () => openChatWith(p) },
+        avAct(p, 52), h('div', { class: 'who' }, h('b', {}, p.full_name || p.username, vb(p.id)), h('span', {}, '@' + p.username + (p.rancho ? ' · ' + p.rancho : ''))), h('span', { class: 'ib-go' }, 'Escribir'))));
+      if (data && !data.length) found.append(h('p', { style: 'color:var(--muted);padding:0 18px' }, 'No encontramos a nadie con ese nombre.'));
     }, 300);
   });
 
-  const { data: convs, error } = await sb.from('conversations')
+  let convRes = await sb.from('conversations')
+    .select(`id,user_a,user_b,last_message_at,a:profiles!user_a(${PROF_IB}),b:profiles!user_b(${PROF_IB})`)
+    .order('last_message_at', { ascending: false }).limit(60);
+  if (convRes.error && /last_seen/i.test(convRes.error.message || '')) convRes = await sb.from('conversations')
     .select(`id,user_a,user_b,last_message_at,a:profiles!user_a(${PROF_MINI}),b:profiles!user_b(${PROF_MINI})`)
     .order('last_message_at', { ascending: false }).limit(60);
+  const { data: convs, error } = convRes;
   if (error) {
     HAS_DM = !/conversations|relation|schema/i.test(error.message || '') ? HAS_DM : false;
     return list.replaceChildren(h('div', { class: 'empty' }, HAS_DM ? friendlyError(error) : 'Los mensajes todavía no están activados.'));
@@ -5017,12 +5093,50 @@ async function renderInbox() {
     const other = c.user_a === state.me.id ? c.b : c.a;
     return { c, other, m: last.get(c.id), n: unread.get(c.id) || 0 };
   }).filter(r => r.other && !blocked.has(r.other.id));
-  if (!rows.length) return list.replaceChildren(h('div', { class: 'dm-empty' }, h('div', { icon: 'shotsbig' }),
-    h('b', {}, '¡Salud! Aquí van tus mensajes'), 'Busca a alguien arriba o entra a su perfil y toca "Mensaje".'));
-  list.replaceChildren(...rows.map(({ c, other, m, n }) => h('button', { class: 'inbox-row' + (n ? ' unread' : ''), onclick: () => { state.chat = { id: c.id, other }; go('chat'); } },
-    avatar(other, 52),
-    h('div', { class: 'who' }, h('b', {}, other.username), h('span', {}, (m.sender_id === state.me.id ? 'Tú: ' : '') + ((m.body || '').replace(/\s*https?:\S+#[ple]=\d+/, '') || msgLabel(m)))),
-    h('small', {}, shortTime(m.created_at)), n ? h('span', { class: 'inbox-dot', 'aria-label': n + ' sin leer' }) : null)));
+
+  // Fila de arriba: tus chats y tus compas, primero los que están conectados
+  const seenIds = new Set(rows.map(r => r.other.id));
+  let extra = [];
+  try {
+    await loadCompas();
+    const cIds = COMPAS ? [...COMPAS.entries()].filter(([id, c]) => c.status === 'aceptada' && !seenIds.has(id)).map(([id]) => id).slice(0, 20) : [];
+    if (cIds.length) { const r = await sb.from('profiles').select(PROF_IB).in('id', cIds); extra = r.data || []; }
+  } catch (_) {}
+  const ppl = [...rows.map(r => ({ p: r.other, n: r.n, chat: r.c })), ...extra.filter(p => !blocked.has(p.id)).map(p => ({ p, n: 0 }))]
+    .sort((a, b) => (b.n > 0) - (a.n > 0) || (new Date(b.p.last_seen || 0) - new Date(a.p.last_seen || 0))).slice(0, 20);
+  people.replaceChildren(
+    h('button', { class: 'ib-person me', onclick: compose }, h('span', { class: 'ib-ring' }, avatar(state.me, 62), h('span', { class: 'ib-plus' }, '+')), h('small', {}, 'Nuevo chat')),
+    ...ppl.map(({ p, n, chat }) => h('button', { class: 'ib-person', onclick: () => { if (chat) { state.chat = { id: chat.id, other: p }; go('chat'); } else openChatWith(p); } },
+      h('span', { class: 'ib-ring' + (n ? ' new' : '') }, avatar(p, 62), isOnline(p.last_seen) ? h('i', { class: 'ib-on' }) : null),
+      h('small', {}, (p.full_name || p.username || '').split(' ')[0]))));
+
+  const paint = () => {
+    const nUnread = rows.filter(r => r.n).length;
+    chips.replaceChildren(
+      h('button', { class: filter === 'all' ? 'on' : '', onclick: () => { filter = 'all'; paint(); } }, 'Todos'),
+      h('button', { class: filter === 'unread' ? 'on' : '', onclick: () => { filter = 'unread'; paint(); } }, 'No leídos' + (nUnread ? ` (${nUnread})` : '')));
+    const show = filter === 'unread' ? rows.filter(r => r.n) : rows;
+    if (!rows.length) return list.replaceChildren(h('div', { class: 'dm-empty' }, h('div', { icon: 'shotsbig' }),
+      h('b', {}, '¡Salud! Aquí van tus mensajes'), 'Busca a alguien arriba o entra a su perfil y toca "Mensaje".'));
+    if (!show.length) return list.replaceChildren(h('p', { class: 'dm-empty', style: 'padding:30px' }, 'Ya leíste todos tus mensajes 🤠'));
+    list.replaceChildren(...show.map(({ c, other, m, n }) => {
+      const mine = m.sender_id === state.me.id;
+      const txt = (m.body || '').replace(/\s*https?:\S+#[ple]=\d+/, '') || msgLabel(m);
+      const status = n ? (n === 1 ? txt : `${n} mensajes nuevos`)
+        : mine ? (m.read_at ? 'Visto' : 'Enviado') + ' · ' + shortTime(m.created_at)
+        : activeLabel(other.last_seen) && Date.now() - new Date(m.created_at) > 3 * 3600e3 ? activeLabel(other.last_seen)
+        : txt + ' · ' + shortTime(m.created_at);
+      return h('button', { class: 'ib-row' + (n ? ' unread' : ''), onclick: () => { state.chat = { id: c.id, other }; go('chat'); } },
+        avAct(other, 58),
+        h('div', { class: 'who' }, h('b', {}, other.full_name || other.username, vb(other.id)), h('span', {}, status)),
+        n ? h('span', { class: 'ib-n', 'aria-label': n + ' sin leer' }, n > 9 ? '9+' : String(n)) : h('span', { class: 'ib-cam', 'aria-label': 'Mandar foto', onclick: (e) => { e.stopPropagation(); state.chat = { id: c.id, other }; state.chatPick = true; go('chat'); } }, h('span', { icon: 'camera' })));
+    }));
+  };
+  paint();
+}
+// Foto con puntito verde si la persona está conectada
+function avAct(p, size) {
+  return h('span', { class: 'av-act' }, avatar(p, size), isOnline(p && p.last_seen) ? h('i', { class: 'ib-on' }) : null);
 }
 const DM_SIGNED = new Map(); // ruta -> { url, exp }
 async function signDm(paths) {
@@ -5033,6 +5147,51 @@ async function signDm(paths) {
     const { data } = await sb.storage.from('dm').createSignedUrls(need, 3600);
     (data || []).forEach(d => { if (d && d.signedUrl) DM_SIGNED.set(d.path || need[data.indexOf(d)], { url: d.signedUrl, exp: now + 3500e3 }); });
   } catch (_) {}
+}
+// ---------- Emojis para escribir ----------
+const EMOJI_SETS = [
+  ['🤠', 'Rancho', '🤠 🐴 🐎 🏇 🐂 🐄 🐮 🐃 🐐 🐑 🐖 🐓 🐔 🐣 🐕 🐈 🌵 🌾 🌽 🌻 🌄 🌅 🔥 🪵 🧱 🚜 🛻 🏡 ⛪ 🎪 🎡 🎺 🥁 🎸 🪕 🎶 🍺 🍻 🥃 🌶️ 🌮 🥩 🍖 🫓 🍞 🥛 🧀 🍉 🍊 🍑'],
+  ['😀', 'Caras', '😀 😃 😄 😁 😆 😂 🤣 😊 😇 🙂 😉 😍 🥰 😘 😗 😋 😛 😜 🤪 😎 🤩 🥳 😏 😌 😴 🤤 😮 😲 😳 🥺 😢 😭 😤 😠 😡 🤬 🤯 😱 🤔 🤫 🤭 🙄 😬 🤥 😷 🤒 🤕 🤑 😈 💀 🤡'],
+  ['👍', 'Manos', '👍 👎 👌 ✌️ 🤞 🤟 🤘 🤙 👋 🤚 ✋ 🖐️ 👏 🙌 👐 🤲 🙏 🤝 💪 👊 ✊ 🤛 🤜 👈 👉 👆 👇 ☝️ 🫶 ✍️'],
+  ['❤️', 'Corazones', '❤️ 🧡 💛 💚 💙 💜 🤎 🖤 🤍 💔 ❣️ 💕 💞 💓 💗 💖 💘 💝 💯 ✨ ⭐ 🌟 💫 🎉 🎊 🙌 👑 🏆 🥇 🎁'],
+  ['🇲🇽', 'Fiesta', '🇲🇽 🎉 🎊 🎆 🎇 🎈 🎂 🍰 💃 🕺 🪅 🎤 🎧 📸 🎥 📍 ⏰ 📅 💵 💰 🙏 ⛅ ☀️ 🌧️ ⛈️ 🌙 🌈 ❄️ 💨 💦'],
+];
+const EMOJI_RECENT_KEY = 'rf_emoji_recent';
+function recentEmojis() { try { return JSON.parse(localStorage.getItem(EMOJI_RECENT_KEY) || '[]'); } catch (_) { return []; } }
+function pushRecent(e) { try { const r = [e, ...recentEmojis().filter(x => x !== e)].slice(0, 24); localStorage.setItem(EMOJI_RECENT_KEY, JSON.stringify(r)); } catch (_) {} }
+function insertAtCaret(el, txt) {
+  const a = el.selectionStart != null ? el.selectionStart : el.value.length, b = el.selectionEnd != null ? el.selectionEnd : el.value.length;
+  el.value = el.value.slice(0, a) + txt + el.value.slice(b);
+  const pos = a + txt.length; try { el.setSelectionRange(pos, pos); } catch (_) {}
+  el.dispatchEvent(new Event('input', { bubbles: true }));
+}
+// Botón 😊 que abre un panel de emojis justo arriba de donde escribes
+function emojiButton(input, host) {
+  let panel = null;
+  const btn = h('button', { class: 'emo-btn', type: 'button', 'aria-label': 'Emojis' }, '😊');
+  const close = () => { if (panel) { panel.remove(); panel = null; btn.classList.remove('on'); } };
+  btn.addEventListener('pointerdown', (e) => e.preventDefault());   // que no se cierre el teclado
+  btn.addEventListener('click', () => {
+    if (panel) return close();
+    btn.classList.add('on');
+    let tab = recentEmojis().length ? -1 : 0;
+    const grid = h('div', { class: 'emo-grid' });
+    const tabs = h('div', { class: 'emo-tabs' });
+    const paint = () => {
+      const list = tab === -1 ? recentEmojis() : EMOJI_SETS[tab][2].split(' ');
+      tabs.replaceChildren(
+        recentEmojis().length ? h('button', { type: 'button', class: tab === -1 ? 'on' : '', 'aria-label': 'Recientes', onpointerdown: (e) => e.preventDefault(), onclick: () => { tab = -1; paint(); } }, '🕘') : '',
+        ...EMOJI_SETS.map(([ico, name], i) => h('button', { type: 'button', class: tab === i ? 'on' : '', 'aria-label': name, onpointerdown: (e) => e.preventDefault(), onclick: () => { tab = i; paint(); } }, ico)));
+      grid.replaceChildren(...list.map(e => h('button', { type: 'button', onpointerdown: (ev) => ev.preventDefault(), onclick: () => { insertAtCaret(input, e); pushRecent(e); try { navigator.vibrate && navigator.vibrate(8); } catch (_) {} } }, e)));
+      grid.scrollTop = 0;
+    };
+    panel = h('div', { class: 'emo-panel' }, tabs, grid);
+    (host || input.closest('form') || input.parentNode).before(panel);
+    paint();
+  });
+  input.addEventListener('focus', () => {});   // el panel se queda abierto mientras escribes
+  btn._close = close;
+  return btn;
 }
 // ---------- Notas de voz ----------
 const VOICE_MAX = 180; // segundos
@@ -5117,23 +5276,25 @@ async function renderChat() {
   const other = chat.other || {};
   $app.append(h('header', { class: 'topbar chat-head' },
     h('button', { class: 'iconbtn plain', 'aria-label': 'Regresar', icon: 'back', onclick: () => go('inbox') }),
-    h('button', { class: 'who', onclick: () => go('profile', { profileId: other.id }) }, avatar(other, 36), h('span', {}, other.username || ''))));
+    h('button', { class: 'who', onclick: () => go('profile', { profileId: other.id }) }, avAct(other, 38), h('span', { class: 'chat-who' }, h('b', {}, other.full_name || other.username || ''), activeLabel(other.last_seen) ? h('small', {}, activeLabel(other.last_seen)) : null))));
   const box = h('main', { class: 'chat' }, h('div', { class: 'spinner' }));
   const input = h('textarea', { class: 'input', rows: 1, maxlength: '2000', placeholder: 'Escribe un mensaje…', 'aria-label': 'Mensaje' });
   const send = h('button', { class: 'send', type: 'submit', 'aria-label': 'Enviar', icon: 'send', disabled: true });
   const picker = h('input', { type: 'file', accept: 'image/*,video/*', hidden: true });
   const attach = h('button', { class: 'attach', type: 'button', 'aria-label': 'Mandar foto o video', icon: 'camera', onclick: () => picker.click() });
   const mic = h('button', { class: 'send mic', type: 'button', 'aria-label': 'Grabar nota de voz', icon: 'mic', onclick: () => recordVoice(form, sendVoice) });
-  const form = h('form', { onsubmit: (e) => { e.preventDefault(); submit(); } }, attach, picker, input, send, mic);
+  const emo = emojiButton(input);
+  const form = h('form', { onsubmit: (e) => { e.preventDefault(); submit(); } }, attach, picker, h('div', { class: 'emo-wrap' }, input, emo), send, mic);
   $app.append(box, h('div', { class: 'composer' }, form));
   const blockedNow = state.blocked && state.blocked.has(other.id);
-  if (blockedNow) { input.disabled = true; attach.disabled = true; mic.disabled = true; input.placeholder = 'Bloqueaste a esta persona'; }
+  if (blockedNow) { input.disabled = true; attach.disabled = true; mic.disabled = true; emo.disabled = true; input.placeholder = 'Bloqueaste a esta persona'; }
 
   const grow = () => { input.style.height = 'auto'; input.style.height = Math.min(130, input.scrollHeight) + 'px'; const has = !!input.value.trim(); send.disabled = !has || blockedNow; send.hidden = !has; mic.hidden = has; };
   send.hidden = true;
   input.addEventListener('input', grow);
   input.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && !('ontouchstart' in window)) { e.preventDefault(); submit(); } });
   picker.addEventListener('change', () => { const f = picker.files && picker.files[0]; picker.value = ''; if (f) sendMedia(f); });
+  if (state.chatPick) { state.chatPick = false; setTimeout(() => picker.click(), 300); }
 
   let msgs = [], alive = true, lastCount = -1;
   const seen = new Set();
@@ -5257,7 +5418,7 @@ async function renderChat() {
   async function submit() {
     const text = input.value.trim();
     if (!text || blockedNow) return;
-    input.value = ''; grow();
+    input.value = ''; grow(); emo._close();
     const tmp = { id: 'tmp' + Date.now(), sender_id: state.me.id, body: text, created_at: new Date().toISOString(), pending: true };
     msgs.push(tmp); paint();
     const { data, error } = await sb.from('messages').insert({ conversation_id: chat.id, sender_id: state.me.id, body: text }).select(COLS).single();
