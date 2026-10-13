@@ -3714,11 +3714,12 @@ async function renderProfile() {
     ratingSlot.replaceChildren(ratingPill(r, open));
   });
   const cover = (prof.cover_url || isMe) ? h('div', { class: 'pf-cover' + (prof.cover_url ? '' : ' empty'), style: prof.cover_url ? `background-image:url("${String(prof.cover_url).replace(/"/g, '')}")` : '',
-      role: 'button', 'aria-label': 'Foto de portada', onclick: () => { if (isMe) coverMenu(prof); else openMediaViewer(prof.cover_url, 'image'); } },
+      role: 'button', 'aria-label': 'Foto de portada', onclick: () => { if (isMe) coverMenu(prof); else openProfilePhoto(prof, prof.cover_url); } },
       isMe ? h('span', { class: 'pf-cover-btn' }, '📷 ', prof.cover_url ? 'Editar portada' : 'Agregar portada') : null) : null;
   const avBtn = h('button', { class: 'pf-av', 'aria-label': isMe ? 'Foto de perfil' : sd ? 'Ver sundown' : 'Foto de perfil', onclick: () => {
       if (isMe) return photoMenu(prof, sd);
-      if (sd) openSundowns([sd], 0, () => render()); else if (prof.avatar_url) openMediaViewer(prof.avatar_url, 'image'); } },
+      if (sd && (prof.avatar_url || prof.cover_url)) return otherPhotoMenu(prof, sd);
+      if (sd) openSundowns([sd], 0, () => render()); else if (prof.avatar_url) openProfilePhoto(prof, prof.avatar_url); } },
     h('div', { class: 'ring' + (sd ? (sd.unseen ? ' new' : ' seen') : '') }, h('div', {}, avatar(prof, 96))),
     isMe ? h('span', { class: 'pf-av-plus', role: 'button', 'aria-label': 'Cambiar foto de perfil', onclick: (e) => { e.stopPropagation(); pickImage(f => savePhoto('avatar', f)); } }, '+') : null);
   const hero = h('section', { class: 'pf-hero' + (cover ? ' has-cover' : '') },
@@ -3986,6 +3987,8 @@ async function savePhoto(kind, file) {
     const url = sb.storage.from('media').getPublicUrl(path).data.publicUrl;
     const { error } = await sb.from('profiles').update(isCover ? { cover_url: url } : { avatar_url: url }).eq('id', state.me.id);
     if (error) throw (/cover_url|column|schema/i.test(error.message || '') ? new Error('Falta activar la foto de portada en Supabase') : error);
+    // También sale como publicación para que la gente reaccione y comente
+    sb.from('posts').insert({ user_id: state.me.id, media_url: url, media_type: 'image', caption: isCover ? '🌄 Actualizó su foto de portada' : '📷 Actualizó su foto de perfil', category: null, shop_links: [] }).then(() => {}, () => {});
     await loadMe(); toast(isCover ? '¡Portada actualizada!' : '¡Foto de perfil actualizada!'); SFX.play('ajua'); render();
   } catch (ex) { toast(friendlyError(ex)); }
 }
@@ -3994,11 +3997,25 @@ async function removeCover() {
   if (error) return toast('No se pudo quitar');
   await loadMe(); toast('Portada quitada'); render();
 }
+// Las fotos de perfil y de portada son publicaciones (como en Facebook): se pueden reaccionar y comentar
+async function openProfilePhoto(prof, url) {
+  if (!url) return;
+  const { data } = await sb.from('posts').select('id').eq('user_id', prof.id).eq('media_url', url).order('created_at', { ascending: false }).limit(1);
+  if (data && data[0]) return openPostById(data[0].id);
+  openMediaViewer(url, 'image');
+}
+function otherPhotoMenu(prof, sd) {
+  const it = (emo, label, fn) => h('button', { class: 'menu-item', onclick: () => { close(); fn(); } }, h('span', { class: 'mi-emo' }, emo), h('span', {}, label));
+  const close = openSheet(prof.full_name || prof.username || 'Foto', h('div', { class: 'sheet-body menu' },
+    sd ? it('🌅', 'Ver sundown', () => openSundowns([sd], 0, () => render())) : null,
+    prof.avatar_url ? it('👤', 'Ver foto de perfil', () => openProfilePhoto(prof, prof.avatar_url)) : null,
+    prof.cover_url ? it('🌄', 'Ver foto de portada', () => openProfilePhoto(prof, prof.cover_url)) : null));
+}
 function photoMenu(prof, sd) {
   const items = [];
   const it = (emo, label, fn) => h('button', { class: 'menu-item', onclick: () => { close(); fn(); } }, h('span', { class: 'mi-emo' }, emo), h('span', {}, label));
   if (sd) items.push(it('🌅', 'Ver sundown', () => openSundowns([sd], 0, () => render())));
-  if (prof.avatar_url) items.push(it('👁️', 'Ver foto de perfil', () => openMediaViewer(prof.avatar_url, 'image')));
+  if (prof.avatar_url) items.push(it('👁️', 'Ver foto de perfil', () => openProfilePhoto(prof, prof.avatar_url)));
   items.push(it('📷', prof.avatar_url ? 'Cambiar foto de perfil' : 'Poner foto de perfil', () => pickImage(f => savePhoto('avatar', f))));
   items.push(it('🌅', 'Crear sundown', () => openSundownCreator(() => render())));
   const close = openSheet('Foto de perfil', h('div', { class: 'sheet-body menu' }, ...items));
@@ -4006,7 +4023,7 @@ function photoMenu(prof, sd) {
 function coverMenu(prof) {
   const it = (emo, label, fn, danger) => h('button', { class: 'menu-item' + (danger ? ' danger' : ''), onclick: () => { close(); fn(); } }, h('span', { class: 'mi-emo' }, emo), h('span', {}, label));
   const close = openSheet('Foto de portada', h('div', { class: 'sheet-body menu' },
-    prof.cover_url ? it('👁️', 'Ver portada', () => openMediaViewer(prof.cover_url, 'image')) : null,
+    prof.cover_url ? it('👁️', 'Ver portada', () => openProfilePhoto(prof, prof.cover_url)) : null,
     it('📷', prof.cover_url ? 'Cambiar portada' : 'Poner foto de portada', () => pickImage(f => savePhoto('cover', f))),
     prof.cover_url ? it('🗑️', 'Quitar portada', removeCover, true) : null));
 }
@@ -4055,6 +4072,7 @@ function editProfile(prof) {
       if (error && /ubicacion|dedica|fierro/i.test(error.message || '')) { delete patch.ubicacion; delete patch.dedica; delete patch.fierro; ({ error } = await sb.from('profiles').update(patch).eq('id', state.me.id)); if (!error) toast('Falta activar la ficha del ranchero en Supabase'); }
       if (error && /duplicate|unique|username/i.test(error.message || '')) { err.textContent = 'Ese nombre de usuario ya está ocupado. Prueba con otro.'; save.disabled = false; return; }
       if (error) throw error;
+      if (patch.avatar_url) sb.from('posts').insert({ user_id: state.me.id, media_url: patch.avatar_url, media_type: 'image', caption: '📷 Actualizó su foto de perfil', category: null, shop_links: [] }).then(() => {}, () => {});
       await loadMe(); close(); toast('Perfil actualizado'); render();
     } catch (ex) { err.textContent = friendlyError(ex); save.disabled = false; }
   } },
