@@ -1013,6 +1013,7 @@ form.locked .vr{right:0}
 .ph-step{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px}
 .ph-step span{flex:0 0 28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#F3BD68,#C7843B);color:#172531;font-weight:800;display:flex;align-items:center;justify-content:center}
 .ph-step p{margin:3px 0 0;line-height:1.4;font-size:15px}
+.fx-petok{background:#FFF6E3;border:1px solid #F0DDB5;border-radius:14px;padding:10px 12px;margin:-4px 0 12px}.fx-petok .fx-check{align-items:flex-start;line-height:1.35}.fx-petok small{display:block;margin-top:6px}
 .fx-report{display:block;margin:4px auto 10px;border:none;background:none;color:var(--muted);font:inherit;font-size:13px;text-decoration:underline;cursor:pointer}
 .adm-kind{display:inline-block;font-size:11.5px;font-weight:800;color:#C7843B;text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px}
 .mc-empty{text-align:center;color:var(--muted);margin:auto}
@@ -2791,7 +2792,7 @@ function reportPost(p, onGone) {
 // Reportar una persona, un anuncio o un comentario
 const REPORT_WHY = {
   user: ['Cuenta falsa o se hace pasar por otra persona', 'Acoso, insultos o amenazas', 'Estafa o fraude', 'Vende animales robados o cosas ilegales', 'Contenido sexual', 'Algo más'],
-  listing: ['Estafa o pide anticipo', 'Venta de mascotas o fauna silvestre', 'Animal robado o sin papeles', 'Fotos o precio engañosos', 'Venta ilegal (armas, drogas)', 'Algo más'],
+  listing: ['Estafa o pide anticipo', 'Fauna silvestre o animal protegido', 'Animal enfermo o en malas condiciones', 'Animal robado o sin papeles', 'Fotos o precio engañosos', 'Venta ilegal (armas, drogas)', 'Algo más'],
   comment: ['Acoso, insultos o amenazas', 'Spam o estafa', 'Contenido sexual', 'Algo más'],
 };
 function reportThing(kind, target, onDone) {
@@ -2840,7 +2841,8 @@ function openRules() {
       'Maltrato animal, violencia o peleas.',
       'Insultos, acoso, amenazas o burlas a otras personas.',
       'Vender drogas, armas o animales robados, o hacer estafas.',
-      'Vender mascotas (perros, gatos, aves de ornato) o fauna silvestre. La Feria es solo para ganado, caballos, equipo, pastura y servicios del campo.',
+      'Vender fauna silvestre o especies protegidas (venados, loros, guacamayas, tortugas, iguanas…).',
+      'Vender perros u otras mascotas sin cumplir las leyes de tu estado, o animales enfermos o maltratados.',
       'Subir fotos o videos de otras personas sin su permiso, o contenido que no es tuyo.',
       'Fotos o videos de menores de edad en situaciones que los expongan.']),
     sec('Qué pasa si alguien rompe las reglas', [
@@ -4338,7 +4340,7 @@ function openHowTo() {
 
 // ---------- La Feria: Mercado (compra-venta) y Eventos ----------
 let HAS_FERIA = true;
-const LCATS = [['Caballos', '🐎'], ['Ganado', '🐄'], ['Monturas y equipo', '🏇'], ['Pastura y alimento', '🌾'], ['Vehículos', '🛻'], ['Servicios', '🧰'], ['Otros', '📦']];
+const LCATS = [['Caballos', '🐎'], ['Ganado', '🐄'], ['Perros y mascotas', '🐕'], ['Monturas y equipo', '🏇'], ['Pastura y alimento', '🌾'], ['Vehículos', '🛻'], ['Servicios', '🧰'], ['Otros', '📦']];
 const LCAT_EMO = Object.fromEntries(LCATS);
 const EKINDS = [['Jaripeo', '🐂'], ['Charreada', '🤠'], ['Cabalgata', '🐎'], ['Baile', '💃'], ['Feria', '🎡'], ['Rodeo', '🏇'], ['Coleadero', '🐃'], ['Carreras', '🏁'], ['Otro', '🎉']];
 const EKIND_EMO = Object.fromEntries(EKINDS);
@@ -4354,12 +4356,15 @@ const SPEC_FIELDS = [
   ['raza', '🧬 Raza', 'text', 'ej. Cuarto de milla, Brahman, Holstein'],
   ['sexo', '⚥ Sexo', ['Macho', 'Hembra', 'Machos y hembras']],
   ['edad', '🎂 Edad', 'text', 'ej. 5 años, 8 meses'],
-  ['peso', '⚖️ Peso aprox.', 'text', 'ej. 450 kg'],
+  ['peso', '⚖️ Peso aprox.', 'text', 'ej. 450 kg', ['Caballos', 'Ganado']],
+  ['vacunas', '💉 Vacunas al día', ['Sí', 'No', 'Algunas'], null, 'Perros y mascotas'],
+  ['desparasitado', '🩺 Desparasitado', ['Sí', 'No'], null, 'Perros y mascotas'],
   ['cabezas', '🔢 Cabezas', 'text', 'ej. 12', 'Ganado'],
   ['registro', '📜 Con registro', ['Sí', 'No']],
   ['arete', '🏷️ Arete SINIIGA', ['Sí', 'No'], null, 'Ganado'],
-  ['fierro', '🔥 Fierro', 'text', 'ej. "M" con media luna']];
-const SPEC_CATS = ['Caballos', 'Ganado'];
+  ['fierro', '🔥 Fierro', 'text', 'ej. "M" con media luna', ['Caballos', 'Ganado']]];
+const SPEC_CATS = ['Caballos', 'Ganado', 'Perros y mascotas'];
+const specFor = (f, cat) => !f[4] || (Array.isArray(f[4]) ? f[4].includes(cat) : f[4] === cat);
 const MAX_LPHOTOS = 20;
 const money = (n) => n == null ? 'Precio a tratar' : '$' + Number(n).toLocaleString('es-MX', { maximumFractionDigits: 0 });
 const isFeat = (x) => !!(x && x.featured_until && new Date(x.featured_until) > new Date());
@@ -4494,8 +4499,8 @@ async function interested(l) {
   document.querySelectorAll('.sheet-bg').forEach(x => x.remove());
   state.chat = { id: cid, other: prof }; go('chat');
 }
-// Mascotas y fauna silvestre no se venden en La Feria
-const PET_RE = /\b(perr[oa]s?|perrit[oa]s?|cachorr[oa]s?|gatit[oa]s?|gat[oa]s? (persa|siam[eé]s|de raza|bebé)|perico|periquit[oa]s?|loro|cotorras?|guacamayas?|tuc[aá]n|canari[oa]s?|hurones?|h[aá]mster|conejit[oa]s? de mascota|venados?|tortugas?|iguanas?|serpientes?|v[ií]boras?|monos?|monitos?|tigres?|leones? africanos?|jaguar|ocelote|tej[oó]n|tlacuache|halc[oó]n(es)?|lechuzas?|búhos?|buhos?)\b/i;
+// La fauna silvestre y las especies protegidas no se venden en La Feria (en México piden permisos especiales)
+const WILD_RE = /\b(loro|loros|cotorras?|guacamayas?|tuc[aá]n(es)?|venados?|tortugas?|iguanas?|serpientes?|v[ií]boras?|monos?|monitos?|tigres?|leones? africanos?|jaguar(es)?|ocelotes?|tej[oó]n(es)?|tlacuaches?|halc[oó]n(es)?|lechuzas?|b[uú]hos?|tarántulas?|escorpiones?|alacranes?)\b/i;
 function listingForm(l) {
   const isNew = !l;
   const kept = [...((l && l.photos) || [])];
@@ -4512,10 +4517,15 @@ function listingForm(l) {
   paintPhotos();
   const title = h('input', { class: 'input', maxlength: '80', placeholder: 'ej. Yegua cuarto de milla, 5 años', value: (l && l.title) || '' });
   const catChips = h('div', { class: 'chips', style: 'padding:0 0 12px;flex-wrap:wrap' });
-  const paintCats = () => { catChips.replaceChildren(...LCATS.map(([c, e]) => h('button', { type: 'button', class: 'chip' + (c === cat ? ' on' : ''), onclick: () => { cat = c; paintCats(); } }, e + ' ' + c))); try { paintSpecs(); } catch (_) {} };
+  const paintCats = () => { catChips.replaceChildren(...LCATS.map(([c, e]) => h('button', { type: 'button', class: 'chip' + (c === cat ? ' on' : ''), onclick: () => { cat = c; paintCats(); } }, e + ' ' + c))); try { paintSpecs(); } catch (_) {} try { petBox.hidden = cat !== 'Perros y mascotas'; } catch (_) {} };
   paintCats();
   const price = h('input', { class: 'input', inputmode: 'numeric', placeholder: 'ej. 45000', value: l && l.price != null ? String(Math.round(l.price)) : '' });
   const nego = h('input', { type: 'checkbox' }); nego.checked = !!(l && l.price == null);
+  // Perros y mascotas: cada quien responde por las leyes de su estado (en CDMX piden registro para vender perros y gatos por internet)
+  const petOk = h('input', { type: 'checkbox' }); petOk.checked = !!(l && l.category === 'Perros y mascotas');
+  const petBox = h('div', { class: 'fx-petok', hidden: true },
+    h('label', { class: 'fx-check' }, petOk, ' Confirmo que cumplo las leyes de mi estado para vender animales de compañía, que el animal está sano y que no es de fauna silvestre.'),
+    h('small', { class: 'hint' }, '⚠️ En la Ciudad de México solo pueden vender perros y gatos por internet quienes tengan registro y autorización. Revisa las reglas de tu estado.'));
   const loc = h('input', { class: 'input', maxlength: '60', placeholder: 'ej. León', value: (l && l.location) || (state.me && state.me.ubicacion) || '' });
   const est = estadoSelect((l && l.estado) || (state.me && state.me.estado), 'Escoge el estado');
   const det = Object.assign({}, (l && l.details) || {});
@@ -4523,8 +4533,8 @@ function listingForm(l) {
   const specBox = h('div', { class: 'fx-spec-form' });
   const paintSpecs = () => {
     if (!HAS_NOV || !SPEC_CATS.includes(cat)) { specBox.replaceChildren(); return; }
-    specBox.replaceChildren(h('div', { class: 'lbl', style: 'margin:4px 0 8px' }, cat === 'Caballos' ? '🐎 Ficha del caballo' : '🐄 Ficha del ganado', h('small', { style: 'font-weight:500;color:var(--muted)' }, ' · opcional, ayuda a vender más rápido')),
-      h('div', { class: 'fx-spec-grid' }, SPEC_FIELDS.filter(f => !f[4] || f[4] === cat).map(([k, label, type, ph]) => {
+    specBox.replaceChildren(h('div', { class: 'lbl', style: 'margin:4px 0 8px' }, cat === 'Caballos' ? '🐎 Ficha del caballo' : cat === 'Perros y mascotas' ? '🐕 Ficha del animal' : '🐄 Ficha del ganado', h('small', { style: 'font-weight:500;color:var(--muted)' }, ' · opcional, ayuda a vender más rápido')),
+      h('div', { class: 'fx-spec-grid' }, SPEC_FIELDS.filter(f => specFor(f, cat)).map(([k, label, type, ph]) => {
         let inp;
         if (Array.isArray(type)) { inp = h('select', { class: 'input' }, h('option', { value: '' }, '—'), ...type.map(o => h('option', { value: o }, o))); inp.value = det[k] || ''; }
         else inp = h('input', { class: 'input', maxlength: '40', placeholder: ph || '', value: det[k] || '' });
@@ -4540,7 +4550,8 @@ function listingForm(l) {
   const body = h('form', { class: 'sheet-body', onsubmit: async (e) => {
     e.preventDefault(); err.textContent = '';
     const tt = title.value.trim(); if (tt.length < 3) return (err.textContent = 'Ponle un título (qué vendes).');
-    if (PET_RE.test(tt + ' ' + desc.value)) return (err.textContent = '🚫 En La Feria no se venden mascotas (perros, gatos, aves de ornato) ni fauna silvestre. Solo ganado, caballos, equipo, pastura y servicios del campo.');
+    if (WILD_RE.test(tt + ' ' + desc.value)) return (err.textContent = '🚫 En La Feria no se vende fauna silvestre ni especies protegidas (venados, loros, guacamayas, tortugas, iguanas…). En México necesitan permisos especiales.');
+    if (cat === 'Perros y mascotas' && !petOk.checked) return (err.textContent = 'Para vender perros o mascotas confirma que cumples las leyes de tu estado.');
     const p = nego.checked ? null : Number(String(price.value).replace(/[^0-9.]/g, ''));
     if (!nego.checked && !(p >= 0 && price.value.trim())) return (err.textContent = 'Pon el precio o marca "Precio a tratar".');
     save.disabled = true; save.textContent = 'Subiendo…';
@@ -4558,7 +4569,7 @@ function listingForm(l) {
       const row = { title: tt, category: cat, price: p, location: loc.value.trim() || null, description: desc.value.trim() || null, photos: urls.slice(0, MAX_LPHOTOS) };
       if (HAS_NOV) {
         row.estado = est.value || null;
-        const keep = SPEC_CATS.includes(cat) ? SPEC_FIELDS.filter(f => !f[4] || f[4] === cat).map(f => f[0]) : [];
+        const keep = SPEC_CATS.includes(cat) ? SPEC_FIELDS.filter(f => specFor(f, cat)).map(f => f[0]) : [];
         row.details = Object.fromEntries(keep.filter(k => det[k] && String(det[k]).trim()).map(k => [k, String(det[k]).trim().slice(0, 40)]));
       }
       const res = isNew ? await sb.from('listings').insert({ ...row, user_id: state.me.id }).select(LIST_SEL).single()
@@ -4571,15 +4582,15 @@ function listingForm(l) {
   } },
     picker, photosBox,
     h('small', { class: 'hint', style: 'display:block;margin:-4px 0 12px' }, '📸 Puedes escoger varias fotos a la vez. La primera es la portada.'),
-    h('div', { class: 'field' }, h('label', {}, '¿Qué vendes?'), title, h('small', { class: 'hint' }, 'Ganado, caballos, equipo, pastura y servicios del campo. No se permiten mascotas ni fauna silvestre.')),
-    h('div', { class: 'field' }, h('label', {}, 'Categoría')), catChips,
+    h('div', { class: 'field' }, h('label', {}, '¿Qué vendes?'), title, h('small', { class: 'hint' }, 'Ganado, caballos, perros, equipo, pastura y servicios del campo. No se permite fauna silvestre.')),
+    h('div', { class: 'field' }, h('label', {}, 'Categoría')), catChips, petBox,
     h('div', { class: 'field' }, h('label', {}, 'Precio (pesos)'), price, h('label', { class: 'fx-check' }, nego, ' Precio a tratar')),
     specBox,
     h('div', { class: 'field' }, h('label', {}, '📍 ¿Dónde está? (ciudad o pueblo)'), loc),
     HAS_NOV ? h('div', { class: 'field' }, h('label', {}, '🗺️ Estado'), est) : null,
     h('div', { class: 'field' }, h('label', {}, 'Descripción'), desc),
     err, save);
-  paintSpecs();
+  paintSpecs(); petBox.hidden = cat !== 'Perros y mascotas';
   close = openSheet(isNew ? 'Vender en La Feria' : 'Editar anuncio', body);
 }
 
