@@ -348,6 +348,8 @@ textarea.input{min-height:90px;resize:vertical}
 .sdc-sheet-head{display:flex;justify-content:space-between;align-items:center;padding:12px 14px 10px 18px;border-bottom:1px solid #D9CBB0}
 .sdc-sheet-head .sdc-done{background:#2C4657;color:#fff}
 .sdc-sheet-body{padding:12px 14px;overflow-y:auto}
+.sdc-etabs{padding:4px 10px 6px;border-bottom:1px solid #EFE6D4}
+.sd-reply{gap:4px!important}.sd-reply .emo{width:34px!important;height:34px!important;font-size:24px!important;padding:0!important;min-width:0}
 .sdc-emojis{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;padding:10px;overflow-y:auto}
 .sdc-emojis button{font-size:34px;border:none;background:none;padding:6px 0;border-radius:12px}
 .sdc-emojis button:active{background:#EFE6D4;transform:scale(1.2)}
@@ -433,8 +435,9 @@ textarea.input{min-height:90px;resize:vertical}
 .pf-compose-acts{display:flex;gap:8px;margin-top:10px}
 .pf-compose-acts button{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;height:36px;border-radius:18px;border:1px solid #E3D6BE;background:#FFFDF8;font:inherit;font-size:13.5px;font-weight:700;color:var(--text);cursor:pointer}
 .pf-compose-acts svg{width:18px;height:18px}
+.pf-more{height:2px}
 .pf-h2{display:flex;align-items:baseline;justify-content:space-between;padding:6px 16px 8px}.pf-h2 b{font-size:18px}.pf-h2 small{color:var(--muted)}
-.pf-feed .card{margin-left:0;margin-right:0}
+.pf-feed .post{margin-left:0;margin-right:0}
 .pf-agrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 14px 20px}.pf-agrid .pf-acard{width:auto}
 .pf-pick{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;max-height:46vh;overflow-y:auto}
 .pf-pick-it{position:relative;aspect-ratio:9/16;border:none;padding:0;border-radius:8px;overflow:hidden;background:#000}
@@ -1010,6 +1013,8 @@ form.locked .vr{right:0}
 .ph-step{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px}
 .ph-step span{flex:0 0 28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#F3BD68,#C7843B);color:#172531;font-weight:800;display:flex;align-items:center;justify-content:center}
 .ph-step p{margin:3px 0 0;line-height:1.4;font-size:15px}
+.fx-report{display:block;margin:4px auto 10px;border:none;background:none;color:var(--muted);font:inherit;font-size:13px;text-decoration:underline;cursor:pointer}
+.adm-kind{display:inline-block;font-size:11.5px;font-weight:800;color:#C7843B;text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px}
 .mc-empty{text-align:center;color:var(--muted);margin:auto}
 .mc-form .send{width:44px;height:44px;border-radius:22px;border:none;background:linear-gradient(135deg,#F3BD68,#C7843B);color:#172531;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .mc-form .send:disabled{opacity:.5}
@@ -2369,6 +2374,13 @@ async function openComments(p, onChange) {
       } }, h('span', { icon: 'trash' }), 'Borrar comentario'),
       h('button', { class: 'menu-item', onclick: () => close() }, h('span', { icon: 'close' }), 'Cancelar')));
   }
+  function otherCmtMenu(c) {
+    const who = (c.profiles && c.profiles.username) || '';
+    const close = openSheet('Comentario de @' + who, h('div', { class: 'sheet-body menu' },
+      h('button', { class: 'menu-item danger', onclick: () => { close(); reportThing('comment', Object.assign({ post_id: p.id }, c)); } }, h('span', { icon: 'flag' }), 'Reportar comentario'),
+      h('button', { class: 'menu-item danger', onclick: async () => { close(); if (await blockUser(c.user_id, who)) { list = list.filter(x => x.user_id !== c.user_id); paint(); } } }, h('span', { icon: 'block' }), 'Bloquear a @' + who),
+      h('button', { class: 'menu-item', onclick: () => close() }, h('span', { icon: 'close' }), 'Cancelar')));
+  }
   function editComment(c) {
     const ta = mentionAssist(h('textarea', { class: 'input', rows: 3, maxlength: '500' })); ta.value = c.body || '';
     const save = h('button', { class: 'btn', style: 'width:100%;margin-top:10px', onclick: async () => {
@@ -2389,7 +2401,8 @@ async function openComments(p, onChange) {
         h('div', { class: 'cmt-bubble' }, h('b', {}, (c.profiles && c.profiles.username) || '', vb(c.user_id)), h('p', {}, ...richText(c.body)), rxSummary(c)),
         h('div', { class: 'cmt-meta' }, h('small', {}, timeAgo(c.created_at) + (c.edited_at ? ' · editado' : '')), HAS_CRX ? rxButton(c) : null,
           !isGuest() ? h('button', { class: 'cmt-act', type: 'button', onclick: () => setReply(c) }, 'Responder') : null,
-          mine ? h('button', { class: 'cmt-act', type: 'button', 'aria-label': 'Opciones del comentario', onclick: () => cmtMenu(c) }, '⋯') : null)));
+          mine ? h('button', { class: 'cmt-act', type: 'button', 'aria-label': 'Opciones del comentario', onclick: () => cmtMenu(c) }, '⋯')
+            : !isGuest() ? h('button', { class: 'cmt-act', type: 'button', 'aria-label': 'Opciones del comentario', onclick: () => otherCmtMenu(c) }, '⋯') : null)));
   }
   const openThreads = new Set();
   function paint() {
@@ -2775,6 +2788,32 @@ function reportPost(p, onGone) {
   } }, r)));
   close = openSheet('Reportar', body);
 }
+// Reportar una persona, un anuncio o un comentario
+const REPORT_WHY = {
+  user: ['Cuenta falsa o se hace pasar por otra persona', 'Acoso, insultos o amenazas', 'Estafa o fraude', 'Vende animales robados o cosas ilegales', 'Contenido sexual', 'Algo más'],
+  listing: ['Estafa o pide anticipo', 'Venta de mascotas o fauna silvestre', 'Animal robado o sin papeles', 'Fotos o precio engañosos', 'Venta ilegal (armas, drogas)', 'Algo más'],
+  comment: ['Acoso, insultos o amenazas', 'Spam o estafa', 'Contenido sexual', 'Algo más'],
+};
+function reportThing(kind, target, onDone) {
+  if (needLogin('Crea tu cuenta para reportar')) return;
+  const titles = { user: 'Reportar a @' + (target.username || ''), listing: 'Reportar anuncio', comment: 'Reportar comentario' };
+  const body = h('div', { class: 'sheet-body menu' }, h('p', { class: 'hint', style: 'margin:0 0 10px' }, '¿Qué está pasando? Nadie más sabrá que fuiste tú.'));
+  let close;
+  (REPORT_WHY[kind] || REPORT_WHY.user).forEach(reason => body.append(h('button', { class: 'menu-item', onclick: async () => {
+    close();
+    const row = { reporter_id: state.me.id, reason, kind, reported_user: target.user_id || target.id };
+    if (kind === 'listing') row.listing_id = target.id;
+    if (kind === 'comment') { row.comment_id = target.id; row.post_id = target.post_id || null; }
+    let { error } = await sb.from('reports').insert(row);
+    if (error && /kind|listing_id|comment_id|column/i.test(error.message || '')) {   // por si falta actualizar la base de datos
+      ({ error } = await sb.from('reports').insert({ reporter_id: state.me.id, reported_user: row.reported_user, post_id: row.post_id || null, reason: `[${kind}${target.id && kind !== 'user' ? ' ' + target.id : ''}] ${reason}` }));
+    }
+    if (error) return toast('No se pudo enviar el reporte');
+    toast('Gracias, lo vamos a revisar 🛡️');
+    onDone && onDone();
+  } }, reason)));
+  close = openSheet(titles[kind] || 'Reportar', body);
+}
 async function blockUser(userId, username) {
   if (!confirm(`¿Bloquear a @${username}? Ya no verás nada de esta persona. Lo puedes deshacer desde su perfil.`)) return false;
   const { error } = await sb.from('blocks').insert({ blocker_id: state.me.id, blocked_id: userId });
@@ -2801,10 +2840,11 @@ function openRules() {
       'Maltrato animal, violencia o peleas.',
       'Insultos, acoso, amenazas o burlas a otras personas.',
       'Vender drogas, armas o animales robados, o hacer estafas.',
+      'Vender mascotas (perros, gatos, aves de ornato) o fauna silvestre. La Feria es solo para ganado, caballos, equipo, pastura y servicios del campo.',
       'Subir fotos o videos de otras personas sin su permiso, o contenido que no es tuyo.',
       'Fotos o videos de menores de edad en situaciones que los expongan.']),
     sec('Qué pasa si alguien rompe las reglas', [
-      'Cualquiera puede reportar una publicación con el botón ⋯.',
+      'Cualquiera puede reportar una publicación, un comentario, un anuncio o una persona con el botón ⋯ o 🚩.',
       'Revisamos los reportes y podemos borrar publicaciones o cuentas.',
       'Si alguien te molesta, bloquéalo: ya no verás nada suyo.']),
     sec('Tu privacidad', [
@@ -2823,7 +2863,17 @@ function openRules() {
 
 // ---------- Creador de Sundowns (como las historias de Facebook) ----------
 let HAS_OVERLAYS = true;
-const SD_EMOJIS = ['🤠', '🐎', '🐴', '🐄', '🐂', '🐓', '🐖', '🐕', '🐑', '🌵', '🌾', '🌽', '🚜', '🛻', '🏡', '🌅', '🌄', '☀️', '🌙', '⭐', '✨', '🔥', '❤️', '😍', '😂', '🥹', '😎', '🙌', '👏', '🙏', '👍', '💯', '🎉', '🎊', '🎶', '🎸', '🎺', '🥁', '💃', '🕺', '👢', '🍺', '🍻', '🥃', '🌮', '🥩', '🌶️', '🏆', '⛪', '💐'];
+const SD_EMOJI_SETS = [
+  ['🤠', 'Rancho', '🤠 👢 🐴 🐎 🏇 🐂 🐄 🐮 🐃 🦬 🐐 🐑 🐖 🐷 🐓 🐔 🐣 🦃 🐕 🐈 🫏 🐇 🦅 🐝 🌵 🌾 🌽 🌻 🌱 🌳 🍃 🪵 🧱 🪓 🛠️ 🧺 🪣 🚜 🛻 🏡 🛖 ⛪ 🌄 🌅 🏞️ ⛰️'],
+  ['🎉', 'Fiesta', '🎉 🎊 🎆 🎇 🎈 🪅 🎂 🎁 💃 🕺 🎶 🎵 🎤 🎸 🪕 🎺 🎻 🥁 🪇 🎪 🎡 🎠 🏆 🥇 🏅 🎯 👑 ✨ 💫 ⭐ 🌟 🔥 💥'],
+  ['😀', 'Caras', '😀 😃 😄 😁 😆 😂 🤣 😊 😇 🥰 😍 🤩 😘 😋 😜 🤪 😎 🥳 😏 🥹 😌 😴 🤤 😮 😲 😳 🥺 😢 😭 😤 😡 🤯 😱 🤔 🤫 🤭 🙄 😬 🤠 😈 💀 🤡'],
+  ['👍', 'Manos', '👍 👎 👌 ✌️ 🤞 🤟 🤘 🤙 👋 👏 🙌 🤲 🙏 🤝 💪 👊 ✊ 🫶 ✍️ 👀 👇 👆 👉 👈'],
+  ['❤️', 'Amor', '❤️ 🧡 💛 💚 💙 💜 🤎 🖤 🤍 💔 ❣️ 💕 💞 💓 💗 💖 💘 💝 💐 🌹 🥀 🌷 🌸 💋 💍 💯'],
+  ['☀️', 'Clima', '☀️ 🌤️ ⛅ 🌥️ ☁️ 🌦️ 🌧️ ⛈️ 🌩️ 🌪️ 🌈 ❄️ 💨 💧 💦 🌙 🌛 ⭐ 🌌 🔥 🌡️'],
+  ['🍺', 'Comida', '🍺 🍻 🥃 🍷 🍹 🥤 ☕ 🥛 🌮 🌯 🫔 🥩 🍖 🍗 🌶️ 🫓 🍞 🧀 🥚 🍳 🍲 🥘 🍉 🍊 🍋 🍑 🍓 🥭 🍍 🥑 🌽 🍰 🎂'],
+  ['🇲🇽', 'México', '🇲🇽 🦅 🌵 🌮 🌶️ 🪅 💀 🕯️ 🌼 🎺 🎸 🤠 🐴 ⛪ 🙏 🕊️'],
+];
+const SD_EMOJIS = SD_EMOJI_SETS[0][2].split(' ');
 const SD_COLORS = ['#FFFFFF', '#000000', '#F3BD68', '#C7843B', '#E2333F', '#F7A8C9', '#2E9C93', '#3B82F6', '#2C4657', '#8B4A22'];
 const isHex = (c) => /^#[0-9A-Fa-f]{6}$/.test(c || '');
 // Dibuja los textos, emojis y la tarjeta de canción encima del Sundown (posiciones en % del recuadro 9:16)
@@ -3002,10 +3052,23 @@ function startCreator(file, onDone, opts = {}) {
   }
   // ---- emojis ----
   function openEmojis() {
+    let tab = recentEmojis().length ? -1 : 0;
+    const tabs = h('div', { class: 'emo-tabs sdc-etabs' });
+    const grid = h('div', { class: 'sdc-emojis' });
+    const add = (e) => { items.push({ t: 'emoji', e, x: 50, y: 50, s: 1, r: 0 }); pushRecent(e); pane.remove(); paint(); };
+    const paintE = () => {
+      tabs.replaceChildren(
+        recentEmojis().length ? h('button', { type: 'button', class: tab === -1 ? 'on' : '', 'aria-label': 'Recientes', onclick: () => { tab = -1; paintE(); } }, '🕘') : '',
+        ...SD_EMOJI_SETS.map(([ico, name], i) => h('button', { type: 'button', class: tab === i ? 'on' : '', 'aria-label': name, onclick: () => { tab = i; paintE(); } }, ico)));
+      const list = tab === -1 ? recentEmojis() : SD_EMOJI_SETS[tab][2].split(' ');
+      grid.replaceChildren(...list.map(e => h('button', { type: 'button', onclick: () => add(e) }, e)));
+      grid.scrollTop = 0;
+    };
     const pane = h('div', { class: 'sdc-sheet' },
       h('div', { class: 'sdc-sheet-head' }, h('b', {}, 'Emojis'), h('button', { class: 'sdc-done', type: 'button', onclick: () => pane.remove() }, 'Cerrar')),
-      h('div', { class: 'sdc-emojis' }, SD_EMOJIS.map(e => h('button', { type: 'button', onclick: () => { items.push({ t: 'emoji', e, x: 50, y: 50, s: 1, r: 0 }); pane.remove(); paint(); } }, e))));
+      tabs, grid);
     root.append(pane);
+    paintE();
   }
   // ---- música (Apple Music, 30 s) ----
   function openMusic() {
@@ -3187,9 +3250,9 @@ function openSundowns(groups, gi, onClose) {
     if (it.user_id !== (state.me && state.me.id)) {
       const inp = h('input', { type: 'text', maxlength: '500', placeholder: 'Responder a ' + (g.user.username || '') + '…', enterkeyhint: 'send', 'aria-label': 'Responder' });
       const fly = (e) => { for (let k = 0; k < 5; k++) { const f = h('span', { class: 'sd-float', style: `left:${20 + Math.random() * 60}%;animation-delay:${k * .12}s` }, e); inner.append(f); setTimeout(() => f.remove(), 2200); } };
-      const emo = (e) => h('button', { type: 'button', class: 'emo', 'aria-label': 'Reaccionar ' + e, onclick: (ev) => { ev.stopPropagation(); if (needLogin('Crea tu cuenta para reaccionar')) return; fly(e); SFX.play({ '❤️': 'love', '😂': 'haha', '🔥': 'fire' }[e]); replySundown(g.user, e + ' Reaccionó a tu sundown'); } }, e);
+      const emo = (e) => h('button', { type: 'button', class: 'emo', 'aria-label': 'Reaccionar ' + e, onclick: (ev) => { ev.stopPropagation(); if (needLogin('Crea tu cuenta para reaccionar')) return; fly(e); SFX.play({ '❤️': 'love', '😂': 'haha', '🔥': 'fire', '🤠': 'ajua', '🐴': 'ajua', '😍': 'love' }[e] || 'love'); replySundown(g.user, e + ' Reaccionó a tu sundown'); } }, e);
       const send = async () => { const t = inp.value.trim(); if (!t) return; if (needLogin('Crea tu cuenta para responder')) return; inp.value = ''; replyBar.classList.remove('typing'); inp.blur(); await replySundown(g.user, '↩️ Respondió a tu sundown: ' + t); };
-      replyBar = h('div', { class: 'sd-reply' }, inp, emo('❤️'), emo('😂'), emo('🔥'),
+      replyBar = h('div', { class: 'sd-reply' }, inp, emo('🤠'), emo('❤️'), emo('😂'), emo('🔥'), emo('🐴'),
         h('button', { type: 'button', class: 'sendbtn', 'aria-label': 'Enviar', icon: 'send', onclick: send }));
       inp.addEventListener('focus', () => setPaused(true, 'button'));
       inp.addEventListener('blur', () => { if (!inp.value.trim()) setPaused(false, 'button'); });
@@ -3760,6 +3823,7 @@ async function renderProfile() {
           : h('button', { class: 'btn ghost', style: 'flex:0 0 52px', 'aria-label': 'Más opciones', onclick: () => {
               const close = openSheet('@' + prof.username, h('div', { class: 'sheet-body' },
                 h('button', { class: 'mn-row', onclick: async () => { close(); const url = location.origin + location.pathname + '#f=' + id; try { if (navigator.share) await navigator.share({ title: 'Ranchfolk', text: 'Mira el perfil de @' + prof.username + ' en Ranchfolk', url }); else { await navigator.clipboard.writeText(url); toast('Enlace copiado'); } } catch (_) {} } }, h('span', { class: 'mn-emo sm' }, '📤'), h('div', {}, h('b', {}, 'Compartir perfil'))),
+                h('button', { class: 'mn-row', onclick: () => { close(); reportThing('user', prof); } }, h('span', { class: 'mn-emo sm' }, '🚩'), h('div', {}, h('b', {}, 'Reportar a @' + prof.username), h('small', {}, 'Cuenta falsa, acoso, estafa…'))),
                 h('button', { class: 'mn-row', onclick: async () => { close(); if (needLogin('Crea tu cuenta para bloquear')) return; if (await blockUser(id, prof.username)) go('feed'); } }, h('span', { class: 'mn-emo sm' }, '🚫'), h('div', {}, h('b', {}, 'Bloquear'), h('small', {}, 'No verás sus publicaciones ni te podrá escribir')))));
             } }, '⋯'));
 
@@ -3826,11 +3890,14 @@ async function renderProfile() {
       if (!list.length) return box.replaceChildren(composer || '', h('div', { class: 'empty' }, isMe ? 'Aún no subes nada. Escribe arriba tu primera publicación.' : 'Todavía no ha publicado nada.'));
       const feed = h('div', { class: 'pf-feed' });
       let shown = 0;
-      const more = h('button', { class: 'btn ghost', style: 'width:calc(100% - 28px);margin:6px 14px 18px' }, 'Ver más publicaciones');
-      const page = () => { list.slice(shown, shown + 8).forEach(p => feed.append(postCard(p, () => render()))); shown += 8; more.hidden = shown >= list.length; };
-      more.onclick = page;
+      // Siguen saliendo solas al ir bajando (sin botón)
+      const more = h('div', { class: 'pf-more', 'aria-hidden': 'true' });
+      const page = () => { list.slice(shown, shown + 8).forEach(p => feed.append(postCard(p, () => render()))); shown += 8; if (shown >= list.length) { more.remove(); io && io.disconnect(); } };
+      const io = 'IntersectionObserver' in window ? new IntersectionObserver((es) => { if (es.some(e => e.isIntersecting) && document.body.contains(more)) page(); }, { rootMargin: '900px 0px' }) : null;
       page();
-      return box.replaceChildren(composer || '', h('div', { class: 'pf-h2' }, h('b', {}, 'Todas las publicaciones'), h('small', {}, list.length + (list.length === 1 ? ' publicación' : ' publicaciones'))), feed, more);
+      if (io && shown < list.length) setTimeout(() => io.observe(more), 0);
+      else if (!io) list.slice(shown).forEach(p => feed.append(postCard(p))), shown = list.length;
+      return box.replaceChildren(composer || '', h('div', { class: 'pf-h2' }, h('b', {}, 'Todas las publicaciones'), h('small', {}, list.length + (list.length === 1 ? ' publicación' : ' publicaciones'))), feed, shown < list.length ? more : '');
     }
     if (tab === 'animals') box.replaceChildren(animals.length ? h('div', { class: 'pf-agrid' }, animals.map(card)) : h('div', { class: 'empty' }, isMe ? 'Agrega a tus animales con el botón de arriba.' : 'Todavía no tiene animales.'));
     else box.replaceChildren(gridOf(posts.filter(p => (p.kind || 'post') === tab), tab === 'ride'
@@ -4413,7 +4480,8 @@ function openListing(l) {
       h('div', {}, h('small', {}, mine ? 'Tu anuncio' : 'Vendedor'), h('b', {}, prof.full_name || prof.username || '', vb(l.user_id)), prof.ubicacion ? h('small', {}, '📍 ' + prof.ubicacion) : null), h('span', { class: 'fx-chev' }, '›')),
     sellerRow,
     ...actions.filter(Boolean),
-    !mine ? h('p', { class: 'fx-tip' }, '🤝 Consejo: vean el animal o el producto en persona antes de pagar y no manden anticipos a desconocidos.') : null);
+    !mine ? h('p', { class: 'fx-tip' }, '🤝 Consejo: vean el animal o el producto en persona antes de pagar y no manden anticipos a desconocidos.') : null,
+    !mine ? h('button', { class: 'fx-report', onclick: () => reportThing('listing', l) }, '🚩 Reportar este anuncio') : null);
   const close = openSheet(l.category, body);
 }
 async function interested(l) {
@@ -4426,6 +4494,8 @@ async function interested(l) {
   document.querySelectorAll('.sheet-bg').forEach(x => x.remove());
   state.chat = { id: cid, other: prof }; go('chat');
 }
+// Mascotas y fauna silvestre no se venden en La Feria
+const PET_RE = /\b(perr[oa]s?|perrit[oa]s?|cachorr[oa]s?|gatit[oa]s?|gat[oa]s? (persa|siam[eé]s|de raza|bebé)|perico|periquit[oa]s?|loro|cotorras?|guacamayas?|tuc[aá]n|canari[oa]s?|hurones?|h[aá]mster|conejit[oa]s? de mascota|venados?|tortugas?|iguanas?|serpientes?|v[ií]boras?|monos?|monitos?|tigres?|leones? africanos?|jaguar|ocelote|tej[oó]n|tlacuache|halc[oó]n(es)?|lechuzas?|búhos?|buhos?)\b/i;
 function listingForm(l) {
   const isNew = !l;
   const kept = [...((l && l.photos) || [])];
@@ -4470,6 +4540,7 @@ function listingForm(l) {
   const body = h('form', { class: 'sheet-body', onsubmit: async (e) => {
     e.preventDefault(); err.textContent = '';
     const tt = title.value.trim(); if (tt.length < 3) return (err.textContent = 'Ponle un título (qué vendes).');
+    if (PET_RE.test(tt + ' ' + desc.value)) return (err.textContent = '🚫 En La Feria no se venden mascotas (perros, gatos, aves de ornato) ni fauna silvestre. Solo ganado, caballos, equipo, pastura y servicios del campo.');
     const p = nego.checked ? null : Number(String(price.value).replace(/[^0-9.]/g, ''));
     if (!nego.checked && !(p >= 0 && price.value.trim())) return (err.textContent = 'Pon el precio o marca "Precio a tratar".');
     save.disabled = true; save.textContent = 'Subiendo…';
@@ -4500,7 +4571,7 @@ function listingForm(l) {
   } },
     picker, photosBox,
     h('small', { class: 'hint', style: 'display:block;margin:-4px 0 12px' }, '📸 Puedes escoger varias fotos a la vez. La primera es la portada.'),
-    h('div', { class: 'field' }, h('label', {}, '¿Qué vendes?'), title),
+    h('div', { class: 'field' }, h('label', {}, '¿Qué vendes?'), title, h('small', { class: 'hint' }, 'Ganado, caballos, equipo, pastura y servicios del campo. No se permiten mascotas ni fauna silvestre.')),
     h('div', { class: 'field' }, h('label', {}, 'Categoría')), catChips,
     h('div', { class: 'field' }, h('label', {}, 'Precio (pesos)'), price, h('label', { class: 'fx-check' }, nego, ' Precio a tratar')),
     specBox,
@@ -4870,19 +4941,32 @@ async function renderAdmin() {
       const { data, error } = await sb.rpc('admin_reports');
       if (error) return box.replaceChildren(h('p', { class: 'err' }, friendlyError(error)));
       const seenPost = new Set();
-      const rows = (data || []).filter(r => !r.post_id || (!seenPost.has(r.post_id) && seenPost.add(r.post_id)));
-      if (!rows.length) return box.replaceChildren(h('div', { class: 'dm-empty' }, h('div', {}, '✅'), h('b', {}, 'No hay reportes pendientes'), 'Cuando alguien reporte una publicación, aparecerá aquí.'));
+      const keyOf = (r) => r.comment_id ? 'c' + r.comment_id : r.listing_id ? 'l' + r.listing_id : r.post_id ? 'p' + r.post_id : 'u' + r.owner_id;
+      const rows = (data || []).filter(r => !seenPost.has(keyOf(r)) && seenPost.add(keyOf(r)));
+      if (!rows.length) return box.replaceChildren(h('div', { class: 'dm-empty' }, h('div', {}, '✅'), h('b', {}, 'No hay reportes pendientes'), 'Cuando alguien reporte una publicación, un anuncio, un comentario o una persona, aparecerá aquí.'));
       box.replaceChildren(...rows.map(r => {
         const card = h('div', { class: 'adm-rep' });
-        const thumb = r.media_url ? (r.media_type === 'video' ? h('video', { src: r.media_url + '#t=0.5', muted: true, playsInline: true, preload: 'metadata' }) : h('img', { src: r.media_url, alt: '' })) : h('span', {}, '🗑️');
+        const kind = r.kind || (r.post_id ? 'post' : 'user');
+        const KL = { post: '📷 Publicación', user: '👤 Persona', listing: '🛒 Anuncio', comment: '💬 Comentario' };
+        const thumb = kind === 'listing' ? (r.listing_photo ? h('img', { src: r.listing_photo, alt: '' }) : h('span', {}, '🛒'))
+          : kind === 'comment' ? h('span', {}, '💬') : kind === 'user' ? h('span', {}, '👤')
+          : r.media_url ? (r.media_type === 'video' ? h('video', { src: r.media_url + '#t=0.5', muted: true, playsInline: true, preload: 'metadata' }) : h('img', { src: r.media_url, alt: '' })) : h('span', {}, '🗑️');
+        const openIt = () => kind === 'listing' ? (r.listing_id && openListingById(r.listing_id)) : kind === 'user' ? (r.owner_id && go('profile', { profileId: r.owner_id })) : (r.post_id && openPostById(r.post_id));
+        const delBtn = kind === 'post' && r.post_id ? ['¿Borrar esta publicación para siempre?', 'admin_delete_post', { pid: r.post_id }, 'Publicación borrada']
+          : kind === 'listing' && r.listing_id ? ['¿Borrar este anuncio?', 'admin_delete_listing', { lid: r.listing_id }, 'Anuncio borrado']
+          : kind === 'comment' && r.comment_id ? ['¿Borrar este comentario?', 'admin_delete_comment', { cid: r.comment_id }, 'Comentario borrado'] : null;
         card.append(
-          h('button', { class: 'adm-thumb', onclick: () => r.post_id && openPostById(r.post_id) }, thumb),
+          h('button', { class: 'adm-thumb', onclick: openIt }, thumb),
           h('div', { class: 'adm-info' },
+            h('span', { class: 'adm-kind' }, KL[kind] || ''),
             h('b', {}, '🚩 ' + r.reason + (r.times > 1 ? ` · ${r.times} reportes` : '')),
             h('small', {}, 'De @' + (r.owner_username || '¿?') + (isBanned(r.owner_banned_until) ? ' (suspendido)' : '') + ' · reportó @' + (r.reporter_username || '¿?') + ' · ' + timeAgo(r.created_at)),
-            r.caption ? h('p', {}, r.caption.slice(0, 120)) : (r.post_id ? null : h('p', {}, 'La publicación ya fue borrada.')),
+            kind === 'listing' ? h('p', {}, r.listing_title || 'El anuncio ya fue borrado.')
+              : kind === 'comment' ? h('p', {}, r.comment_body ? '“' + r.comment_body.slice(0, 140) + '”' : 'El comentario ya fue borrado.')
+              : kind === 'user' ? null
+              : r.caption ? h('p', {}, r.caption.slice(0, 120)) : (r.post_id ? null : h('p', {}, 'La publicación ya fue borrada.')),
             h('div', { class: 'adm-acts' },
-              r.post_id ? h('button', { class: 'btn small danger-btn', onclick: async () => { if (!confirm('¿Borrar esta publicación para siempre?')) return; const { error: e2 } = await sb.rpc('admin_delete_post', { pid: r.post_id }); if (e2) return toast(friendlyError(e2)); toast('Publicación borrada'); card.remove(); loadStats(); } }, '🗑️ Borrar') : null,
+              delBtn ? h('button', { class: 'btn small danger-btn', onclick: async () => { if (!confirm(delBtn[0])) return; const { error: e2 } = await sb.rpc(delBtn[1], delBtn[2]); if (e2) return toast(friendlyError(e2)); toast(delBtn[3]); card.remove(); loadStats(); } }, '🗑️ Borrar') : null,
               r.owner_id ? (isBanned(r.owner_banned_until) ? h('button', { class: 'btn small ghost', onclick: () => unban(r.owner_id, r.owner_username, loadTab) }, 'Quitar suspensión') : h('button', { class: 'btn small ghost', onclick: () => banSheet(r.owner_id, r.owner_username, loadTab) }, '⛔ Suspender')) : null,
               h('button', { class: 'btn small ghost', onclick: async () => { const { error: e2 } = await sb.rpc('admin_resolve_report', { rid: r.id }); if (e2) return toast(friendlyError(e2)); toast('Reporte descartado'); card.remove(); loadStats(); } }, '✓ Está bien'))));
         return card;
