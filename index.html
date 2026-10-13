@@ -386,6 +386,15 @@ textarea.input{min-height:90px;resize:vertical}
 .pf-hero{background:linear-gradient(180deg,#2C4657,#172531);color:#F1E4CC;text-align:center;padding:22px 14px 18px}
 .pf-av{border:none;background:none;padding:0;margin:0 auto;display:block}
 .pf-av .ring{width:112px;height:112px;margin:0 auto}
+.pf-av{position:relative;width:112px}
+.pf-av-plus{position:absolute;right:0;bottom:4px;width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#F3BD68,#C7843B);color:#172531;font-size:24px;font-weight:800;line-height:31px;text-align:center;border:3px solid #1F3242;box-shadow:0 2px 8px rgba(0,0,0,.35);cursor:pointer}
+.pf-hero.has-cover{padding-top:0}
+.pf-cover{position:relative;height:160px;margin:0 -14px -56px;background:#33495A center/cover no-repeat;cursor:pointer}
+.pf-cover::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(23,37,49,0) 45%,rgba(28,44,57,.95))}
+.pf-cover.empty{background:repeating-linear-gradient(135deg,#2C4657 0 14px,#304C5E 14px 28px)}
+.pf-cover-btn{position:absolute;right:10px;top:10px;z-index:1;background:rgba(23,37,49,.72);color:#FFF6E6;font-size:12.5px;font-weight:700;padding:6px 11px;border-radius:999px;border:1px solid rgba(243,189,104,.5)}
+.pf-hero.has-cover .pf-av{z-index:1}
+.at-wrap{display:flex;align-items:center;gap:0}.at-wrap span{font-weight:800;color:var(--muted);padding:0 6px 0 2px;font-size:17px}.at-wrap .input{flex:1}
 .pf-hero h1{margin:10px 0 2px;font-size:23px;color:#fff}
 .pf-sub{color:#F3BD68;font-size:14px}
 .pf-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:14px}
@@ -3436,9 +3445,17 @@ async function renderProfile() {
     const open = () => openReviews(prof, refresh);
     ratingSlot.replaceChildren(ratingPill(r, open));
   });
-  const hero = h('section', { class: 'pf-hero' },
-    h('button', { class: 'pf-av', 'aria-label': sd ? 'Ver sundown' : 'Foto de perfil', onclick: () => { if (sd) openSundowns([sd], 0, () => render()); } },
-      h('div', { class: 'ring' + (sd ? (sd.unseen ? ' new' : ' seen') : '') }, h('div', {}, avatar(prof, 96)))),
+  const cover = (prof.cover_url || isMe) ? h('div', { class: 'pf-cover' + (prof.cover_url ? '' : ' empty'), style: prof.cover_url ? `background-image:url("${String(prof.cover_url).replace(/"/g, '')}")` : '',
+      role: 'button', 'aria-label': 'Foto de portada', onclick: () => { if (isMe) coverMenu(prof); else openMediaViewer(prof.cover_url, 'image'); } },
+      isMe ? h('span', { class: 'pf-cover-btn' }, '📷 ', prof.cover_url ? 'Editar portada' : 'Agregar portada') : null) : null;
+  const avBtn = h('button', { class: 'pf-av', 'aria-label': isMe ? 'Foto de perfil' : sd ? 'Ver sundown' : 'Foto de perfil', onclick: () => {
+      if (isMe) return photoMenu(prof, sd);
+      if (sd) openSundowns([sd], 0, () => render()); else if (prof.avatar_url) openMediaViewer(prof.avatar_url, 'image'); } },
+    h('div', { class: 'ring' + (sd ? (sd.unseen ? ' new' : ' seen') : '') }, h('div', {}, avatar(prof, 96))),
+    isMe ? h('span', { class: 'pf-av-plus', role: 'button', 'aria-label': 'Cambiar foto de perfil', onclick: (e) => { e.stopPropagation(); pickImage(f => savePhoto('avatar', f)); } }, '+') : null);
+  const hero = h('section', { class: 'pf-hero' + (cover ? ' has-cover' : '') },
+    cover,
+    avBtn,
     h('h1', {}, prof.full_name || prof.username, vb(prof.id)),
     h('div', { class: 'pf-sub' }, '@' + prof.username + (prof.ubicacion || prof.estado ? ' · 📍 ' + [prof.ubicacion, prof.estado && !(prof.ubicacion || '').toLowerCase().includes(prof.estado.toLowerCase()) ? prof.estado : ''].filter(Boolean).join(', ') : '')),
     ratingSlot,
@@ -3683,6 +3700,48 @@ function editAnimal(a) {
   close = openSheet(isNew ? 'Nuevo animal' : 'Editar ' + a.name, body);
 }
 
+// Cambiar foto de perfil o portada directo desde el perfil (como Facebook)
+function pickImage(onFile) {
+  const inp = h('input', { type: 'file', accept: 'image/*', hidden: true });
+  inp.addEventListener('change', () => { const f = inp.files && inp.files[0]; inp.remove(); if (f) onFile(f); });
+  document.body.append(inp); inp.click();
+}
+async function savePhoto(kind, file) {
+  const isCover = kind === 'cover';
+  toast(isCover ? 'Subiendo portada…' : 'Subiendo foto de perfil…');
+  try {
+    const blob = await compressImage(file, isCover ? 1600 : 640);
+    const path = `${state.me.id}/${isCover ? 'portada' : 'avatar'}-${Date.now()}.jpg`;
+    const up = await sb.storage.from('media').upload(path, blob, { contentType: 'image/jpeg', cacheControl: '31536000' });
+    if (up.error) throw up.error;
+    const url = sb.storage.from('media').getPublicUrl(path).data.publicUrl;
+    const { error } = await sb.from('profiles').update(isCover ? { cover_url: url } : { avatar_url: url }).eq('id', state.me.id);
+    if (error) throw (/cover_url|column|schema/i.test(error.message || '') ? new Error('Falta activar la foto de portada en Supabase') : error);
+    await loadMe(); toast(isCover ? '¡Portada actualizada!' : '¡Foto de perfil actualizada!'); SFX.play('ajua'); render();
+  } catch (ex) { toast(friendlyError(ex)); }
+}
+async function removeCover() {
+  const { error } = await sb.from('profiles').update({ cover_url: null }).eq('id', state.me.id);
+  if (error) return toast('No se pudo quitar');
+  await loadMe(); toast('Portada quitada'); render();
+}
+function photoMenu(prof, sd) {
+  const items = [];
+  const it = (emo, label, fn) => h('button', { class: 'menu-item', onclick: () => { close(); fn(); } }, h('span', { class: 'mi-emo' }, emo), h('span', {}, label));
+  if (sd) items.push(it('🌅', 'Ver sundown', () => openSundowns([sd], 0, () => render())));
+  if (prof.avatar_url) items.push(it('👁️', 'Ver foto de perfil', () => openMediaViewer(prof.avatar_url, 'image')));
+  items.push(it('📷', prof.avatar_url ? 'Cambiar foto de perfil' : 'Poner foto de perfil', () => pickImage(f => savePhoto('avatar', f))));
+  items.push(it('🌅', 'Crear sundown', () => openSundownCreator(() => render())));
+  const close = openSheet('Foto de perfil', h('div', { class: 'sheet-body menu' }, ...items));
+}
+function coverMenu(prof) {
+  const it = (emo, label, fn, danger) => h('button', { class: 'menu-item' + (danger ? ' danger' : ''), onclick: () => { close(); fn(); } }, h('span', { class: 'mi-emo' }, emo), h('span', {}, label));
+  const close = openSheet('Foto de portada', h('div', { class: 'sheet-body menu' },
+    prof.cover_url ? it('👁️', 'Ver portada', () => openMediaViewer(prof.cover_url, 'image')) : null,
+    it('📷', prof.cover_url ? 'Cambiar portada' : 'Poner foto de portada', () => pickImage(f => savePhoto('cover', f))),
+    prof.cover_url ? it('🗑️', 'Quitar portada', removeCover, true) : null));
+}
+const USER_RE = /^[a-z0-9._]{3,30}$/;
 function editProfile(prof) {
   let newAvatar = null;
   const prev = h('div', {}, avatar(prof, 84));
@@ -3693,6 +3752,9 @@ function editProfile(prof) {
     prev.replaceChildren(a);
   });
   const name = h('input', { class: 'input', id: 'pn', value: prof.full_name || '', maxlength: '60' });
+  const uname = h('input', { class: 'input', id: 'pus', value: prof.username || '', maxlength: '30', autocapitalize: 'none', autocomplete: 'off', spellcheck: 'false', inputmode: 'text' });
+  const uHint = h('small', { class: 'hint' }, 'Solo letras minúsculas, números, punto y guion bajo (3 a 30). Así te encuentran y te mencionan con @.');
+  uname.addEventListener('input', () => { const v = uname.value.toLowerCase().replace(/\s+/g, '').replace(/[^a-z0-9._]/g, ''); if (v !== uname.value) uname.value = v; });
   const rancho = h('input', { class: 'input', id: 'pr', value: prof.rancho || '', maxlength: '60', placeholder: 'ej. Rancho El Mezquite' });
   const ubic = h('input', { class: 'input', id: 'pu', value: prof.ubicacion || '', maxlength: '60', placeholder: 'ej. León' });
   const estado = estadoSelect(prof.estado); estado.id = 'pe';
@@ -3704,7 +3766,14 @@ function editProfile(prof) {
   const body = h('form', { class: 'sheet-body', onsubmit: async (e) => {
     e.preventDefault(); save.disabled = true; err.textContent = '';
     try {
+      const newU = uname.value.trim().toLowerCase();
+      if (newU !== prof.username) {
+        if (!USER_RE.test(newU)) { err.textContent = 'El nombre de usuario debe tener de 3 a 30 letras minúsculas, números, punto o guion bajo.'; save.disabled = false; return; }
+        const { data: taken } = await sb.from('profiles').select('id').ilike('username', newU.replace(/_/g, '\\_')).neq('id', state.me.id).limit(1);
+        if (taken && taken.length) { err.textContent = '@' + newU + ' ya lo está usando alguien más. Prueba con otro.'; save.disabled = false; return; }
+      }
       const patch = { full_name: name.value.trim() || null, rancho: rancho.value.trim() || null, ubicacion: ubic.value.trim() || null, estado: estado.value || null, dedica: dedica.value.trim() || null, fierro: fierro.value.trim() || null };
+      if (newU !== prof.username) patch.username = newU;
       if (newAvatar) {
         const blob = await compressImage(newAvatar, 480);
         const path = `${state.me.id}/avatar-${Date.now()}.jpg`;
@@ -3715,6 +3784,7 @@ function editProfile(prof) {
       let { error } = await sb.from('profiles').update(patch).eq('id', state.me.id);
       if (error && /estado/i.test(error.message || '')) { delete patch.estado; ({ error } = await sb.from('profiles').update(patch).eq('id', state.me.id)); }
       if (error && /ubicacion|dedica|fierro/i.test(error.message || '')) { delete patch.ubicacion; delete patch.dedica; delete patch.fierro; ({ error } = await sb.from('profiles').update(patch).eq('id', state.me.id)); if (!error) toast('Falta activar la ficha del ranchero en Supabase'); }
+      if (error && /duplicate|unique|username/i.test(error.message || '')) { err.textContent = 'Ese nombre de usuario ya está ocupado. Prueba con otro.'; save.disabled = false; return; }
       if (error) throw error;
       await loadMe(); close(); toast('Perfil actualizado'); render();
     } catch (ex) { err.textContent = friendlyError(ex); save.disabled = false; }
@@ -3722,6 +3792,7 @@ function editProfile(prof) {
     h('div', { style: 'display:flex;align-items:center;gap:16px;margin-bottom:18px' }, prev,
       fileIn, h('label', { for: 'av', class: 'btn ghost small', style: 'display:inline-flex;align-items:center;cursor:pointer' }, 'Cambiar foto')),
     h('div', { class: 'field' }, h('label', { for: 'pn' }, 'Nombre'), name),
+    h('div', { class: 'field' }, h('label', { for: 'pus' }, 'Nombre de usuario'), h('div', { class: 'at-wrap' }, h('span', {}, '@'), uname), uHint),
     h('div', { class: 'field' }, h('label', { for: 'pr' }, '🏡 Tu rancho'), rancho),
     h('div', { class: 'field' }, h('label', { for: 'pu' }, '📍 Ciudad o pueblo'), ubic),
     h('div', { class: 'field' }, h('label', { for: 'pe' }, '🗺️ Estado'), estado, h('small', { class: 'hint' }, 'Para mostrarte ventas, eventos y gente cerca de ti.')),
