@@ -946,6 +946,41 @@ html,body{background:#F5EFE3!important;background-image:none!important;color:#17
 .nav button{font-size:10.5px}
 .nav-ico{position:relative;display:flex}
 .nav-badge{top:-7px;right:-11px;min-width:17px;height:17px;font-size:10px;border-width:1.5px}
+/* Barra de abajo estilo Facebook: pegada abajo, de lado a lado, solo iconos */
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:6;background:linear-gradient(180deg,#22384A,#172531);border-top:1px solid rgba(243,189,104,.35);box-shadow:0 -4px 18px rgba(23,37,49,.25);padding-bottom:env(safe-area-inset-bottom)}
+.tabbar-in{max-width:620px;margin:0 auto;display:flex;align-items:stretch}
+.tabbar button{position:relative;flex:1 1 0;min-width:0;height:56px;border:none;background:none;display:flex;align-items:center;justify-content:center;color:#C9D3DA;opacity:.85;padding:0;cursor:pointer}
+.tabbar button svg{width:26px;height:26px}
+.tabbar button.on{color:#F3BD68;opacity:1}
+.tabbar button.on::before{content:"";position:absolute;top:0;left:18%;right:18%;height:3px;border-radius:0 0 3px 3px;background:#F3BD68;box-shadow:0 0 8px rgba(243,189,104,.6)}
+.tabbar .nav-ico{position:relative;display:flex}
+.tabbar .nav-badge{top:-6px;right:-12px}
+.tab-av{display:flex;border-radius:50%;padding:2px;border:2px solid transparent}.tab-av.on{border-color:#F3BD68}.tab-av .avatar{font-size:11px!important}
+main{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+.fx{padding-bottom:84px}
+.top-actions{gap:6px}
+.top-actions .iconbtn{width:40px;height:40px}
+.top-actions .iconbtn svg{width:21px;height:21px}
+.top-plus svg{stroke-width:2.4}
+@media (max-width:400px){.topbar .logo{font-size:25px!important}.top-actions{gap:4px}.top-actions .iconbtn{width:38px;height:38px}}
+@media (max-width:350px){.topbar .logo{font-size:21px!important}.top-actions .iconbtn{width:35px;height:35px}}
+/* Compas */
+.pf-btns .btn{white-space:nowrap;padding:0 10px}.pf-btns .btn:first-child{flex:1.35}
+.cb-ico{display:inline-flex;margin-right:6px;vertical-align:-5px}.cb-ico svg{width:20px;height:20px}
+.btn.small .cb-ico svg{width:17px;height:17px}
+.cp-hero{display:flex;align-items:center;gap:14px;margin:14px;padding:14px;border-radius:20px;background:linear-gradient(180deg,#2C4657,#172531);color:#F1E4CC}
+.cp-hero b{display:block;font-size:17px;color:#fff}.cp-hero small{color:#C9D3DA;font-size:13px;line-height:1.35}
+.cp-burst{flex:0 0 64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#172531;background:repeating-conic-gradient(from 0deg,#F3BD68 0 12deg,#E9A84F 12deg 24deg);box-shadow:0 0 0 3px rgba(243,189,104,.35)}
+.cp-burst svg{width:40px;height:40px}
+.cp-sec{padding:4px 14px 10px}
+.cp-head{display:flex;align-items:center;gap:8px;margin:8px 2px 10px}.cp-head b{font-size:18px}
+.cp-n{background:#C2183A;color:#fff;font-size:12px;font-weight:800;border-radius:10px;padding:1px 8px}
+.cp-row{display:flex;gap:12px;align-items:center;padding:8px 0}
+.cp-av{border:none;background:none;padding:0;flex:0 0 auto}
+.cp-main{flex:1;min-width:0}
+.cp-name{display:block;border:none;background:none;padding:0;text-align:left;font:inherit;color:inherit;cursor:pointer;max-width:100%}
+.cp-name b{display:block;font-size:15.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cp-name small{color:var(--muted);font-size:12.5px}
+.cp-acts{display:flex;gap:8px;margin-top:7px}.cp-acts .btn{flex:1;height:36px;font-size:13.5px;padding:0 8px}
 .pw-wrap{position:relative}.pw-wrap .input{width:100%;padding-right:52px}
 .pw-eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:42px;height:42px;border:none;background:none;color:#5B6B76;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:50%}
 /* Barra de abajo con más aire: el + es un círculo más chico y la barra usa más ancho */
@@ -1013,6 +1048,7 @@ const ICONS = {
   shotsbig: '<svg width="96" height="96" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7.6 C17.6 7.6 21.4 10.6 21.4 14.4 C21.4 18.2 17.6 21 12 21 C10.9 21 9.8 20.9 8.8 20.6 L4.4 22.4 L5.6 18.8 C3.6 17.6 2.6 16.1 2.6 14.4 C2.6 10.6 6.4 7.6 12 7.6 Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="8.2" cy="14.4" r="1.15" fill="url(#g)"/><circle cx="12" cy="14.4" r="1.15" fill="url(#g)"/><circle cx="15.8" cy="14.4" r="1.15" fill="url(#g)"/><g transform="translate(12 6.4) rotate(-10) scale(.25) translate(-50 -20)"><path d="M14 21.5 C18 25.5 26 26.6 34 26 C40 25.6 44 24.4 50 24.4 C56 24.4 60 25.6 66 26 C74 26.6 82 25.5 86 21.5 C84 25 80 29 72 30.4 C64 31.6 58 30.2 50 30.2 C42 30.2 36 31.6 28 30.4 C20 29 16 25 14 21.5 Z M33 25.6 C33.4 19 34.6 12 38 8.4 C40 6.4 43 7 45 8.6 C47.4 10.4 48.6 10.6 50 10.6 C51.4 10.6 52.6 10.4 55 8.6 C57 7 60 6.4 62 8.4 C65.4 12 66.6 19 67 25.6 C62 24.6 56 24 50 24 C44 24 38 24.6 33 25.6 Z" fill="currentColor"/><path d="M33.6 21.6 C40 20.4 60 20.4 66.4 21.6 L66.8 24.6 C60 23.4 40 23.4 33.2 24.6 Z" fill="url(#g)"/></g></svg>',
   feria: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9 5 4h14l2 5"/><path d="M3 9a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0"/><path d="M5 12v8h14v-8"/><path d="M10 20v-5h4v5"/></svg>',
   menu: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>',
+  compas: '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><defs><mask id="hsm"><rect width="24" height="24" fill="#fff"/><rect x="6.4" y="4.2" width="11.2" height="10.4" rx="4.2" fill="none" stroke="#000" stroke-width="1.4"/><path d="M9.4 4.9v3.8M11.8 4.5v4.2M14.2 4.9v3.4" stroke="#000" stroke-width="1.15" stroke-linecap="round"/><path d="M17.2 8.4c-1.6.2-3.2 1.1-4.4 2.6" fill="none" stroke="#000" stroke-width="1.15" stroke-linecap="round"/></mask></defs><g mask="url(#hsm)"><path d="M.6 19.4 7 10.6l3.6 3.4-6.8 9z"/><path d="M23.4 19.4 17 10.6l-3.6 3.4 6.8 9z"/><rect x="6.4" y="4.2" width="11.2" height="10.4" rx="4.2"/></g></svg>',
   bell: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>',
   mic: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v4"/></svg>',
   send: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>',
@@ -1609,18 +1645,28 @@ function go(view, extra) {
   if (typeof syncBack === 'function') syncBack();
 }
 function navBar() {
-  const b = (v, icon, label, isOn) => h('button', { class: isOn ? 'on' : '', 'aria-label': label, onclick: () => { if (v === 'profile' && needLogin('Crea tu cuenta para tener tu perfil')) return; if (v === 'explore') state.focusSearch = true; go(v, v === 'profile' ? { profileId: state.me.id } : undefined); } },
-    h('span', { icon }), label);
+  const b = (v, icon, label, isOn, extra) => h('button', { class: isOn ? 'on' : '', 'aria-label': label, title: label, onclick: () => {
+      if ((v === 'profile' || v === 'compas') && needLogin(v === 'compas' ? 'Crea tu cuenta para hacer compas' : 'Crea tu cuenta para tener tu perfil')) return;
+      go(v, v === 'profile' ? { profileId: state.me.id } : undefined); } },
+    h('span', { class: 'nav-ico' }, icon, extra || null));
   const ownProfile = state.view === 'profile' && state.profileId === state.me.id;
-  return h('nav', { class: 'nav' }, h('div', { class: 'nav-in' },
-    b('feed', 'home', 'Inicio', state.view === 'feed'),
-    b('explore', 'search', 'Buscar', state.view === 'explore'),
-    b('rides', 'horseshoe', 'Rides', state.view === 'rides'),
-    h('button', { class: 'plus', 'aria-label': 'Subir', onclick: () => { if (needLogin('Crea tu cuenta para subir tus fotos y videos')) return; state.uploadKind = state.view === 'rides' ? 'ride' : 'post'; go('upload'); }, icon: 'plus' }),
+  const compaBadge = h('span', { class: 'dm-badge nav-badge', hidden: true });
+  if (!isGuest() && HAS_COMPAS) loadCompas().then(() => { const n = compaIncoming(); compaBadge.hidden = !n; compaBadge.textContent = n > 9 ? '9+' : String(n); });
+  const me = isGuest() ? h('span', { icon: 'user', style: 'display:flex' }) : h('span', { class: 'tab-av' + (ownProfile ? ' on' : '') }, avatar(state.me, 28));
+  return h('nav', { class: 'tabbar' }, h('div', { class: 'tabbar-in' },
+    b('feed', h('span', { icon: 'home', style: 'display:flex' }), 'Inicio', state.view === 'feed'),
+    b('rides', h('span', { icon: 'horseshoe', style: 'display:flex' }), 'Rides', state.view === 'rides'),
+    b('compas', h('span', { icon: 'compas', style: 'display:flex' }), 'Compas', state.view === 'compas', compaBadge),
+    b('feria', h('span', { icon: 'feria', style: 'display:flex' }), 'La Feria', state.view === 'feria'),
     navBell(),
-    b('feria', 'feria', 'Feria', state.view === 'feria'),
-    b('profile', 'user', 'Perfil', ownProfile)
-  ));
+    b('profile', me, 'Perfil', ownProfile)));
+}
+// Botones de arriba (como Facebook): publicar, buscar, menú y mensajes
+function plusButton() {
+  return h('button', { class: 'iconbtn dm-btn top-plus', 'aria-label': 'Publicar', icon: 'plus', onclick: () => { if (needLogin('Crea tu cuenta para subir tus fotos y videos')) return; state.uploadKind = state.view === 'rides' ? 'ride' : 'post'; go('upload'); } });
+}
+function topActions() {
+  return h('div', { class: 'top-actions' }, plusButton(), searchButton(), menuButton(), dmButton());
 }
 
 // ---------- pantallas ----------
@@ -1632,7 +1678,7 @@ function render() {
   if (!state.me) { $app.append(h('div', { class: 'spinner' })); return; }
   if (isGuest() && !['feed', 'rides', 'explore', 'profile', 'animal'].includes(state.view)) state.view = 'feed';
   if (state.view === 'welcome') return renderWelcome();
-  const views = { saved: renderSaved, admin: renderAdmin, feed: renderFeed, rides: renderRides, explore: renderExplore, upload: renderUpload, profile: renderProfile, animal: renderAnimal, inbox: renderInbox, chat: renderChat, notifs: renderNotifs, feria: renderFeria };
+  const views = { compas: renderCompas, saved: renderSaved, admin: renderAdmin, feed: renderFeed, rides: renderRides, explore: renderExplore, upload: renderUpload, profile: renderProfile, animal: renderAnimal, inbox: renderInbox, chat: renderChat, notifs: renderNotifs, feria: renderFeria };
   (views[state.view] || renderFeed)();
   if (state.view !== 'chat') $app.append(navBar());
   if (HEADS.size) paintHeads(); else if (!HEADS_LOADED && !isGuest()) setTimeout(loadHeads, 1500);
@@ -1723,7 +1769,7 @@ function renderAuth() {
 
 async function renderFeed() {
   const main = h('main');
-  $app.append(h('header', { class: 'topbar' }, h('div', { class: 'logo' }, 'Ranchfolk'), h('div', { class: 'top-actions' }, menuButton(), dmButton())), main);
+  $app.append(h('header', { class: 'topbar' }, h('div', { class: 'logo' }, 'Ranchfolk'), topActions()), main);
 
   const stories = h('div', { class: 'stories' });
   const chips = h('div', { class: 'chips' }, ['Todo', ...CATEGORIES].map(c =>
@@ -2423,6 +2469,107 @@ async function renderWelcome() {
 
 // ---------- Reportar, bloquear, borrar ----------
 const REPORT_REASONS = ['Contenido sexual o desnudos', 'Violencia o maltrato animal', 'Acoso o insultos', 'Spam, estafa o venta ilegal', 'Algo más'];
+// ---------- Compas (solicitudes de amistad) ----------
+let HAS_COMPAS = true;
+let COMPAS = null; // Map otroId -> { status, dir: 'in'|'out', at }
+let COMPAS_P = null;
+function loadCompas(force) {
+  if (isGuest() || !HAS_COMPAS) return Promise.resolve(new Map());
+  if (COMPAS && !force) return Promise.resolve(COMPAS);
+  if (COMPAS_P && !force) return COMPAS_P;
+  const me = state.me.id;
+  COMPAS_P = sb.from('compas').select('requester,addressee,status,created_at,accepted_at').or(`requester.eq.${me},addressee.eq.${me}`).limit(2000).then(({ data, error }) => {
+    COMPAS_P = null;
+    if (error) { if (/compas|relation|schema/i.test(error.message || '')) HAS_COMPAS = false; COMPAS = new Map(); return COMPAS; }
+    COMPAS = new Map((data || []).map(r => { const out = r.requester === me; return [out ? r.addressee : r.requester, { status: r.status, dir: out ? 'out' : 'in', at: r.accepted_at || r.created_at }]; }));
+    return COMPAS;
+  });
+  return COMPAS_P;
+}
+const compaOf = (id) => (COMPAS && COMPAS.get(id)) || null;
+const compaIncoming = () => COMPAS ? [...COMPAS.values()].filter(x => x.status === 'pendiente' && x.dir === 'in').length : 0;
+function refreshCompaBadge() { const b = document.querySelector('.tabbar [aria-label="Compas"] .nav-badge'); if (b) { const n = compaIncoming(); b.hidden = !n; b.textContent = n > 9 ? '9+' : String(n); } }
+function compaMissing(e) { return /compas|relation|schema/i.test((e && e.message) || ''); }
+async function compaAction(id, what) {
+  const me = state.me.id;
+  let res;
+  if (what === 'send') res = await sb.from('compas').insert({ requester: me, addressee: id });
+  else if (what === 'accept') res = await sb.from('compas').update({ status: 'aceptada' }).eq('requester', id).eq('addressee', me);
+  else res = await sb.from('compas').delete().or(`and(requester.eq.${me},addressee.eq.${id}),and(requester.eq.${id},addressee.eq.${me})`);
+  if (res.error) {
+    if (compaMissing(res.error)) { toast('Falta activar los compas en Supabase'); return false; }
+    if (/duplicate|unique/i.test(res.error.message || '')) { await loadCompas(true); refreshCompaBadge(); return true; }
+    toast(/row-level|policy/i.test(res.error.message || '') ? 'No se puede mandar la solicitud a esta persona' : 'No se pudo, intenta otra vez'); return false;
+  }
+  if (what === 'send') { COMPAS.set(id, { status: 'pendiente', dir: 'out', at: new Date().toISOString() }); toast('🤝 Solicitud enviada'); }
+  else if (what === 'accept') { COMPAS.set(id, { status: 'aceptada', dir: 'in', at: new Date().toISOString() }); SFX.play('ajua'); toast('🤝 ¡Ya son compas!'); if (state.following) state.following.add(id); }
+  else COMPAS.delete(id);
+  try { navigator.vibrate && navigator.vibrate(15); } catch (_) {}
+  refreshCompaBadge();
+  return true;
+}
+// Botón de compa para el perfil y las listas
+function compaBtn(id, opts = {}) {
+  if (!HAS_COMPAS || isGuest() || !state.me || id === state.me.id) return null;
+  const b = h('button', { type: 'button', class: 'btn' + (opts.small ? ' small' : '') });
+  const paint = () => {
+    const c = compaOf(id);
+    b.className = 'btn' + (opts.small ? ' small' : '') + (!c ? ' pf-gold' : c.status === 'pendiente' && c.dir === 'in' ? ' pf-gold' : ' ghost');
+    b.replaceChildren(h('span', { icon: 'compas', class: 'cb-ico' }), h('span', {}, !c ? (opts.small ? 'Agregar' : 'Agregar compa') : c.status === 'aceptada' ? 'Compas' : c.dir === 'out' ? 'Enviada' : 'Responder'));
+  };
+  b.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    const c = compaOf(id);
+    const done = async (what) => { b.disabled = true; await compaAction(id, what); b.disabled = false; paint(); opts.onChange && opts.onChange(); };
+    if (!c) return done('send');
+    const who = opts.name ? '@' + opts.name : 'esta persona';
+    const it = (emo, label, fn, danger) => h('button', { class: 'menu-item' + (danger ? ' danger' : ''), onclick: () => { close(); fn(); } }, h('span', { class: 'mi-emo' }, emo), h('span', {}, label));
+    const items = c.status === 'aceptada' ? [it('💔', 'Dejar de ser compas', () => done('remove'), true)]
+      : c.dir === 'out' ? [it('↩️', 'Cancelar solicitud', () => done('remove'), true)]
+      : [it('🤝', 'Confirmar solicitud', () => done('accept')), it('✕', 'Eliminar solicitud', () => done('remove'), true)];
+    const close = openSheet(c.status === 'aceptada' ? 'Tú y ' + who + ' son compas' : c.dir === 'out' ? 'Le mandaste solicitud a ' + who : who + ' quiere ser tu compa', h('div', { class: 'sheet-body menu' }, ...items, it('', 'Cancelar', () => {})));
+  });
+  paint();
+  if (!COMPAS) loadCompas().then(paint);
+  return b;
+}
+async function renderCompas() {
+  const main = h('main');
+  $app.append(h('header', { class: 'topbar' }, h('div', { class: 'logo', style: 'font-size:26px' }, 'Compas'), topActions()), main);
+  main.append(h('div', { class: 'spinner' }));
+  await loadCompas(true);
+  if (!HAS_COMPAS) return main.replaceChildren(h('div', { class: 'empty' }, 'Falta activar los compas en Supabase.'));
+  const ids = [...COMPAS.keys()];
+  const { data: profs } = ids.length ? await sb.from('profiles').select('id,username,full_name,avatar_url,rancho,estado').in('id', ids.slice(0, 1000)) : { data: [] };
+  const byId = new Map((profs || []).map(p => [p.id, p]));
+  const bl = state.blocked || new Set();
+  const list = (pred) => [...COMPAS.entries()].filter(([id, c]) => pred(c) && byId.has(id) && !bl.has(id)).sort((a, b) => (a[1].at < b[1].at ? 1 : -1)).map(([id, c]) => ({ p: byId.get(id), c }));
+  const incoming = list(c => c.status === 'pendiente' && c.dir === 'in');
+  const sent = list(c => c.status === 'pendiente' && c.dir === 'out');
+  const friends = list(c => c.status === 'aceptada');
+  const row = (p, actions) => h('div', { class: 'cp-row' },
+    h('button', { class: 'cp-av', onclick: () => go('profile', { profileId: p.id }) }, avatar(p, 64)),
+    h('div', { class: 'cp-main' },
+      h('button', { class: 'cp-name', onclick: () => go('profile', { profileId: p.id }) }, h('b', {}, p.full_name || p.username, vb(p.id)), h('small', {}, '@' + p.username + (p.estado ? ' · ' + p.estado : ''))),
+      actions ? h('div', { class: 'cp-acts' }, ...actions) : null));
+  const act = (label, cls, id, what) => h('button', { class: 'btn small ' + cls, onclick: async (e) => { e.currentTarget.disabled = true; if (await compaAction(id, what)) render(); else e.currentTarget.disabled = false; } }, label);
+  const sec = (title, count, kids, empty) => h('section', { class: 'cp-sec' }, h('div', { class: 'cp-head' }, h('b', {}, title), count ? h('span', { class: 'cp-n' }, String(count)) : null), ...(kids.length ? kids : empty ? [h('p', { class: 'hint', style: 'margin:4px 2px 8px' }, empty)] : []));
+  const hero = h('div', { class: 'cp-hero' }, h('div', { class: 'cp-burst' }, h('span', { icon: 'compas' })),
+    h('div', {}, h('b', {}, friends.length ? (friends.length === 1 ? 'Tienes 1 compa' : `Tienes ${friends.length} compas`) : 'Haz compas en Ranchfolk'), h('small', {}, 'Cuando aceptan tu solicitud, se siguen los dos y pueden platicar.')));
+  const sugg = h('div');
+  main.replaceChildren(hero,
+    sec('Solicitudes', incoming.length, incoming.map(({ p }) => row(p, [act('Confirmar', 'pf-gold', p.id, 'accept'), act('Eliminar', 'ghost', p.id, 'remove')])), 'No tienes solicitudes nuevas.'),
+    sugg,
+    sec('Tus compas', friends.length, friends.map(({ p }) => row(p, [compaBtn(p.id, { small: true, name: p.username, onChange: () => render() }), h('button', { class: 'btn small ghost', onclick: () => openChatWith(p) }, '💬 Mensaje')])), 'Todavía no tienes compas. ¡Manda tu primera solicitud!'),
+    sent.length ? sec('Solicitudes enviadas', sent.length, sent.map(({ p }) => row(p, [act('Cancelar', 'ghost', p.id, 'remove')]))) : '',
+    h('button', { class: 'btn ghost', style: 'width:calc(100% - 28px);margin:6px 14px 20px', onclick: inviteFriends }, '📤 Invitar compas por WhatsApp'));
+  // Personas que quizá conozcas (sin compa todavía)
+  const { data: more } = await sb.from('profiles').select('id,username,full_name,avatar_url,rancho,estado').order('created_at', { ascending: false }).limit(80);
+  const myEst = state.me.estado;
+  const sg = (more || []).filter(x => x.id !== state.me.id && !COMPAS.has(x.id) && !bl.has(x.id))
+    .sort((a, c) => ((c.estado && c.estado === myEst) - (a.estado && a.estado === myEst)) || (!!c.avatar_url - !!a.avatar_url)).slice(0, 15);
+  if (sg.length) sugg.replaceChildren(sec('Personas que quizá conozcas', 0, sg.map(p => row(p, [compaBtn(p.id, { small: true, name: p.username }), h('button', { class: 'btn small ghost', onclick: (e) => { e.currentTarget.closest('.cp-row').remove(); } }, 'Quitar')]))));
+}
 // ---------- Publicaciones guardadas ----------
 let HAS_SAVED = true;
 let SAVED = null; // Set de ids
@@ -3054,7 +3201,7 @@ function rideCard(p) {
 
 async function renderExplore() {
   const main = h('main');
-  $app.append(h('header', { class: 'topbar' }, h('div', { class: 'logo', style: 'font-size:24px' }, 'Buscar'), h('div', { class: 'top-actions' }, menuButton(), dmButton())), main);
+  $app.append(h('header', { class: 'topbar' }, h('div', { class: 'logo', style: 'font-size:24px' }, 'Buscar'), topActions()), main);
   const search = h('input', { class: 'input', type: 'search', placeholder: 'Buscar personas, publicaciones, ventas, eventos…', 'aria-label': 'Buscar', enterkeyhint: 'search' });
   const people = h('div', { style: 'padding:0 16px' });
   const tagBar = h('div', { class: 'tag-bar' });
@@ -3424,7 +3571,7 @@ async function renderProfile() {
   const main = h('main');
   const top = h('header', { class: 'topbar' },
     !isMe ? h('button', { class: 'iconbtn plain', 'aria-label': 'Regresar', icon: 'back', onclick: () => go('feed') }) : h('div', { class: 'logo', style: 'font-size:24px' }, 'Perfil'),
-    isMe ? h('div', { class: 'top-actions' }, menuButton(), dmButton()) : h('div'));
+    isMe ? topActions() : h('div'));
   $app.append(top, main);
   main.append(h('div', { class: 'spinner' }));
 
@@ -3486,8 +3633,9 @@ async function renderProfile() {
         h('button', { class: 'btn ghost', onclick: () => editProfile(prof) }, '✏️ Editar perfil'),
         h('button', { class: 'btn ghost', style: 'flex:0 0 52px', 'aria-label': 'Invitar a mis compas', onclick: inviteFriends }, '📤'))
     : h('div', { class: 'pf-btns' },
-        !blocked && hasF && followBtn(id, { gold: true, onChange: bumpFollowers }),
-        !blocked && (HAS_DM || isGuest()) && h('button', { class: 'btn ' + (hasF ? 'ghost' : 'pf-gold'), onclick: () => { if (!needLogin('Crea tu cuenta para mandar mensajes')) openChatWith(prof); } }, '💬 Mensaje'),
+        !blocked && compaBtn(id, { name: prof.username }),
+        !blocked && hasF && (() => { const fb = followBtn(id, { gold: !HAS_COMPAS || isGuest(), onChange: bumpFollowers }); if (fb && HAS_COMPAS && !isGuest()) fb.classList.remove('pf-gold'); return fb; })(),
+        !blocked && (HAS_DM || isGuest()) && h('button', { class: 'btn ghost', style: 'flex:0 0 52px', 'aria-label': 'Mandar mensaje', onclick: () => { if (!needLogin('Crea tu cuenta para mandar mensajes')) openChatWith(prof); } }, '💬'),
         blocked ? h('button', { class: 'btn ghost', onclick: () => unblockUser(id, prof.username) }, 'Desbloquear')
           : h('button', { class: 'btn ghost', style: 'flex:0 0 52px', 'aria-label': 'Más opciones', onclick: () => {
               const close = openSheet('@' + prof.username, h('div', { class: 'sheet-body' },
@@ -4027,7 +4175,7 @@ async function fetchEvents({ limit = 60, estado } = {}) {
 // ---- pantalla La Feria ----
 async function renderFeria() {
   const main = h('main', { class: 'fx' });
-  $app.append(h('header', { class: 'topbar' }, h('div', { class: 'logo' }, 'La Feria'), h('div', { class: 'top-actions' }, menuButton(), dmButton())), main);
+  $app.append(h('header', { class: 'topbar' }, h('div', { class: 'logo' }, 'La Feria'), topActions()), main);
   const tab = state.feriaTab || 'mercado';
   const seg = h('div', { class: 'fx-seg' },
     h('button', { class: tab === 'mercado' ? 'on' : '', onclick: () => { state.feriaTab = 'mercado'; render(); } }, '🛒 Mercado'),
@@ -4369,6 +4517,7 @@ async function fetchNotifs(force) {
   const uname = (state.me && state.me.username) || '';
   const esc = (x) => x.replace(/[%_\\]/g, (c) => '\\' + c);
   const mentionOk = (txt) => uname && new RegExp('(^|[\\s(¡¿"“])@' + uname.replace(/[.*+?^${}()|[\]\\\-]/g, '\\$&') + '(?![A-Za-z0-9_])', 'i').test(txt || '');
+  const cpP = HAS_COMPAS ? loadCompas(true) : Promise.resolve(new Map());
   const [lk, cm, sh, fw, rp, mc, mp] = await Promise.all([
     sb.from('likes').select('created_at,user_id,post_id' + (HAS_REACT ? ',reaction' : '') + ',' + NOTIF_PROF + ',' + POSTJ).eq('posts.user_id', me).neq('user_id', me).order('created_at', { ascending: false }).limit(40),
     sb.from('comments').select('id,body,created_at,user_id,post_id,' + NOTIF_PROF + ',' + POSTJ).eq('posts.user_id', me).neq('user_id', me).order('created_at', { ascending: false }).limit(40),
@@ -4380,6 +4529,12 @@ async function fetchNotifs(force) {
   const b = state.blocked || new Set();
   const items = [];
   (lk.data || []).forEach(x => items.push({ t: 'react', at: x.created_at, who: x.profiles, uid: x.user_id, post: x.posts, react: x.reaction || 'ajua' }));
+  const cpMap = await cpP;
+  const cpIds = [...cpMap.entries()].filter(([, c]) => (c.status === 'pendiente' && c.dir === 'in') || (c.status === 'aceptada' && c.dir === 'out')).map(([id]) => id);
+  if (cpIds.length) {
+    const { data: cpProfs } = await sb.from('profiles').select('id,username,full_name,avatar_url').in('id', cpIds.slice(0, 200));
+    (cpProfs || []).forEach(pp => { const c = cpMap.get(pp.id); if (!c) return; items.push({ t: c.status === 'aceptada' ? 'compa_ok' : 'compa_req', at: c.at, who: pp, uid: pp.id }); });
+  }
   const cSeen = new Set();
   ((rp && rp.data) || []).forEach(x => { cSeen.add(x.id); items.push({ t: 'reply', at: x.created_at, who: x.profiles, uid: x.user_id, post: x.posts, body: x.body }); });
   ((mc && mc.data) || []).forEach(x => { if (cSeen.has(x.id) || !mentionOk(x.body)) return; cSeen.add(x.id); items.push({ t: 'mention', at: x.created_at, who: x.profiles, uid: x.user_id, post: x.posts, body: x.body }); });
@@ -4393,8 +4548,8 @@ async function fetchNotifs(force) {
 // Botón de notificaciones en la barra de abajo (con globito de cuántas hay nuevas)
 function navBell() {
   const badge = h('span', { class: 'dm-badge nav-badge', hidden: true });
-  const btn = h('button', { class: state.view === 'notifs' ? 'on' : '', 'aria-label': 'Notificaciones', onclick: () => { if (needLogin('Crea tu cuenta para recibir avisos')) return; go('notifs'); } },
-    h('span', { class: 'nav-ico' }, h('span', { icon: 'bell', style: 'display:flex' }), badge), 'Avisos');
+  const btn = h('button', { class: state.view === 'notifs' ? 'on' : '', 'aria-label': 'Notificaciones', title: 'Avisos', onclick: () => { if (needLogin('Crea tu cuenta para recibir avisos')) return; go('notifs'); } },
+    h('span', { class: 'nav-ico' }, h('span', { icon: 'bell', style: 'display:flex' }), badge));
   if (!isGuest() && state.view !== 'notifs') fetchNotifs().then(items => { const seen = notifSeen(); const n = items.filter(i => i.at > seen).length; badge.hidden = !n; badge.textContent = n > 9 ? '9+' : String(n); }).catch(() => {});
   return btn;
 }
@@ -4424,6 +4579,8 @@ async function renderNotifs() {
     : i.t === 'pmention' ? ['te mencionó en ' + (i.post && i.post.kind === 'ride' ? 'un ride' : i.post && i.post.kind === 'sundown' ? 'un sundown' : 'una publicación') + ': ', quote(i)]
     : i.t === 'share' ? ['compartió tu publicación']
     : i.t === 'follow' ? ['empezó a seguirte']
+    : i.t === 'compa_req' ? ['quiere ser tu compa 🤝']
+    : i.t === 'compa_ok' ? ['aceptó tu solicitud de compa 🤝']
     : [(REACT[i.react] || REACT.ajua).k === 'ajua' ? 'le dio ajúa a tu ' : 'reaccionó ' + REACT[i.react].e + ' a tu ', i.post && i.post.kind === 'sundown' ? 'sundown' : i.post && i.post.kind === 'ride' ? 'ride' : 'publicación'];
   const today = new Date().toDateString();
   let lastGroup = '';
@@ -4432,10 +4589,10 @@ async function renderNotifs() {
     const g = i.at > seen ? 'Nuevas' : new Date(i.at).toDateString() === today ? 'Hoy' : 'Anteriores';
     if (g !== lastGroup) { kids.push(h('h3', { class: 'n-group' }, g)); lastGroup = g; }
     const thumb = i.post && i.post.media_url ? (i.post.media_type === 'video' ? h('video', { src: i.post.media_url + '#t=0.5', muted: true, playsInline: true, preload: 'metadata' }) : h('img', { src: i.post.media_url, alt: '', loading: 'lazy' })) : null;
-    kids.push(h('div', { class: 'notif' + (i.at > seen ? ' new' : ''), role: 'button', tabindex: '0', onclick: () => i.t === 'follow' ? go('profile', { profileId: i.uid }) : i.t === 'share' ? openPostById(i.shareId) : i.post && openPostById(i.post.id) },
-      h('span', { class: 'av-react' }, avatar(i.who, 48), i.t === 'react' ? reactIcon(i.react, 'badge') : h('span', { class: 'n-badge' }, i.t === 'comment' ? '💬' : i.t === 'reply' ? '↩️' : i.t === 'mention' || i.t === 'pmention' ? '@' : i.t === 'follow' ? '🤠' : '🔁')),
+    kids.push(h('div', { class: 'notif' + (i.at > seen ? ' new' : ''), role: 'button', tabindex: '0', onclick: () => i.t === 'compa_req' ? go('compas') : (i.t === 'follow' || i.t === 'compa_ok') ? go('profile', { profileId: i.uid }) : i.t === 'share' ? openPostById(i.shareId) : i.post && openPostById(i.post.id) },
+      h('span', { class: 'av-react' }, avatar(i.who, 48), i.t === 'react' ? reactIcon(i.react, 'badge') : h('span', { class: 'n-badge' }, i.t === 'comment' ? '💬' : i.t === 'reply' ? '↩️' : i.t === 'mention' || i.t === 'pmention' ? '@' : i.t === 'compa_req' || i.t === 'compa_ok' ? '🤝' : i.t === 'follow' ? '🤠' : '🔁')),
       h('div', { class: 'n-txt' }, h('p', {}, h('b', {}, i.who.username || ''), ' ', ...what(i)), h('small', {}, timeAgo(i.at))),
-      i.t === 'follow' ? (isFollowing(i.uid) ? null : followBtn(i.uid, { small: true, gold: true })) : thumb && h('span', { class: 'n-thumb' }, thumb)));
+      i.t === 'compa_req' ? compaBtn(i.uid, { small: true, name: i.who.username }) : i.t === 'compa_ok' ? null : i.t === 'follow' ? (isFollowing(i.uid) ? null : followBtn(i.uid, { small: true, gold: true })) : thumb && h('span', { class: 'n-thumb' }, thumb)));
   });
   list.replaceChildren(...kids);
 }
@@ -5164,7 +5321,7 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').catch(() => {});
   // El aviso llegó con la app abierta: suena la campana aquí adentro
   navigator.serviceWorker.addEventListener('message', (e) => {
-    if (e.data && e.data.type === 'herria-notif') { NOTIF_CACHE.at = 0; const bell = document.querySelector('.nav [aria-label="Notificaciones"]'); if (bell && state.view !== 'notifs') bell.replaceWith(navBell()); return; }
+    if (e.data && e.data.type === 'herria-notif') { NOTIF_CACHE.at = 0; const bell = document.querySelector('.tabbar [aria-label="Notificaciones"]'); if (bell && state.view !== 'notifs') bell.replaceWith(navBell()); return; }
     if (!e.data || e.data.type !== 'herria-msg') return;
     msgDing();
     const b = document.querySelector('.msg-count'); if (b) refreshUnread(b);
@@ -5218,6 +5375,7 @@ sb.auth.onAuthStateChange((_event, session) => {
   state.session = session;
   if (!changed) return;
   stopInbox();
+  COMPAS = null; SAVED = null;
   state.me = session ? null : GUEST; state.blocked = new Set(); state.view = 'feed'; render();
   if (session) setTimeout(async () => { await loadMe(); listenInbox(); enablePush(true); if (needsWelcome()) { state.view = 'welcome'; state.welcomeStep = 0; } render(); openDeepLink(); }, 0);
   else setTimeout(openDeepLink, 300);
@@ -5230,6 +5388,7 @@ function openDeepLink() {
     go('profile', { profileId: f[1] });
     return;
   }
+  if (location.hash === '#c' && state.me && !isGuest()) { history.replaceState(history.state, '', location.pathname + location.search); go('compas'); return; }
   const u = /^#u=([0-9a-f-]{36})$/.exec(location.hash || '');
   if (u && state.me && !isGuest()) {  // tocaste un aviso de mensaje: abre ese chat
     history.replaceState(history.state, '', location.pathname + location.search);
