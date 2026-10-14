@@ -3534,17 +3534,26 @@ function openRideCreator(onDone) {
   async function startCam() {
     stopCam(); msg.hidden = true;
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { showMsg('Tu teléfono no deja usar la cámara aquí. Sube un video de tu galería.'); return; }
+    const vid = { facingMode: facing, width: { ideal: 720 }, height: { ideal: 1280 }, aspectRatio: { ideal: 9 / 16 }, frameRate: { ideal: 30 } };
     try {
-      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: facing, width: { ideal: 720 }, height: { ideal: 1280 }, aspectRatio: { ideal: 9 / 16 }, frameRate: { ideal: 30 } }, audio: true });
+      try { stream = await navigator.mediaDevices.getUserMedia({ video: vid, audio: true }); }
+      catch (e1) {
+        // Si el micrófono está bloqueado (por ejemplo, desde las notas de voz), que al menos abra la cámara
+        if (!e1 || e1.name === 'AbortError') throw e1;
+        stream = await navigator.mediaDevices.getUserMedia({ video: vid, audio: false });
+        toast('🎤 El micrófono está bloqueado: se grabará sin sonido. Puedes ponerle canción.');
+      }
       if (!root.isConnected) return stopCam();
       live.srcObject = stream; live.classList.toggle('mirror', facing === 'user'); live.play().catch(() => {});
     } catch (e) {
-      showMsg(e && e.name === 'NotAllowedError' ? 'Para grabar, Ranchfolk necesita permiso de la cámara y el micrófono.' : 'No se pudo abrir la cámara. Puedes subir un video de tu galería.', e && e.name === 'NotAllowedError');
+      const denied = e && (e.name === 'NotAllowedError' || e.name === 'SecurityError');
+      showMsg(denied ? 'La cámara está bloqueada para Ranchfolk. Toca "Cómo dar permiso" y sigue los pasos (toma un minuto).' : e && e.name === 'NotReadableError' ? 'Otra app está usando la cámara. Ciérrala y toca "Probar otra vez".' : 'No se pudo abrir la cámara. Puedes subir un video de tu galería.', denied);
     }
   }
   function showMsg(t, perm) {
     msg.hidden = false;
     msg.replaceChildren(h('p', {}, t), perm ? h('button', { class: 'btn small', type: 'button', onclick: () => { close(); permHelp('camera', () => openRideCreator(onDone)); } }, 'Cómo dar permiso') : '',
+      h('button', { class: 'btn small ghost', type: 'button', style: 'margin-top:8px', onclick: () => startCam() }, '🔄 Probar otra vez'),
       h('button', { class: 'btn small ghost', type: 'button', style: 'margin-top:8px', onclick: () => gallery.click() }, '🖼️ Subir de la galería'));
   }
   gallery.addEventListener('change', () => {
@@ -3562,7 +3571,8 @@ function openRideCreator(onDone) {
     raf = requestAnimationFrame(tick);
   }
   function beginRec() {
-    const mime = ['video/mp4;codecs=avc1.42E01E,mp4a.40.2', 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'].find(t => { try { return MediaRecorder.isTypeSupported(t); } catch (_) { return false; } });
+    const withMic = stream.getAudioTracks().length > 0;
+    const mime = (withMic ? ['video/mp4;codecs=avc1.42E01E,mp4a.40.2', 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'] : ['video/mp4;codecs=avc1.42E01E', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm']).find(t => { try { return MediaRecorder.isTypeSupported(t); } catch (_) { return false; } });
     try { rec = new MediaRecorder(stream, mime ? { mimeType: mime, videoBitsPerSecond: 4000000 } : undefined); } catch (_) { rec = null; return toast('Tu teléfono no puede grabar aquí. Sube un video de la galería.'); }
     chunks = [];
     rec.ondataavailable = (e) => { if (e.data && e.data.size) chunks.push(e.data); };
@@ -6096,6 +6106,13 @@ function permHelp(kind, retry) {
       step(1, ['Abre ', B('Ajustes'), ' del iPhone (el engrane ⚙️).']),
       step(2, ['Baja hasta ', B('Notificaciones'), ' y busca ', B('Ranchfolk'), '.']),
       step(3, ['Activa ', B('Permitir notificaciones'), '.'])])
+    : installed && isMic ? [
+      step(1, ['Abre la app de ', B('Chrome'), ' (el navegador, no Ranchfolk).']),
+      step(2, ['Toca los ', B('tres puntitos ⋮'), ' › ', B('Configuración'), ' › ', B('Configuración de sitios'), '.']),
+      step(3, ['Entra a ', B(isCam ? 'Cámara' : 'Micrófono'), '. Si ', B('jaibo2026.github.io'), ' sale en ', B('Bloqueados'), ', tócalo y escoge ', B('Permitir'), '.']),
+      isCam ? step(4, ['Regresa y haz lo mismo en ', B('Micrófono'), ' (para que el video tenga sonido).']) : null,
+      step(isCam ? 5 : 4, ['Si no aparece ahí: en los ', B('Ajustes del teléfono'), ' › ', B('Aplicaciones'), ' › ', B('Chrome'), ' › ', B('Permisos'), ', pon ', B(isCam ? 'Cámara y Micrófono' : 'Micrófono'), ' en ', B('Permitir'), '.']),
+      step(isCam ? 6 : 5, ['Cierra Ranchfolk por completo y vuelve a abrirla.'])].filter(Boolean)
     : installed ? [
       step(1, ['Sal de Ranchfolk y ', B('deja presionado el ícono'), ' de la app en tu pantalla.']),
       step(2, ['Toca ', B('Información de la app'), ' (la ⓘ).']),
@@ -6110,7 +6127,8 @@ function permHelp(kind, retry) {
   const close = openSheet(isCam ? '🎥 Activa la cámara' : isMic ? '🎤 Activa el micrófono' : '🔔 Activa los avisos', h('div', { class: 'sheet-body ph' },
     h('p', { class: 'ph-lead' }, isCam ? 'Le dijiste al teléfono que no usara la cámara o el micrófono, por eso no se pueden grabar rides. Se arregla así:' : isMic ? 'Le dijiste al teléfono que no usara el micrófono, por eso no se pueden grabar notas de voz. Se arregla así:' : 'Le dijiste al teléfono que no mostrara avisos de Ranchfolk. Se arregla así:'),
     ...steps,
-    !ios && installed ? h('p', { class: 'hint', style: 'margin:4px 0 12px' }, 'Si no aparece ahí: abre ', B('Chrome'), ' › ⋮ › ', B('Configuración'), ' › ', B('Configuración de sitios'), ' › ', B(what), ' y quita a ', B('jaibo2026.github.io'), ' de la lista de bloqueados.') : null,
+    !ios && installed && isMic ? h('p', { class: 'hint', style: 'margin:4px 0 12px' }, 'Ranchfolk usa los permisos de Chrome, por eso en "Permisos de la app" de Ranchfolk no aparece nada.') : null,
+    !ios && installed && !isMic ? h('p', { class: 'hint', style: 'margin:4px 0 12px' }, 'Si no aparece ahí: abre ', B('Chrome'), ' › ⋮ › ', B('Configuración'), ' › ', B('Configuración de sitios'), ' › ', B(what), ' y quita a ', B('jaibo2026.github.io'), ' de la lista de bloqueados.') : null,
     h('button', { class: 'btn pf-gold', style: 'width:100%;margin-top:6px', onclick: async () => { close(); if (retry) retry(); } }, 'Ya lo activé, probar otra vez'),
     h('button', { class: 'btn ghost', style: 'width:100%;margin-top:8px', onclick: () => close() }, 'Ahora no')));
 }
