@@ -6,7 +6,7 @@ self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
 // así que lo que ya se vio se sirve desde el teléfono y no vuelve a gastar datos.
 const IMG_CACHE = 'rf-img-v1', VID_CACHE = 'rf-vid-v1';
 const MEDIA_RE = /\/storage\/v1\/object\/public\/media\//;
-const MAX_IMG = 250, MAX_VID = 25, MAX_VID_BYTES = 40 * 1048576;
+const MAX_IMG = 250, MAX_VID = 25, MAX_VID_BYTES = 15 * 1048576;
 async function trim(name, max) {
   try { const c = await caches.open(name); const keys = await c.keys(); for (let i = 0; i < keys.length - max; i++) await c.delete(keys[i]); } catch (_) {}
 }
@@ -45,10 +45,11 @@ async function keepVideo(url) {
   if (!MEDIA_RE.test(url) || !isVideoUrl(url)) return;
   const c = await caches.open(VID_CACHE);
   if (await c.match(url)) return;
-  const res = await fetch(url, { mode: 'cors', credentials: 'omit' });
-  if (!res.ok || res.status !== 200) return;
+  const ctl = new AbortController();
+  const res = await fetch(url, { mode: 'cors', credentials: 'omit', signal: ctl.signal });
+  if (!res.ok || res.status !== 200) return ctl.abort();
   const len = Number(res.headers.get('Content-Length') || 0);
-  if (len > MAX_VID_BYTES) return;
+  if (!len || len > MAX_VID_BYTES) return ctl.abort();   // los videos grandes no se vuelven a bajar
   await c.put(url, res);
   await trim(VID_CACHE, MAX_VID);
 }

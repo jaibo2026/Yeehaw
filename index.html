@@ -1246,8 +1246,8 @@ async function shrinkVideo(file, onProgress, o = {}) {
     const stream = c.captureStream(30);
     // Versión ligera (480p) para cuando la señal está mala: se graba al mismo tiempo, no tarda más
     let c2 = null, g2 = null, stream2 = null;
-    if (o.sd && Math.min(W, H) > 520) {
-      const s2 = 480 / Math.min(W, H);
+    if (o.sd && Math.min(W, H) > 600) {
+      const s2 = 540 / Math.min(W, H);
       c2 = document.createElement('canvas'); c2.width = Math.round(W * s2 / 2) * 2; c2.height = Math.round(H * s2 / 2) * 2;
       g2 = c2.getContext('2d'); stream2 = c2.captureStream(30);
     }
@@ -1270,7 +1270,7 @@ async function shrinkVideo(file, onProgress, o = {}) {
     let rec2 = null, chunks2 = [], stopped2 = Promise.resolve();
     if (stream2) {
       try {
-        rec2 = new MediaRecorder(stream2, { mimeType: mime, videoBitsPerSecond: 900000, audioBitsPerSecond: withAudio ? 64000 : undefined });
+        rec2 = new MediaRecorder(stream2, { mimeType: mime, videoBitsPerSecond: 1000000, audioBitsPerSecond: withAudio ? 96000 : undefined });
         rec2.ondataavailable = (e) => { if (e.data && e.data.size) chunks2.push(e.data); };
         stopped2 = new Promise(r => { rec2.onstop = r; });
       } catch (_) { rec2 = null; }
@@ -1302,7 +1302,7 @@ async function shrinkVideo(file, onProgress, o = {}) {
     if (onProgress) onProgress(100);
     if (o.sd) {
       const sd = rec2 && chunks2.length ? new Blob(chunks2, { type: mime.split(';')[0] }) : null;
-      return { hd: out, sd: sd && sd.size && sd.size < out.size * 0.8 ? sd : null, poster };
+      return { hd: out, sd: sd && sd.size && sd.size < out.size * 0.75 ? sd : null, poster };
     }
     return out;
   } catch (_) { cleanup(); return file; }
@@ -1317,13 +1317,11 @@ async function prepVideo(file, onProgress, maxSec) {
 // Calidad tipo Facebook: una versión HD nítida + una ligera de 480p + foto de portada, todo en una pasada.
 // Teléfonos con buen procesador graban en 1080p; los demás en 720p (con el doble de nitidez que antes).
 async function prepVideoSet(file, onProgress, maxSec) {
-  const strong = (navigator.hardwareConcurrency || 4) >= 6 && (navigator.deviceMemory || 4) >= 4;
   const dur = await videoDuration(file);
   const len = Math.min(dur || 60, maxSec || dur || 60);
   // Que nunca pase del límite de subida: si el video es largo, se baja un poco la calidad
   const budget = Math.floor(MAX_UP_MB * 0.85 * 8 * 1048576 / Math.max(len, 1)) - 160000;
-  const side = strong ? 1080 : 720;
-  const vbps = Math.max(1200000, Math.min(strong ? 5000000 : 3200000, budget));
+  const side = 720, vbps = Math.max(1200000, Math.min(2300000, budget));
   let r = await shrinkVideo(file, onProgress, { maxSec, side, vbps, sd: true });
   if (r instanceof Blob) r = { hd: r, sd: null, poster: null };
   if (tooBig(r.hd)) { const b = await prepVideo(file, onProgress, maxSec); r = { hd: b, sd: null, poster: null }; }
@@ -1355,10 +1353,14 @@ async function uploadVideoSet(set, file) {
 const withVariants = (path) => isHQ(path) ? [path, path.replace(/-hq\.(mp4|webm)$/i, '-sd.$1'), path.replace(/-hq\.(mp4|webm)$/i, '-p.jpg')] : [path];
 const isHQ = (url) => /-hq\.(mp4|webm)(\?|$)/i.test(String(url || ''));
 const posterOf = (url) => isHQ(url) ? String(url).replace(/-hq\.(mp4|webm)/i, '-p.jpg') : null;
+// Como Facebook con datos móviles: arranca con la versión ligera (rápida). La HD solo con Wi‑Fi o internet muy rápido.
 function slowNet() {
   if (SAVER.on) return true;
-  const c = navigator.connection; if (!c) return false;
-  return !!c.saveData || /(^|-)2g|3g/.test(c.effectiveType || '') || (c.downlink > 0 && c.downlink < 1);
+  const c = navigator.connection;
+  if (!c) return true;                                     // iPhone no dice qué señal hay: mejor la que carga rápido
+  if (c.saveData) return true;
+  if (c.type === 'wifi' || c.type === 'ethernet') return false;
+  return !(c.downlink >= 8 && c.effectiveType === '4g' && !c.type);   // en computadora con buen internet, HD
 }
 let SD_MISSING = new Set();
 function bestSrc(url) {
@@ -2285,6 +2287,7 @@ function keepWhenWatched(v, url) {
   if (!url || !('serviceWorker' in navigator)) return;
   const keep = () => {
     if (KEPT.has(url) || !(v.duration > 0) || v.currentTime < v.duration * 0.8) return;
+    if (isHQ(url) && slowNet()) return;   // la HD pesa mucho para volverla a bajar con datos
     KEPT.add(url);
     navigator.serviceWorker.ready.then(r => r.active && r.active.postMessage({ type: 'rf-keep', url })).catch(() => {});
   };
