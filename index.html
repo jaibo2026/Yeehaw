@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <meta name="theme-color" content="#172531">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -128,6 +128,9 @@ main{flex:1;padding-bottom:calc(104px + env(safe-area-inset-bottom))}
 .rc-post-foot{padding:10px 16px calc(12px + env(safe-area-inset-bottom));border-top:1px solid #EFE6D4}
 .rc-pub{width:100%}
 .ride-ovl{container-type:inline-size}
+.composer{bottom:var(--kb,0px)!important}
+.mini-chat,.mchat-mini{bottom:var(--kb,0px)}
+
 .ib-seen{line-height:0;flex-shrink:0;margin-right:6px}
 .ib-seen .avatar,.ib-seen img{width:16px!important;height:16px!important;font-size:8px}
 .ib-sent{width:16px;height:16px;border-radius:50%;border:1.5px solid #4D6473;color:#4D6473;font-size:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-right:6px}
@@ -2005,6 +2008,10 @@ async function fetchSundownGroups(userId) {
 function go(view, extra) {
   if (typeof stopRideSong === 'function') stopRideSong();
   document.querySelectorAll('.reels-ov').forEach(x => x._close ? x._close(true) : x.remove());
+  const changed = view !== state.view
+    || (extra && 'profileId' in extra && extra.profileId !== state.profileId)
+    || (extra && 'animalId' in extra && extra.animalId !== state.animalId)
+    || (view === 'chat' && state.chat && (!history.state || !history.state.chat || history.state.chat.id !== state.chat.id));
   if (view !== state.view) state.prevView = state.view;
   state.view = view;
   if (extra && 'profileId' in extra) state.profileId = extra.profileId;
@@ -2012,7 +2019,7 @@ function go(view, extra) {
   if (view !== 'explore') state.tag = null;
   window.scrollTo({ top: 0, behavior: 'instant' });
   render();
-  if (typeof syncBack === 'function') syncBack();
+  if (typeof navAfterGo === 'function') navAfterGo(changed);
 }
 function navBar() {
   const b = (v, icon, label, isOn, extra) => h('button', { class: isOn ? 'on' : '', 'aria-label': label, title: label, onclick: () => {
@@ -3965,7 +3972,7 @@ function openReels(start) {
   };
   const ov = h('div', { class: 'reels-ov', role: 'dialog', 'aria-label': 'Rides' },
     h('div', { class: 'rides-top' },
-      h('button', { class: 'iconbtn', 'aria-label': 'Cerrar', icon: 'back', style: 'color:#fff;background:rgba(0,0,0,.35)', onclick: () => ARMED ? history.back() : close() }),
+      h('button', { class: 'iconbtn', 'aria-label': 'Cerrar', icon: 'back', style: 'color:#fff;background:rgba(0,0,0,.35)', onclick: () => close() }),
       h('div', { class: 'logo', style: 'font-size:22px;color:#fff' }, 'Rides'),
       h('span', { style: 'width:40px' })),
     wrap);
@@ -6372,7 +6379,7 @@ async function renderChat() {
     form.classList.toggle('typing', has); more.hidden = !has;
   };
   input.addEventListener('input', () => { grow(); sendTyping(); });
-  input.addEventListener('focus', () => { if (input.value.trim()) form.classList.add('typing'); });
+  input.addEventListener('focus', () => { if (input.value.trim()) form.classList.add('typing'); const was = nearBottom(); setTimeout(() => { if (was) toBottom(true); }, 350); });
   input.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && !('ontouchstart' in window)) { e.preventDefault(); submit(); } });
   const pickFiles = (inp) => { const fs = [...(inp.files || [])].slice(0, 10); inp.value = ''; (async () => { for (const f of fs) await sendMedia(f); })(); };
   gallery.addEventListener('change', () => pickFiles(gallery));
@@ -6710,7 +6717,6 @@ async function renderChat() {
   state.cleanup = () => { alive = false; clearTimeout(typingT); document.querySelectorAll('.mm-bg').forEach(x => x.remove()); if (VOICE_NOW) VOICE_NOW.pause(); clearInterval(poll); if (channel) try { sb.removeChannel(channel); } catch (_) {} };
   grow();
   await load();
-  input.focus({ preventScroll: true });
 }
 
 // Ojito 👁️ para ver u ocultar la contraseña (en cualquier campo de contraseña)
@@ -6750,45 +6756,89 @@ if ('serviceWorker' in navigator) {
 ['pointerdown', 'touchstart', 'keydown'].forEach(ev => document.addEventListener(ev, () => { if (!SFX.ready) SFX.unlock(); }, { passive: true, capture: true }));
 document.addEventListener('visibilitychange', () => { if (!document.hidden) { const b = document.querySelector('.msg-count'); if (b) refreshUnread(b); } });
 let started = false;
-// Botón "atrás" del teléfono: cierra lo que esté abierto, regresa al inicio, y en el inicio actualiza.
-// Botón "atrás" del teléfono: cierra lo que esté abierto y regresa al inicio.
-// En el inicio: si estás abajo, te sube hasta arriba; si ya estás arriba, el siguiente "atrás" cierra la app.
-let ARMED = false;
-try { history.scrollRestoration = 'manual'; } catch (_) {}
-function armBack() { if (ARMED) return; try { history.pushState({ yh: 1 }, ''); ARMED = true; } catch (_) {} }
-function backNeeded() {
-  const overlay = document.querySelector('.sd-viewer,.sheet-bg,.react-pick-bg,.sdc,.menu-bg,.reels-ov');
-  return !!overlay || state.view !== 'feed' || window.scrollY > 120;
-}
-function syncBack() { if (backNeeded()) armBack(); }
 setInterval(() => { const b = document.querySelector('.msg-count'); if (b && !document.hidden) refreshUnread(b); }, 20000);
-window.addEventListener('scroll', () => { if (!ARMED && window.scrollY > 120) armBack(); }, { passive: true });
-// Cada vez que cambia la pantalla o se abre algo, el "atrás" queda listo para regresar
-new MutationObserver(() => syncBack()).observe(document.body, { childList: true });
-window.addEventListener('popstate', () => {
-  ARMED = false;
+// ---------- Botón "atrás" del teléfono, como en Facebook ----------
+// Cada pantalla que abres (mensajes, rides, perfil…) queda en el historial: "atrás" te regresa a la anterior,
+// y lo que esté abierto encima (hojas, visores, menús) se cierra primero. Solo en el inicio, "atrás" sale de la app.
+// Chrome se salta las entradas del historial creadas sin que la persona tocara la pantalla, por eso
+// solo se agregan entradas justo después de un toque.
+try { history.scrollRestoration = 'manual'; } catch (_) {}
+const OV_SEL = '.sd-viewer,.sheet-bg,.react-pick-bg,.sdc,.menu-bg,.reels-ov,.mm-bg';
+const OV_STACK = [];          // por cada cosa abierta encima: ¿se agregó una entrada al historial?
+let NAV_POP = false, NAV_IGNORE = 0;
+const canPush = () => !navigator.userActivation || navigator.userActivation.isActive;
+function navSnap(extra) {
+  const c = state.chat;
+  const o = c && c.other ? { id: c.other.id, username: c.other.username, full_name: c.other.full_name, avatar_url: c.other.avatar_url, last_seen: c.other.last_seen } : null;
+  return Object.assign({ rf: 1, view: state.view, profileId: state.profileId || null, animalId: state.animalId || null, tag: state.tag || null, chat: c ? { id: c.id, other: o } : null }, extra || {});
+}
+// Pone el historial al día con lo que hay abierto encima. Regresa cuántas entradas sobran (cosas que se cerraron con su botón).
+function ovSync() {
+  const n = document.querySelectorAll(OV_SEL).length;
+  while (OV_STACK.length < n) { const ok = canPush(); if (ok) try { history.pushState(navSnap({ ov: 1 }), ''); } catch (_) {} OV_STACK.push(ok); }
+  let extra = 0; while (OV_STACK.length > n) { if (OV_STACK.pop()) extra++; }
+  return extra;
+}
+function navAfterGo(changed) {
+  if (NAV_POP) { ovSync(); return; }
+  const extra = ovSync();
+  try {
+    if (extra > 0) history.replaceState(navSnap(), '');              // se cerró algo para ir a otra pantalla: se reutiliza su entrada
+    else if (changed && canPush()) history.pushState(navSnap(), '');
+    else history.replaceState(navSnap(), '');
+  } catch (_) {}
+}
+function syncBack() {}   // (compatibilidad con el código anterior)
+new MutationObserver(() => {
+  if (NAV_POP) return;
+  const extra = ovSync();
+  if (extra > 0) { NAV_IGNORE++; try { history.go(-extra); } catch (_) { NAV_IGNORE--; } }   // se cerró con su botón: quitar su entrada
+}).observe(document.body, { childList: true });
+function closeTopOverlay() {
   const picker = document.querySelector('.react-pick-bg');
-  if (picker) { picker.remove(); return syncBack(); }
+  if (picker) { picker.remove(); return true; }
+  const mm = document.querySelector('.mm-bg');
+  if (mm) { mm.remove(); document.querySelectorAll('.mm-focus').forEach(x => x.classList.remove('mm-focus')); return true; }
   const menu = document.querySelector('.menu-bg');
-  if (menu && !document.querySelector('.sheet-bg')) { menu._close(); return syncBack(); }
+  if (menu && !document.querySelector('.sheet-bg')) { menu._close(); return true; }
   const sdcPane = document.querySelector('.sdc .sdc-pane .sdc-done, .sdc .sdc-sheet .sdc-done');
-  if (sdcPane) { sdcPane.click(); return syncBack(); }
+  if (sdcPane) { sdcPane.click(); return true; }
   const sdc = document.querySelector('.sdc');
-  if (sdc) { sdc._close(); return syncBack(); }
+  if (sdc) { sdc._close(); return true; }
   const viewerClose = document.querySelector('.sd-viewer [aria-label="Cerrar"]');
-  if (viewerClose) { viewerClose.click(); return syncBack(); }
+  if (viewerClose) { viewerClose.click(); return true; }
   const sheets = document.querySelectorAll('.sheet-bg');
-  if (sheets.length) { const c = sheets[sheets.length - 1].querySelector('.sheet-head [aria-label="Cerrar"]'); c ? c.click() : sheets[sheets.length - 1].remove(); return syncBack(); }
+  if (sheets.length) { const c = sheets[sheets.length - 1].querySelector('.sheet-head [aria-label="Cerrar"]'); c ? c.click() : sheets[sheets.length - 1].remove(); return true; }
   const reels = document.querySelector('.reels-ov');
-  if (reels) { reels._close(); return syncBack(); }
-  if (state.view === 'auth') { go('feed'); return syncBack(); }
-  if (!state.me || state.view === 'welcome') return syncBack();
-  if (state.view === 'chat') { go('inbox'); return syncBack(); }
-  if (state.view !== 'feed') { go('feed'); return syncBack(); }
-  // En el inicio y abajo: sube hasta arriba y avisa; el siguiente "atrás" ya cierra la app
-  window.scrollTo({ top: 0, behavior: 'instant' });
-  toast('Toca atrás otra vez para salir');
+  if (reels) { reels._close(true); return true; }
+  return false;
+}
+window.addEventListener('popstate', (e) => {
+  if (NAV_IGNORE > 0) { NAV_IGNORE--; return; }
+  NAV_POP = true;
+  try {
+    // 1) Si hay algo abierto encima, "atrás" lo cierra
+    if (document.querySelector(OV_SEL)) {
+      if (OV_STACK.length) OV_STACK.pop();
+      closeTopOverlay();
+      return;
+    }
+    // 2) Si no, regresa a la pantalla anterior
+    const st = e.state && e.state.rf ? e.state : { view: 'feed' };
+    if (!state.me || state.view === 'welcome') return;
+    if (st.view === 'chat' && st.chat) state.chat = st.chat;
+    const v = st.view === 'chat' && !state.chat ? 'inbox' : (st.view || 'feed');
+    if (st.tag) state.tag = st.tag;
+    go(v, { profileId: st.profileId, animalId: st.animalId });
+  } finally { setTimeout(() => { NAV_POP = false; }, 0); }
 });
+try { if (!history.state || !history.state.rf) history.replaceState({ rf: 1, view: 'feed' }, ''); } catch (_) {}
+// Teclado: la barra para escribir sube junto con el teclado (también en iPhone)
+if (window.visualViewport) {
+  const vv = window.visualViewport;
+  const fixKb = () => { const kb = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop)); document.documentElement.style.setProperty('--kb', kb + 'px'); };
+  vv.addEventListener('resize', fixKb); vv.addEventListener('scroll', fixKb);
+}
 sb.auth.onAuthStateChange((_event, session) => {
   if (_event === 'PASSWORD_RECOVERY') setTimeout(openNewPassword, 900);
   const changed = !started || (session && session.user.id) !== (state.session && state.session.user.id);
