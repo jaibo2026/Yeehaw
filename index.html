@@ -128,6 +128,85 @@ main{flex:1;padding-bottom:calc(104px + env(safe-area-inset-bottom))}
 .rc-post-foot{padding:10px 16px calc(12px + env(safe-area-inset-bottom));border-top:1px solid #EFE6D4}
 .rc-pub{width:100%}
 .ride-ovl{container-type:inline-size}
+.ib-seen{line-height:0;flex-shrink:0;margin-right:6px}
+.ib-seen .avatar,.ib-seen img{width:16px!important;height:16px!important;font-size:8px}
+.ib-sent{width:16px;height:16px;border-radius:50%;border:1.5px solid #4D6473;color:#4D6473;font-size:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-right:6px}
+.ib-row .who span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.chat.mchat{gap:2px;padding-bottom:calc(96px + env(safe-area-inset-bottom))}
+.mchat .msg{touch-action:pan-y;transition:transform .05s}
+.mchat .msg.them{margin-left:34px}
+.mchat .msg.g-solo,.mchat .msg.g-first{margin-top:8px}
+.mchat .msg.me.g-solo{border-radius:20px 20px 6px 20px}
+.mchat .msg.me.g-first{border-radius:20px 20px 6px 20px}
+.mchat .msg.me.g-mid{border-radius:20px 6px 6px 20px}
+.mchat .msg.me.g-last{border-radius:20px 6px 20px 20px}
+.mchat .msg.them.g-solo{border-radius:20px 20px 20px 6px}
+.mchat .msg.them.g-first{border-radius:20px 20px 20px 6px}
+.mchat .msg.them.g-mid{border-radius:6px 20px 20px 6px}
+.mchat .msg.them.g-last{border-radius:6px 20px 20px 20px}
+.msg-av{position:absolute;left:-32px;bottom:0;line-height:0}
+.msg-av .avatar,.msg-av img{width:26px!important;height:26px!important}
+.mchat .msg.bigemo{background:none!important;border:none!important;box-shadow:none!important;font-size:46px;line-height:1.1;padding:0 2px}
+.mchat .msg.unsent{background:none!important;border:1px solid #D9CBB0!important;color:#4D6473!important;font-style:italic;font-size:14px}
+.msg-ed{display:block;font-size:10.5px;opacity:.7;margin-top:2px;text-align:right;font-style:normal}
+.mchat .msg.show-time{margin-bottom:16px}
+.mchat .msg.show-time::after{content:attr(data-t);position:absolute;bottom:-17px;font-size:11px;color:#4D6473;white-space:nowrap;font-weight:500}
+.mchat .msg.me.show-time::after{right:4px}
+.mchat .msg.them.show-time::after{left:4px}
+.mchat .msg.swipe-ok::before{content:'↩';position:absolute;left:-30px;top:50%;transform:translateY(-50%);font-size:18px;color:#C7843B}
+.mchat .msg.flash{animation:mflash 1.2s ease-out}
+@keyframes mflash{0%,40%{box-shadow:0 0 0 4px rgba(243,189,104,.8)}100%{box-shadow:0 0 0 0 rgba(243,189,104,0)}}
+.msg-q{display:flex;flex-direction:column;max-width:72%;margin-top:10px;margin-bottom:-6px}
+.msg-q.me{align-self:flex-end;align-items:flex-end}
+.msg-q.them{align-self:flex-start;align-items:flex-start;margin-left:34px}
+.msg-q small{font-size:11.5px;color:#4D6473;margin:0 6px 3px}
+.msg-q-b{border:none;background:#EFE6D4;color:#4D6473;font-size:13.5px;line-height:1.3;padding:8px 12px 14px;border-radius:16px;text-align:left;max-width:100%;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.msg-seen-av{align-self:flex-end;margin:3px 2px 0;line-height:0}
+.msg-seen-av .avatar,.msg-seen-av img{width:16px!important;height:16px!important;font-size:8px}
+.msg-state{align-self:flex-end;font-size:11px;color:#4D6473;margin:3px 4px 0}
+.typing-b{padding:12px 16px!important}
+.tdots{display:flex;gap:4px}
+.tdots i{width:7px;height:7px;border-radius:50%;background:#9AA8B2;animation:tdot 1.2s infinite}
+.tdots i:nth-child(2){animation-delay:.15s}.tdots i:nth-child(3){animation-delay:.3s}
+@keyframes tdot{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-4px);opacity:1}}
+.mm-bg{position:fixed;inset:0;z-index:50;background:rgba(23,37,49,.35);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);display:flex;align-items:flex-end;justify-content:center;padding:0 12px calc(20px + env(safe-area-inset-bottom));animation:up .15s ease-out}
+.mm-panel{width:100%;max-width:420px;display:flex;flex-direction:column;gap:10px}
+.mm-rx{align-self:center;display:flex;gap:4px;background:#FFFDF8;border-radius:30px;padding:6px 8px;box-shadow:0 6px 24px rgba(0,0,0,.25)}
+.mm-rx button{width:46px;height:46px;border:none;background:none;border-radius:50%;font-size:28px;display:flex;align-items:center;justify-content:center;transition:transform .12s}
+.mm-rx button:active{transform:scale(1.3)}
+.mm-rx button.on{background:#F4EBDB}
+.mm-rx .r-horse svg{width:30px;height:30px}
+.mm-acts{background:#FFFDF8;border-radius:18px;overflow:hidden;box-shadow:0 6px 24px rgba(0,0,0,.25)}
+.mm-act{display:flex;align-items:center;gap:14px;width:100%;border:none;background:none;padding:14px 18px;font-size:16px;font-weight:600;color:#172531;text-align:left;border-bottom:1px solid #EFE6D4}
+.mm-act:last-child{border-bottom:none}
+.mm-act span{width:24px;text-align:center}
+.mm-act.danger{color:#B3261E}
+.mc-form{align-items:flex-end}
+.mc-tools{display:flex;gap:2px;align-items:center;flex-shrink:0}
+.mc-ico{width:40px;height:46px;border:none;background:none;color:#2C4657;display:flex;align-items:center;justify-content:center;font-size:22px;padding:0;flex-shrink:0}
+.mc-ico svg{width:26px;height:26px}
+.mc-quick{font-size:26px}
+.mc-more{width:34px;height:46px;border:none;background:none;color:#C7843B;font-size:30px;font-weight:700;padding:0;flex-shrink:0}
+.mc-form.typing .mc-tools{display:none}
+.mc-more[hidden]{display:none}
+.mc-form:not(.typing) .mc-more{display:none}
+.mc-pill textarea{border-radius:22px!important}
+.mc-reply{max-width:520px;margin:0 auto;display:flex;align-items:center;gap:10px;padding:8px 14px 0}
+.mc-reply[hidden]{display:none}
+.mc-reply-t{flex:1;min-width:0;border-left:3px solid #C7843B;padding:2px 10px;display:flex;flex-direction:column}
+.mc-reply-t b{font-size:13px}
+.mc-reply-t span{font-size:13px;color:#4D6473;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mc-reply button{border:none;background:#EFE6D4;width:30px;height:30px;border-radius:50%;font-size:14px;flex-shrink:0}
+.mc-newpill{position:absolute;left:50%;top:-46px;transform:translateX(-50%);border:none;background:#2C4657;color:#FFF6E6;font-weight:700;font-size:13px;padding:8px 14px;border-radius:18px;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+.mc-newpill[hidden]{display:none}
+.mc-composer{position:fixed}
+.ci-btn{margin-left:auto;font-size:24px;color:#F3BD68}
+.chat-head .who{flex:1}
+.ci-head{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0 14px}
+.ci-head b{font-size:18px}.ci-head small{color:#4D6473}
+.mchat .dm-empty{display:flex;flex-direction:column;align-items:center;gap:4px}
+
 .fx-ph.vid{position:relative}
 .fx-ph video{width:100%;height:100%;object-fit:cover}
 .fx-ph-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;font-size:13px;display:flex;align-items:center;justify-content:center;pointer-events:none}
@@ -5976,15 +6055,17 @@ async function renderInbox() {
     if (!show.length) return list.replaceChildren(h('p', { class: 'dm-empty', style: 'padding:30px' }, 'Ya leíste todos tus mensajes 🤠'));
     list.replaceChildren(...show.map(({ c, other, m, n }) => {
       const mine = m.sender_id === state.me.id;
-      const txt = (m.body || '').replace(/\s*https?:\S+#[ple]=\d+/, '') || msgLabel(m);
-      const status = n ? (n === 1 ? txt : `${n} mensajes nuevos`)
-        : mine ? (m.read_at ? 'Visto' : 'Enviado') + ' · ' + shortTime(m.created_at)
-        : activeLabel(other.last_seen) && Date.now() - new Date(m.created_at) > 3 * 3600e3 ? activeLabel(other.last_seen)
-        : txt + ' · ' + shortTime(m.created_at);
+      const unsent = !m.body && !m.media_type;
+      const txt = unsent ? (mine ? 'Anulaste el envío de un mensaje' : 'Anuló el envío de un mensaje') : (m.body || '').replace(/\s*https?:\S+#[ple]=\d+/, '') || msgLabel(m);
+      // Como Messenger: "Tú: …" en lo tuyo, y siempre la hora
+      const status = n > 1 ? `${n} mensajes nuevos · ${shortTime(m.created_at)}` : (mine && !unsent ? 'Tú: ' : '') + txt + ' · ' + shortTime(m.created_at);
       return h('button', { class: 'ib-row' + (n ? ' unread' : ''), onclick: () => { state.chat = { id: c.id, other }; go('chat'); } },
         avAct(other, 58),
         h('div', { class: 'who' }, h('b', {}, other.full_name || other.username, vb(other.id)), h('span', {}, status)),
-        n ? h('span', { class: 'ib-n', 'aria-label': n + ' sin leer' }, n > 9 ? '9+' : String(n)) : h('span', { class: 'ib-cam', 'aria-label': 'Mandar foto', onclick: (e) => { e.stopPropagation(); state.chat = { id: c.id, other }; state.chatPick = true; go('chat'); } }, h('span', { icon: 'camera' })));
+        n ? h('span', { class: 'ib-n', 'aria-label': n + ' sin leer' }, n > 9 ? '9+' : String(n))
+          : mine && m.read_at ? h('span', { class: 'ib-seen', 'aria-label': 'Visto' }, avatar(other, 16))
+          : mine ? h('span', { class: 'ib-sent', 'aria-label': 'Enviado' }, '✓')
+          : h('span', { class: 'ib-cam', 'aria-label': 'Mandar foto', onclick: (e) => { e.stopPropagation(); state.chat = { id: c.id, other }; state.chatPick = true; go('chat'); } }, h('span', { icon: 'camera' })));
     }));
   };
   paint();
@@ -6239,36 +6320,74 @@ function openMediaViewer(src, type) {
   document.addEventListener('keydown', onKey);
   document.body.append(bg);
 }
+// ---------- Chat estilo Messenger ----------
+// Burbujas agrupadas con la foto de la otra persona, deslizar para responder, dejar presionado para reaccionar,
+// responder, copiar, editar o anular el envío; "escribiendo…", visto con la fotito, y botón rápido 🤠.
+let HAS_MSG2 = true;   // columnas de responder / editar / anular
+const EMOJI_ONLY = /^(?:\p{Extended_Pictographic}|\p{Emoji_Modifier}|\p{Emoji_Component}|‍|️|\s){1,24}$/u;
+const isBigEmoji = (t) => !!t && t.length <= 24 && EMOJI_ONLY.test(t) && !/^[\d#*\s]+$/.test(t) && [...t.replace(/\s/g, '')].filter(c => /\p{Extended_Pictographic}/u.test(c)).length <= 3;
 async function renderChat() {
   const chat = state.chat;
   if (!chat) return go('inbox');
   const other = chat.other || {};
+  const otherName = (other.full_name || other.username || '').split(' ')[0];
+  const info = () => {
+    const blockedNow2 = state.blocked && state.blocked.has(other.id);
+    const close = openSheet(other.full_name || other.username || 'Chat', h('div', { class: 'sheet-body menu' },
+      h('div', { class: 'ci-head' }, avatar(other, 72), h('b', {}, other.full_name || other.username || ''), h('small', {}, '@' + (other.username || '') + (activeLabel(other.last_seen) ? ' · ' + activeLabel(other.last_seen) : ''))),
+      h('button', { class: 'mn-row', onclick: () => { close(); go('profile', { profileId: other.id }); } }, h('span', { class: 'mn-emo sm' }, '👤'), h('div', {}, h('b', {}, 'Ver perfil'))),
+      h('button', { class: 'mn-row', onclick: () => { close(); reportThing('user', other); } }, h('span', { class: 'mn-emo sm' }, '🚩'), h('div', {}, h('b', {}, 'Reportar'), h('small', {}, 'Nadie más sabrá que fuiste tú'))),
+      h('button', { class: 'mn-row', onclick: async () => { close(); if (blockedNow2) { await unblockUser(other.id, other.username); } else if (await blockUser(other.id, other.username)) go('inbox'); else return; render(); } },
+        h('span', { class: 'mn-emo sm' }, '⛔'), h('div', {}, h('b', {}, blockedNow2 ? 'Desbloquear' : 'Bloquear'), h('small', {}, blockedNow2 ? 'Podrán volver a escribirse' : 'Ya no podrá escribirte ni ver tus cosas')))));
+  };
   $app.append(h('header', { class: 'topbar chat-head' },
     h('button', { class: 'iconbtn plain', 'aria-label': 'Regresar', icon: 'back', onclick: () => go('inbox') }),
-    h('button', { class: 'who', onclick: () => go('profile', { profileId: other.id }) }, avAct(other, 38), h('span', { class: 'chat-who' }, h('b', {}, other.full_name || other.username || ''), activeLabel(other.last_seen) ? h('small', {}, activeLabel(other.last_seen)) : null))));
-  const box = h('main', { class: 'chat' }, h('div', { class: 'spinner' }));
-  const input = h('textarea', { class: 'input', rows: 1, maxlength: '2000', placeholder: 'Escribe un mensaje…', 'aria-label': 'Mensaje' });
-  const send = h('button', { class: 'send', type: 'submit', 'aria-label': 'Enviar', icon: 'send', disabled: true });
-  const picker = h('input', { type: 'file', accept: 'image/*,video/*', hidden: true });
-  const attach = h('button', { class: 'attach', type: 'button', 'aria-label': 'Mandar foto o video', icon: 'camera', onclick: () => picker.click() });
+    h('button', { class: 'who', onclick: () => go('profile', { profileId: other.id }) }, avAct(other, 38), h('span', { class: 'chat-who' }, h('b', {}, other.full_name || other.username || ''), activeLabel(other.last_seen) ? h('small', {}, activeLabel(other.last_seen)) : null)),
+    h('button', { class: 'iconbtn plain ci-btn', 'aria-label': 'Información del chat', onclick: info }, 'ⓘ')));
+  const box = h('main', { class: 'chat mchat' }, h('div', { class: 'spinner' }));
+  const input = h('textarea', { class: 'input', rows: 1, maxlength: '2000', placeholder: 'Aa', 'aria-label': 'Mensaje' });
+  const send = h('button', { class: 'send', type: 'submit', 'aria-label': 'Enviar', icon: 'send' });
+  const quick = h('button', { class: 'mc-ico mc-quick', type: 'button', 'aria-label': 'Mandar 🤠' }, '🤠');
+  const gallery = h('input', { type: 'file', accept: 'image/*,video/*', multiple: true, hidden: true });
+  const camera = h('input', { type: 'file', accept: 'image/*,video/*', capture: 'environment', hidden: true });
+  const camBtn = h('button', { class: 'mc-ico', type: 'button', 'aria-label': 'Cámara', icon: 'camera', onclick: () => camera.click() });
+  const galBtn = h('button', { class: 'mc-ico', type: 'button', 'aria-label': 'Fotos y videos', onclick: () => gallery.click() }, '🖼️');
   const mic = h('button', { class: 'send mic', type: 'button', 'aria-label': 'Mantén presionado para grabar una nota de voz', icon: 'mic' });
+  const more = h('button', { class: 'mc-more', type: 'button', 'aria-label': 'Más opciones', hidden: true, onclick: () => { form.classList.remove('typing'); } }, '›');
   const emo = emojiButton(input);
-  const form = h('form', { onsubmit: (e) => { e.preventDefault(); submit(); } }, attach, picker, h('div', { class: 'emo-wrap' }, input, emo), send, mic);
+  const tools = h('div', { class: 'mc-tools' }, camBtn, galBtn, quick);
+  const form = h('form', { class: 'mc-form', onsubmit: (e) => { e.preventDefault(); submit(); } }, more, tools, gallery, camera, h('div', { class: 'emo-wrap mc-pill' }, input, emo), send, mic);
   holdToRecord(mic, form, (b, sec) => sendVoice(b, sec));
-  $app.append(box, h('div', { class: 'composer' }, form));
+  const replyBar = h('div', { class: 'mc-reply', hidden: true });
+  const newPill = h('button', { class: 'mc-newpill', type: 'button', hidden: true, onclick: () => { toBottom(true); newPill.hidden = true; } }, '↓ Mensajes nuevos');
+  $app.append(box, h('div', { class: 'composer mc-composer' }, newPill, replyBar, form));
   const blockedNow = state.blocked && state.blocked.has(other.id);
-  if (blockedNow) { input.disabled = true; attach.disabled = true; mic.disabled = true; emo.disabled = true; input.placeholder = 'Bloqueaste a esta persona'; }
+  if (blockedNow) { [input, camBtn, galBtn, mic, emo, quick, send].forEach(x => x.disabled = true); input.placeholder = 'Bloqueaste a esta persona'; }
 
-  const grow = () => { input.style.height = 'auto'; input.style.height = Math.min(130, input.scrollHeight) + 'px'; const has = !!input.value.trim(); send.disabled = !has || blockedNow; send.hidden = !has; mic.hidden = has; };
-  send.hidden = true;
-  input.addEventListener('input', grow);
+  let replyTo = null, editing = null;
+  const grow = () => {
+    input.style.height = 'auto'; input.style.height = Math.min(130, input.scrollHeight) + 'px';
+    const has = !!input.value.trim();
+    send.hidden = !has && !editing; mic.hidden = has || !!editing;
+    form.classList.toggle('typing', has); more.hidden = !has;
+  };
+  input.addEventListener('input', () => { grow(); sendTyping(); });
+  input.addEventListener('focus', () => { if (input.value.trim()) form.classList.add('typing'); });
   input.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && !('ontouchstart' in window)) { e.preventDefault(); submit(); } });
-  picker.addEventListener('change', () => { const f = picker.files && picker.files[0]; picker.value = ''; if (f) sendMedia(f); });
-  if (state.chatPick) { state.chatPick = false; setTimeout(() => picker.click(), 300); }
+  const pickFiles = (inp) => { const fs = [...(inp.files || [])].slice(0, 10); inp.value = ''; (async () => { for (const f of fs) await sendMedia(f); })(); };
+  gallery.addEventListener('change', () => pickFiles(gallery));
+  camera.addEventListener('change', () => pickFiles(camera));
+  quick.addEventListener('click', () => { if (!blockedNow) sendText('🤠'); });
+  if (state.chatPick) { state.chatPick = false; setTimeout(() => gallery.click(), 300); }
 
-  let msgs = [], alive = true, lastCount = -1;
+  let msgs = [], alive = true, lastCount = -1, firstPaint = true;
   const seen = new Set();
-  const rx = new Map();   // id del mensaje -> [{ user_id, reaction }]
+  const byId = (id) => msgs.find(m => m.id === id);
+  const snippet = (m) => !m ? 'Mensaje' : m.unsent_at ? 'Mensaje anulado' : m.body ? m.body.replace(/\s*https?:\S+#[ple]=\d+/, '').slice(0, 90) : msgLabel(m);
+  const nameOf = (uid) => uid === state.me.id ? 'ti' : otherName;
+
+  // ---- reacciones ----
+  const rx = new Map();
   async function loadRx() {
     if (!HAS_MSG_RX) return;
     const ids = msgs.map(m => m.id).filter(id => typeof id === 'number');
@@ -6301,72 +6420,196 @@ async function renderChat() {
     if (!pill) { pill = h('button', { class: 'msg-rx', type: 'button' }); el.append(pill); }
     const mineR = list.find(r => r.user_id === state.me.id);
     pill.setAttribute('aria-label', mineR ? 'Quitar tu reacción' : 'Reaccionar');
-    pill.onclick = (e) => { e.stopPropagation(); if (mineR) setRx(m, mineR.reaction); else openReactPicker(el, null, (k) => setRx(m, k)); };
+    pill.onclick = (e) => { e.stopPropagation(); if (mineR) setRx(m, mineR.reaction); else msgMenu(el, m); };
     const kinds = [...new Set(list.map(r => r.reaction))];
     pill.replaceChildren(...kinds.map(k => reactIcon(k, 'mini')), list.length > 1 ? h('span', { class: 'rx-n' }, String(list.length)) : '');
   }
-  // Dejar presionado (o doble toque) un mensaje para reaccionar
-  function armRx(el, m) {
-    if (!HAS_MSG_RX || m.pending) return;
-    let t = null, fired = false, lastTap = 0;
-    const open = () => { const cur = (rx.get(m.id) || []).find(r => r.user_id === state.me.id); openReactPicker(el, cur ? cur.reaction : null, (k) => setRx(m, k)); };
-    el.addEventListener('pointerdown', (e) => { if (e.target.closest('.msg-rx,.msg-post,video,.vp')) return; fired = false; clearTimeout(t); t = setTimeout(() => { fired = true; try { navigator.vibrate && navigator.vibrate(15); } catch (_) {} open(); }, 420); });
-    ['pointerup', 'pointerleave', 'pointercancel', 'pointermove'].forEach(ev => el.addEventListener(ev, (e) => { if (ev !== 'pointermove' || Math.abs(e.movementY) > 4) clearTimeout(t); }));
+
+  // ---- menú al dejar presionado: reacciones + responder, copiar, editar, anular ----
+  function msgMenu(el, m) {
+    if (m.pending || m.unsent_at) return;
+    document.querySelectorAll('.mm-bg').forEach(x => x.remove());
+    const mine = m.sender_id === state.me.id;
+    const cur = (rx.get(m.id) || []).find(r => r.user_id === state.me.id);
+    const done = () => { bg.remove(); el.classList.remove('mm-focus'); };
+    const act = (ico, label, fn, danger) => h('button', { class: 'mm-act' + (danger ? ' danger' : ''), type: 'button', onclick: () => { done(); fn(); } }, h('span', {}, ico), label);
+    const canEdit = mine && HAS_MSG2 && m.body && !m.media_path && Date.now() - new Date(m.created_at) < 15 * 60e3;
+    const acts = [
+      act('↩️', 'Responder', () => setReply(m)),
+      m.body ? act('📋', 'Copiar', () => { try { navigator.clipboard.writeText(m.body); toast('Copiado'); } catch (_) {} }) : null,
+      canEdit ? act('✏️', 'Editar', () => startEdit(m)) : null,
+      mine && HAS_MSG2 ? act('🗑️', 'Anular envío', () => unsend(m), true) : null,
+      !mine ? act('🚩', 'Reportar', () => reportThing('user', other)) : null].filter(Boolean);
+    const bg = h('div', { class: 'mm-bg', onclick: (e) => { if (e.target === bg) done(); } },
+      h('div', { class: 'mm-panel' + (mine ? ' me' : '') },
+        HAS_MSG_RX ? h('div', { class: 'mm-rx' }, REACTS.map(r => h('button', { type: 'button', class: cur && cur.reaction === r.k ? 'on' : '', 'aria-label': r.l, onclick: () => { done(); setRx(m, r.k); } }, reactIcon(r.k)))) : null,
+        h('div', { class: 'mm-acts' }, acts)));
+    el.classList.add('mm-focus');
+    document.body.append(bg);
+    try { navigator.vibrate && navigator.vibrate(15); } catch (_) {}
+  }
+  // Dejar presionado = menú; doble toque = ❤️; deslizar a la derecha = responder; un toque = ver la hora
+  function armMsg(el, m) {
+    if (m.pending || m.unsent_at) return;
+    let t = null, fired = false, lastTap = 0, sx = 0, sy = 0, dx = 0, swiping = false, down = false;
+    el.addEventListener('pointerdown', (e) => {
+      if (e.target.closest('.msg-rx,.msg-post,video,.vp,.msg-q')) return;
+      down = true; fired = false; swiping = false; dx = 0; sx = e.clientX; sy = e.clientY; clearTimeout(t);
+      t = setTimeout(() => { if (!swiping) { fired = true; msgMenu(el, m); } }, 420);
+    });
+    el.addEventListener('pointermove', (e) => {
+      if (!down) return;
+      const mx = e.clientX - sx, my = e.clientY - sy;
+      if (Math.abs(my) > 8 && !swiping) { clearTimeout(t); down = false; return; }
+      if (mx > 10 && Math.abs(mx) > Math.abs(my)) { swiping = true; clearTimeout(t); dx = Math.min(80, mx); el.style.transform = `translateX(${dx}px)`; el.classList.toggle('swipe-ok', dx > 55); }
+    });
+    const end = () => {
+      if (!down) return; down = false; clearTimeout(t);
+      if (swiping) { el.style.transition = 'transform .18s'; el.style.transform = ''; setTimeout(() => { el.style.transition = ''; }, 200); el.classList.remove('swipe-ok'); if (dx > 55) { setReply(m); try { navigator.vibrate && navigator.vibrate(10); } catch (_) {} } fired = true; }
+    };
+    el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end); el.addEventListener('pointerleave', end);
     el.addEventListener('contextmenu', (e) => e.preventDefault());
     el.addEventListener('click', (e) => {
       if (fired) { fired = false; e.stopPropagation(); e.preventDefault(); return; }
+      if (e.target.closest('.msg-rx,.msg-post,video,.vp,.msg-q,img')) return;
       const now = Date.now();
-      if (now - lastTap < 300) { lastTap = 0; e.stopPropagation(); e.preventDefault(); clearTimeout(el._tapT); setRx(m, 'love'); el.classList.remove('rx-pop'); void el.offsetWidth; el.classList.add('rx-pop'); return; }
+      if (HAS_MSG_RX && now - lastTap < 300) { lastTap = 0; clearTimeout(el._timeT); el.classList.remove('show-time'); setRx(m, 'love'); el.classList.remove('rx-pop'); void el.offsetWidth; el.classList.add('rx-pop'); return; }
       lastTap = now;
+      clearTimeout(el._timeT); el._timeT = setTimeout(() => el.classList.toggle('show-time'), 260);
     }, true);
-    if ((m.media_path || m.localUrl) && !isAudioMsg(m)) el.append(h('button', { class: 'msg-rx-add', type: 'button', 'aria-label': 'Reaccionar a esta ' + (m.media_type === 'video' ? 'video' : 'foto'), onclick: (e) => { e.stopPropagation(); open(); } }, '☺'));
   }
-  const nodes = new Map(); // id -> elemento (para que los videos no se reinicien)
+
+  // ---- responder / editar / anular ----
+  function setReply(m) {
+    editing = null; replyTo = m;
+    replyBar.hidden = false;
+    replyBar.replaceChildren(h('div', { class: 'mc-reply-t' }, h('b', {}, 'Respondiendo a ' + (m.sender_id === state.me.id ? 'ti mismo' : otherName)), h('span', {}, snippet(m))),
+      h('button', { type: 'button', 'aria-label': 'Cancelar respuesta', onclick: clearBar }, '✕'));
+    grow(); input.focus();
+  }
+  function startEdit(m) {
+    replyTo = null; editing = m;
+    replyBar.hidden = false;
+    replyBar.replaceChildren(h('div', { class: 'mc-reply-t' }, h('b', {}, '✏️ Editando mensaje'), h('span', {}, snippet(m))),
+      h('button', { type: 'button', 'aria-label': 'Cancelar edición', onclick: () => { clearBar(); input.value = ''; grow(); } }, '✕'));
+    input.value = m.body || ''; grow(); input.focus();
+  }
+  function clearBar() { replyTo = null; editing = null; replyBar.hidden = true; replyBar.replaceChildren(); grow(); }
+  async function unsend(m) {
+    if (!confirm('¿Anular el envío? Se quitará para los dos.')) return;
+    const keep = { body: m.body, media_path: m.media_path, media_type: m.media_type };
+    Object.assign(m, { unsent_at: new Date().toISOString(), body: null, media_path: null }); paint();
+    const { error } = await sb.rpc('unsend_message', { mid: m.id });
+    if (error) { Object.assign(m, keep, { unsent_at: null }); paint(); return toast(/function|unsend/i.test(error.message || '') ? 'Falta activar esta función en Supabase' : 'No se pudo anular'); }
+    if (keep.media_path) sb.storage.from('dm').remove([keep.media_path]).catch(() => {});
+  }
+
+  // ---- "escribiendo…" ----
+  let typingUntil = 0, typingT = null, lastTypingSent = 0, channel = null;
+  const typingEl = h('div', { class: 'msg them typing-b g-solo' }, h('span', { class: 'tdots' }, h('i'), h('i'), h('i')));
+  typingEl.append(h('span', { class: 'msg-av' }, avatar(other, 26)));
+  function sendTyping() {
+    if (!channel || !input.value.trim() || Date.now() - lastTypingSent < 2500) return;
+    lastTypingSent = Date.now();
+    try { channel.send({ type: 'broadcast', event: 'typing', payload: { u: state.me.id } }); } catch (_) {}
+  }
+  function showTyping() {
+    const near = nearBottom();
+    typingUntil = Date.now() + 4500;
+    if (!typingEl.isConnected) { box.append(typingEl); if (near) toBottom(); }
+    clearTimeout(typingT); typingT = setTimeout(() => { if (Date.now() >= typingUntil) typingEl.remove(); }, 4600);
+  }
+
+  // ---- burbujas ----
+  const nodes = new Map();
   function bubble(m) {
-    const key = m.id + (m.pending ? 'p' : '');
+    const key = m.id + (m.pending ? 'p' : '') + (m.edited_at || '') + (m.unsent_at ? 'u' : '');
     if (nodes.has(key)) return nodes.get(key);
     const mine = m.sender_id === state.me.id;
+    const side = mine ? 'me' : 'them';
     let el;
-    if (isAudioMsg(m)) {
+    if (m.unsent_at) {
+      el = h('div', { class: 'msg unsent ' + side }, mine ? 'Anulaste el envío de un mensaje' : otherName + ' anuló el envío de un mensaje');
+    } else if (isAudioMsg(m)) {
       const src = m.localUrl || (DM_SIGNED.get(m.media_path) || {}).url;
-      el = h('div', { class: 'msg voice ' + (mine ? 'me' : 'them') + (m.pending ? ' pending' : '') }, voicePlayer(src, m.dur || voiceDur(m.media_path)),
-        m.pending ? h('span', { class: 'msg-up' }, 'Enviando…') : null);
+      el = h('div', { class: 'msg voice ' + side + (m.pending ? ' pending' : '') }, voicePlayer(src, m.dur || voiceDur(m.media_path)));
       if (!src) return el;
     } else if (m.media_path || m.localUrl) {
       const src = m.localUrl || (DM_SIGNED.get(m.media_path) || {}).url;
       const media = !src ? h('div', { class: 'msg-media-ph' }, 'Cargando…')
         : m.media_type === 'video' ? h('video', { src, controls: true, playsinline: true, preload: 'metadata' })
-        : h('img', { src, alt: 'Foto', loading: 'lazy', onclick: (e) => { const box = e.currentTarget.closest('.msg'); clearTimeout(box._tapT); box._tapT = setTimeout(() => openMediaViewer(src, 'image'), 300); } });
-      el = h('div', { class: 'msg hasmedia ' + (mine ? 'me' : 'them') + (m.pending ? ' pending' : '') }, media, m.body ? h('p', {}, m.body) : null,
-        m.pending ? h('span', { class: 'msg-up' }, 'Enviando…') : null);
-      if (!src) return el; // sin enlace todavía: no guardar, se vuelve a intentar
+        : h('img', { src, alt: 'Foto', loading: 'lazy', onclick: () => openMediaViewer(src, 'image') });
+      el = h('div', { class: 'msg hasmedia ' + side + (m.pending ? ' pending' : '') }, media, m.body ? h('p', {}, m.body) : null);
+      if (!src) return el;
+    } else if (isBigEmoji(m.body)) {
+      el = h('div', { class: 'msg bigemo ' + side + (m.pending ? ' pending' : '') }, m.body.trim());
     } else {
       const pm = /#([ple])=(\d+)/.exec(m.body || '');
       const openers = { p: [openPostById, '👀 Ver publicación'], l: [openListingById, '🛒 Ver anuncio'], e: [openEventById, '📅 Ver evento'] };
-      el = pm ? h('div', { class: 'msg ' + (mine ? 'me' : 'them') + (m.pending ? ' pending' : '') }, m.body.replace(/\s*https?:\S+#[ple]=\d+/, ''),
+      el = pm ? h('div', { class: 'msg ' + side + (m.pending ? ' pending' : '') }, m.body.replace(/\s*https?:\S+#[ple]=\d+/, ''),
           h('button', { class: 'msg-post', onclick: () => openers[pm[1]][0](Number(pm[2])) }, openers[pm[1]][1]))
-        : h('div', { class: 'msg ' + (mine ? 'me' : 'them') + (m.pending ? ' pending' : '') }, m.body);
+        : h('div', { class: 'msg ' + side + (m.pending ? ' pending' : '') }, ...richText(m.body || ''));
     }
-    armRx(el, m);
+    if (m.edited_at && !m.unsent_at) el.append(h('span', { class: 'msg-ed' }, 'Editado'));
+    el.dataset.t = new Date(m.created_at).toLocaleTimeString('es-MX', { hour: 'numeric', minute: '2-digit' });
+    el.dataset.id = m.id;
+    armMsg(el, m);
     nodes.set(key, el);
     return el;
   }
-  function paint() {
-    const kids = []; let prev = null;
-    for (const m of msgs) {
-      if (!prev || new Date(m.created_at) - new Date(prev.created_at) > 15 * 60e3) kids.push(h('div', { class: 'msg-time' }, shortTime(m.created_at)));
-      const el = bubble(m); if (!m.pending) rxPill(m, el); kids.push(el);
-      prev = m;
-    }
-    const lastMine = [...msgs].reverse().find(m => m.sender_id === state.me.id && !m.pending);
-    if (lastMine && msgs[msgs.length - 1] === lastMine && lastMine.read_at) kids.push(h('div', { class: 'msg-seen' }, 'Visto'));
-    if (!msgs.length) kids.push(h('div', { class: 'dm-empty' }, h('div', { icon: 'shotsbig' }), h('b', {}, '¡Salud!'), `Mándale el primer mensaje a @${other.username || ''}.`));
-    box.replaceChildren(...kids);
-    if (msgs.length !== lastCount) { lastCount = msgs.length; window.scrollTo(0, document.body.scrollHeight); }
+  // Cita de la respuesta, arriba de la burbuja (como en Messenger)
+  function quoteEl(m) {
+    const o = byId(m.reply_to); const mine = m.sender_id === state.me.id;
+    const who = mine ? (o && o.sender_id === state.me.id ? 'Te respondiste' : 'Respondiste a ' + otherName) : (o && o.sender_id === state.me.id ? otherName + ' te respondió' : otherName + ' respondió');
+    return h('div', { class: 'msg-q ' + (mine ? 'me' : 'them') },
+      h('small', {}, '↩ ' + who),
+      h('button', { type: 'button', class: 'msg-q-b', onclick: () => { const t = box.querySelector(`.msg[data-id="${m.reply_to}"]`); if (t) { t.scrollIntoView({ block: 'center', behavior: 'smooth' }); t.classList.remove('flash'); void t.offsetWidth; t.classList.add('flash'); } } }, o ? snippet(o) : 'Mensaje'));
   }
-  const COLS = 'id,sender_id,body,media_path,media_type,created_at,read_at';
+  const near3 = (a, b) => a && b && a.sender_id === b.sender_id && !a.unsent_at === !b.unsent_at && Math.abs(new Date(b.created_at) - new Date(a.created_at)) < 3 * 60e3 && !b.reply_to;
+  const nearBottom = () => window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 160;
+  const toBottom = (smooth) => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: smooth ? 'smooth' : 'instant' });
+  function paint() {
+    const wasNear = nearBottom();
+    const kids = []; let prev = null;
+    const lastRead = [...msgs].reverse().find(m => m.sender_id === state.me.id && !m.pending && m.read_at);
+    msgs.forEach((m, i) => {
+      const gap = !prev || new Date(m.created_at) - new Date(prev.created_at) > 15 * 60e3;
+      if (gap) kids.push(h('div', { class: 'msg-time' }, shortTime(m.created_at)));
+      const next = msgs[i + 1];
+      const nextGap = next && new Date(next.created_at) - new Date(m.created_at) > 15 * 60e3;
+      const joinPrev = !gap && near3(prev, m), joinNext = next && !nextGap && near3(m, next);
+      if (m.reply_to && HAS_MSG2 && !m.unsent_at) kids.push(quoteEl(m));
+      const el = bubble(m);
+      el.classList.remove('g-solo', 'g-first', 'g-mid', 'g-last');
+      el.classList.add(joinPrev ? (joinNext ? 'g-mid' : 'g-last') : (joinNext ? 'g-first' : 'g-solo'));
+      el.querySelectorAll(':scope > .msg-av').forEach(x => x.remove());
+      if (m.sender_id !== state.me.id && !joinNext) el.append(h('span', { class: 'msg-av' }, avatar(other, 26)));
+      if (!m.pending && !m.unsent_at) rxPill(m, el);
+      kids.push(el);
+      if (lastRead && m === lastRead) kids.push(h('div', { class: 'msg-seen-av', title: 'Visto' }, avatar(other, 16)));
+      prev = m;
+    });
+    const lastMine = [...msgs].reverse().find(m => m.sender_id === state.me.id);
+    if (lastMine && lastMine !== lastRead && msgs[msgs.length - 1] === lastMine) kids.push(h('div', { class: 'msg-state' }, lastMine.pending ? '◯ Enviando' : '✓ Enviado'));
+    if (!msgs.length) kids.push(h('div', { class: 'dm-empty' }, avatar(other, 84), h('b', {}, other.full_name || other.username || ''), h('span', {}, '@' + (other.username || '')), h('small', {}, 'Saluda con un 🤠 o escríbele algo.')));
+    if (typingEl.isConnected && Date.now() < typingUntil) kids.push(typingEl);
+    box.replaceChildren(...kids);
+    if (msgs.length !== lastCount) {
+      const newest = msgs[msgs.length - 1];
+      if (firstPaint || wasNear || (newest && newest.sender_id === state.me.id)) { toBottom(!firstPaint); newPill.hidden = true; }
+      else if (lastCount >= 0) newPill.hidden = false;
+      lastCount = msgs.length; firstPaint = false;
+    }
+  }
+  window.addEventListener('scroll', function onS() { if (!alive) return window.removeEventListener('scroll', onS); if (nearBottom()) newPill.hidden = true; }, { passive: true });
+
+  let COLS = 'id,sender_id,body,media_path,media_type,created_at,read_at' + (HAS_MSG2 ? ',reply_to,edited_at,unsent_at' : '');
   async function load() {
-    const { data, error } = await sb.from('messages').select(COLS).eq('conversation_id', chat.id).order('created_at', { ascending: true }).limit(300);
+    let { data, error } = await sb.from('messages').select(COLS).eq('conversation_id', chat.id).order('created_at', { ascending: true }).limit(300);
+    if (error && HAS_MSG2 && /reply_to|edited_at|unsent_at/i.test(error.message || '')) {
+      HAS_MSG2 = false; COLS = 'id,sender_id,body,media_path,media_type,created_at,read_at';
+      ({ data, error } = await sb.from('messages').select(COLS).eq('conversation_id', chat.id).order('created_at', { ascending: true }).limit(300));
+    }
     if (!alive) return;
     if (error) return box.replaceChildren(h('div', { class: 'empty' }, friendlyError(error)));
     await signDm((data || []).filter(m => m.media_path).map(m => m.media_path));
@@ -6374,6 +6617,7 @@ async function renderChat() {
     const pend = msgs.filter(m => m.pending);
     msgs = (data || []).concat(pend);
     msgs.forEach(m => seen.add(m.id));
+    if (msgs.some(m => m.sender_id !== state.me.id) && typingEl.isConnected) { typingEl.remove(); typingUntil = 0; }
     paint();
     loadRx();
     if (msgs.some(m => m.sender_id !== state.me.id && !m.read_at)) sb.rpc('mark_read', { conv: chat.id }).then(() => {}, () => {});
@@ -6385,64 +6629,86 @@ async function renderChat() {
     if (/size|large|exceed/i.test(m)) return 'El archivo es muy pesado (máx. 50 MB)';
     return 'No se pudo enviar';
   }
+  async function insertMsg(row) {
+    if (replyTo && HAS_MSG2 && typeof replyTo.id === 'number') row.reply_to = replyTo.id;
+    let r = await sb.from('messages').insert(row).select(COLS).single();
+    if (r.error && row.reply_to && /reply_to/i.test(r.error.message || '')) { HAS_MSG2 = false; delete row.reply_to; COLS = 'id,sender_id,body,media_path,media_type,created_at,read_at'; r = await sb.from('messages').insert(row).select(COLS).single(); }
+    return r;
+  }
+  async function sendText(text) {
+    if (blockedNow) return;
+    const tmp = { id: 'tmp' + Date.now() + Math.random(), sender_id: state.me.id, body: text, created_at: new Date().toISOString(), pending: true, reply_to: replyTo && replyTo.id };
+    const rt = replyTo; clearBar();
+    msgs.push(tmp); paint();
+    replyTo = rt;
+    const { data, error } = await insertMsg({ conversation_id: chat.id, sender_id: state.me.id, body: text });
+    replyTo = null;
+    msgs = msgs.filter(m => m !== tmp);
+    if (error) { paint(); toast(failMsg(error)); return false; }
+    if (data && !seen.has(data.id)) { seen.add(data.id); msgs.push(data); }
+    SFX.play('sent'); paint();
+    return true;
+  }
   async function submit() {
     const text = input.value.trim();
     if (!text || blockedNow) return;
-    input.value = ''; grow(); emo._close();
-    const tmp = { id: 'tmp' + Date.now(), sender_id: state.me.id, body: text, created_at: new Date().toISOString(), pending: true };
-    msgs.push(tmp); paint();
-    const { data, error } = await sb.from('messages').insert({ conversation_id: chat.id, sender_id: state.me.id, body: text }).select(COLS).single();
-    msgs = msgs.filter(m => m !== tmp);
-    if (error) { input.value = text; grow(); paint(); return toast(failMsg(error)); }
-    if (data && !seen.has(data.id)) { seen.add(data.id); msgs.push(data); }
-    SFX.play('sent');
-    paint();
+    if (editing) {
+      const m = editing; clearBar(); input.value = ''; grow();
+      if (text === m.body) return;
+      const old = m.body; m.body = text; m.edited_at = new Date().toISOString(); paint();
+      const { error } = await sb.rpc('edit_message', { mid: m.id, new_body: text });
+      if (error) { m.body = old; m.edited_at = null; paint(); toast(/editar/i.test(error.message || '') ? 'Ya pasaron más de 15 minutos: no se puede editar' : 'No se pudo editar'); }
+      return;
+    }
+    input.value = ''; grow(); emo._close(); form.classList.remove('typing');
+    const ok = await sendText(text);
+    if (!ok) { input.value = text; grow(); }
   }
   async function sendMedia(file) {
     if (blockedNow) return;
     const isVideo = (file.type || '').startsWith('video/');
     if (!isVideo && !(file.type || '').startsWith('image/')) return toast('Solo se pueden mandar fotos o videos');
     if (file.size > MAX_VIDEO_MB * 1024 * 1024) return toast(`El video es muy pesado (máx. ${MAX_VIDEO_MB} MB)`);
-    if (isVideo) toast('Preparando el video para mandarlo… no salgas del chat');
-    const blob = isVideo ? await prepVideo(file) : await compressImage(file, 1600);
-    if (isVideo && tooBig(blob)) return toast('El video es muy largo. Prueba con uno más corto.');
-    const localUrl = URL.createObjectURL(blob);
-    const tmp = { id: 'tmp' + Date.now(), sender_id: state.me.id, media_type: isVideo ? 'video' : 'image', localUrl, created_at: new Date().toISOString(), pending: true };
+    const rt = replyTo; clearBar();
+    const tmp = { id: 'tmp' + Date.now() + Math.random(), sender_id: state.me.id, media_type: isVideo ? 'video' : 'image', localUrl: URL.createObjectURL(file), created_at: new Date().toISOString(), pending: true };
     msgs.push(tmp); paint();
+    const blob = isVideo ? await prepVideo(file) : await compressImage(file, 1600);
+    if (isVideo && tooBig(blob)) { msgs = msgs.filter(m => m !== tmp); paint(); return toast('El video es muy largo. Prueba con uno más corto.'); }
     const ext = isVideo ? videoExt(blob, file) : 'jpg';
     const path = `${chat.id}/${state.me.id}-${Date.now()}.${ext}`;
     const up = await sb.storage.from('dm').upload(path, blob, { contentType: isVideo ? (blob.type || file.type || 'video/mp4') : 'image/jpeg', upsert: false });
     let data = null, error = up.error;
-    if (!error) {
-      const r = await sb.from('messages').insert({ conversation_id: chat.id, sender_id: state.me.id, media_path: path, media_type: tmp.media_type }).select(COLS).single();
-      data = r.data; error = r.error;
-    }
+    if (!error) { replyTo = rt; const r = await insertMsg({ conversation_id: chat.id, sender_id: state.me.id, media_path: path, media_type: tmp.media_type }); replyTo = null; data = r.data; error = r.error; }
     msgs = msgs.filter(m => m !== tmp);
-    if (error) { paint(); URL.revokeObjectURL(localUrl); return toast(failMsg(error)); }
-    if (data) { DM_SIGNED.set(path, { url: localUrl, exp: Date.now() + 3500e3 }); if (!seen.has(data.id)) { seen.add(data.id); msgs.push(data); } SFX.play('sent'); }
+    if (error) { paint(); URL.revokeObjectURL(tmp.localUrl); return toast(failMsg(error)); }
+    if (data) { DM_SIGNED.set(path, { url: tmp.localUrl, exp: Date.now() + 3500e3 }); if (!seen.has(data.id)) { seen.add(data.id); msgs.push(data); } SFX.play('sent'); }
     paint();
   }
   async function sendVoice(blob, secs) {
     if (blockedNow) return;
+    const rt = replyTo; clearBar();
     const localUrl = URL.createObjectURL(blob);
     const tmp = { id: 'tmp' + Date.now(), sender_id: state.me.id, media_type: 'audio', localUrl, dur: secs, created_at: new Date().toISOString(), pending: true };
     msgs.push(tmp); paint();
     const path = `${chat.id}/${state.me.id}-${Date.now()}-d${secs}.${voiceExt(blob)}`;
     const up = await sb.storage.from('dm').upload(path, blob, { contentType: blob.type || 'audio/webm', upsert: false });
     let data = null, error = up.error;
-    if (!error) { const r = await sb.from('messages').insert({ conversation_id: chat.id, sender_id: state.me.id, media_path: path, media_type: 'audio' }).select(COLS).single(); data = r.data; error = r.error; }
+    if (!error) { replyTo = rt; const r = await insertMsg({ conversation_id: chat.id, sender_id: state.me.id, media_path: path, media_type: 'audio' }); replyTo = null; data = r.data; error = r.error; }
     msgs = msgs.filter(m => m !== tmp);
     if (error) { paint(); URL.revokeObjectURL(localUrl); return toast(/mime|type|check|contenido/i.test(error.message || '') ? 'Falta activar las notas de voz en Supabase' : failMsg(error)); }
     if (data) { DM_SIGNED.set(path, { url: localUrl, exp: Date.now() + 3500e3 }); if (!seen.has(data.id)) { seen.add(data.id); msgs.push(data); } SFX.play('sent'); }
     paint();
   }
-  let channel = null;
   try {
-    if (sb.channel) channel = sb.channel('dm-' + chat.id).on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: 'conversation_id=eq.' + chat.id }, () => load())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'message_reactions' }, (pl) => { const id = (pl.new && pl.new.message_id) || (pl.old && pl.old.message_id); if (!id || seen.has(id)) loadRx(); }).subscribe();
+    if (sb.channel) channel = sb.channel('dm-' + chat.id, { config: { broadcast: { self: false } } })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: 'conversation_id=eq.' + chat.id }, () => load())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'message_reactions' }, (pl) => { const id = (pl.new && pl.new.message_id) || (pl.old && pl.old.message_id); if (!id || seen.has(id)) loadRx(); })
+      .on('broadcast', { event: 'typing' }, (pl) => { if (pl && pl.payload && pl.payload.u === other.id) showTyping(); })
+      .subscribe();
   } catch (_) { channel = null; }
   const poll = setInterval(() => { if (!document.hidden) load(); }, channel ? 15000 : 4000);
-  state.cleanup = () => { alive = false; if (VOICE_NOW) VOICE_NOW.pause(); clearInterval(poll); if (channel) try { sb.removeChannel(channel); } catch (_) {} };
+  state.cleanup = () => { alive = false; clearTimeout(typingT); document.querySelectorAll('.mm-bg').forEach(x => x.remove()); if (VOICE_NOW) VOICE_NOW.pause(); clearInterval(poll); if (channel) try { sb.removeChannel(channel); } catch (_) {} };
+  grow();
   await load();
   input.focus({ preventScroll: true });
 }
