@@ -1238,44 +1238,72 @@ async function shrinkVideo(file, onProgress, o = {}) {
     const trimming = dur < full - 0.5;
     const sc = Math.min(1, side / Math.min(W, H));
     const kbps = file.size * 8 / full / 1000;
-    if (!o.force && !trimming && sc === 1 && (kbps < 2200 || file.size < 6 * 1048576)) { cleanup(); return file; }   // ya viene ligero
+    if (!o.force && !trimming && sc === 1 && (kbps < (o.sd ? 2500 : 2200) || file.size < (o.sd ? 4 : 6) * 1048576)) { cleanup(); return file; }   // ya viene ligero
     const cw = Math.round(W * sc / 2) * 2, ch = Math.round(H * sc / 2) * 2;
     const c = document.createElement('canvas'); c.width = cw; c.height = ch;
     const g = c.getContext('2d');
+    g.imageSmoothingQuality = 'high';
     const stream = c.captureStream(30);
+    // Versión ligera (480p) para cuando la señal está mala: se graba al mismo tiempo, no tarda más
+    let c2 = null, g2 = null, stream2 = null;
+    if (o.sd && Math.min(W, H) > 520) {
+      const s2 = 480 / Math.min(W, H);
+      c2 = document.createElement('canvas'); c2.width = Math.round(W * s2 / 2) * 2; c2.height = Math.round(H * s2 / 2) * 2;
+      g2 = c2.getContext('2d'); stream2 = c2.captureStream(30);
+    }
+    let posterP = null;
     let withAudio = false;
     try {
       actx = new (window.AudioContext || window.webkitAudioContext)();
       const src = actx.createMediaElementSource(v), dest = actx.createMediaStreamDestination();
       src.connect(dest);   // el audio va a la grabación, no a la bocina
-      dest.stream.getAudioTracks().forEach(t => stream.addTrack(t));
+      dest.stream.getAudioTracks().forEach(t => { stream.addTrack(t); if (stream2) stream2.addTrack(t.clone()); });
       withAudio = true;
     } catch (_) {}
     if (actx && actx.state === 'suspended') await actx.resume().catch(() => {});
     try { await v.play(); }
     catch (_) { v.muted = true; await v.play(); }   // si no deja con sonido, al menos sin sonido
-    const rec = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: vbps, audioBitsPerSecond: withAudio ? 96000 : undefined });
+    const rec = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: vbps, audioBitsPerSecond: withAudio ? 128000 : undefined });
     const chunks = [];
     rec.ondataavailable = (e) => { if (e.data && e.data.size) chunks.push(e.data); };
     const stopped = new Promise(r => { rec.onstop = r; });
+    let rec2 = null, chunks2 = [], stopped2 = Promise.resolve();
+    if (stream2) {
+      try {
+        rec2 = new MediaRecorder(stream2, { mimeType: mime, videoBitsPerSecond: 900000, audioBitsPerSecond: withAudio ? 64000 : undefined });
+        rec2.ondataavailable = (e) => { if (e.data && e.data.size) chunks2.push(e.data); };
+        stopped2 = new Promise(r => { rec2.onstop = r; });
+      } catch (_) { rec2 = null; }
+    }
     let finish;
     const done = new Promise(r => { finish = r; });
     const draw = () => {
       try { g.drawImage(v, 0, 0, cw, ch); } catch (_) {}
+      if (g2) try { g2.drawImage(v, 0, 0, c2.width, c2.height); } catch (_) {}
+      // Foto de portada: un cuadro del principio, para que el video aparezca al instante mientras carga
+      if (o.sd && !posterP && v.currentTime >= Math.min(0.4, dur / 3)) posterP = new Promise(r => { try { c.toBlob(b => r(b), 'image/jpeg', 0.8); } catch (_) { r(null); } });
       if (onProgress) onProgress(Math.min(99, Math.round(v.currentTime / dur * 100)));
       if (v.ended || v.currentTime >= dur) return finish(true);
       raf = v.requestVideoFrameCallback ? v.requestVideoFrameCallback(draw) : requestAnimationFrame(draw);
     };
     v.onended = () => finish(true);
     rec.start(1000);
+    if (rec2) try { rec2.start(1000); } catch (_) { rec2 = null; }
     draw();
     const ok = await Promise.race([done, new Promise(r => setTimeout(() => r(false), dur * 1000 * 3 + 20000))]);
     try { v.pause(); } catch (_) {}
-    rec.stop(); await stopped; cleanup();
+    rec.stop(); if (rec2) try { rec2.stop(); } catch (_) {}
+    await stopped; await stopped2;
+    const poster = posterP ? await posterP : null;
+    cleanup();
     if (!ok) return file;
     const out = new Blob(chunks, { type: mime.split(';')[0] });
     if (!out.size || (!trimming && !o.force && out.size >= file.size * 0.9)) return file;
     if (onProgress) onProgress(100);
+    if (o.sd) {
+      const sd = rec2 && chunks2.length ? new Blob(chunks2, { type: mime.split(';')[0] }) : null;
+      return { hd: out, sd: sd && sd.size && sd.size < out.size * 0.8 ? sd : null, poster };
+    }
     return out;
   } catch (_) { cleanup(); return file; }
 }
@@ -1285,6 +1313,67 @@ async function prepVideo(file, onProgress, maxSec) {
   if (tooBig(blob)) blob = await shrinkVideo(file, onProgress, { maxSec, side: 480, vbps: 700000, force: true });
   if (tooBig(blob) && !maxSec) blob = await shrinkVideo(file, onProgress, { maxSec: 90, side: 480, vbps: 600000, force: true });
   return blob;
+}
+// Calidad tipo Facebook: una versión HD nítida + una ligera de 480p + foto de portada, todo en una pasada.
+// Teléfonos con buen procesador graban en 1080p; los demás en 720p (con el doble de nitidez que antes).
+async function prepVideoSet(file, onProgress, maxSec) {
+  const strong = (navigator.hardwareConcurrency || 4) >= 6 && (navigator.deviceMemory || 4) >= 4;
+  const dur = await videoDuration(file);
+  const len = Math.min(dur || 60, maxSec || dur || 60);
+  // Que nunca pase del límite de subida: si el video es largo, se baja un poco la calidad
+  const budget = Math.floor(MAX_UP_MB * 0.85 * 8 * 1048576 / Math.max(len, 1)) - 160000;
+  const side = strong ? 1080 : 720;
+  const vbps = Math.max(1200000, Math.min(strong ? 5000000 : 3200000, budget));
+  let r = await shrinkVideo(file, onProgress, { maxSec, side, vbps, sd: true });
+  if (r instanceof Blob) r = { hd: r, sd: null, poster: null };
+  if (tooBig(r.hd)) { const b = await prepVideo(file, onProgress, maxSec); r = { hd: b, sd: null, poster: null }; }
+  return r;
+}
+function videoDuration(file) {
+  return new Promise(res => {
+    const u = URL.createObjectURL(file), v = document.createElement('video');
+    const end = (d) => { URL.revokeObjectURL(u); res(d); };
+    v.preload = 'metadata'; v.onloadedmetadata = () => end(isFinite(v.duration) ? v.duration : 0); v.onerror = () => end(0);
+    setTimeout(() => end(0), 8000); v.src = u;
+  });
+}
+// Sube las versiones: principal "-hq", ligera "-sd" y portada "-p.jpg" (el nombre avisa a la app que existen)
+async function uploadVideoSet(set, file) {
+  const base = `${state.me.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const ext = videoExt(set.hd, file);
+  const multi = set.hd !== file && (set.sd || set.poster);
+  const path = multi ? `${base}-hq.${ext}` : `${base}.${ext}`;
+  const opts = (b, t) => ({ contentType: t || b.type || file.type, cacheControl: '31536000' });
+  const jobs = [sb.storage.from('media').upload(path, set.hd, opts(set.hd))];
+  if (multi && set.sd) jobs.push(sb.storage.from('media').upload(`${base}-sd.${videoExt(set.sd, file)}`, set.sd, opts(set.sd)).catch(() => null));
+  if (multi && set.poster) jobs.push(sb.storage.from('media').upload(`${base}-p.jpg`, set.poster, opts(set.poster, 'image/jpeg')).catch(() => null));
+  const [up] = await Promise.all(jobs);
+  if (up.error) throw up.error;
+  return { path, url: sb.storage.from('media').getPublicUrl(path).data.publicUrl };
+}
+// Qué versión ver: con buena señal la HD; con señal mala, ahorro de datos o datos limitados, la ligera
+const withVariants = (path) => isHQ(path) ? [path, path.replace(/-hq\.(mp4|webm)$/i, '-sd.$1'), path.replace(/-hq\.(mp4|webm)$/i, '-p.jpg')] : [path];
+const isHQ = (url) => /-hq\.(mp4|webm)(\?|$)/i.test(String(url || ''));
+const posterOf = (url) => isHQ(url) ? String(url).replace(/-hq\.(mp4|webm)/i, '-p.jpg') : null;
+function slowNet() {
+  if (SAVER.on) return true;
+  const c = navigator.connection; if (!c) return false;
+  return !!c.saveData || /(^|-)2g|3g/.test(c.effectiveType || '') || (c.downlink > 0 && c.downlink < 1);
+}
+let SD_MISSING = new Set();
+function bestSrc(url) {
+  if (!isHQ(url) || !slowNet() || SD_MISSING.has(url)) return url;
+  return String(url).replace(/-hq\.(mp4|webm)/i, '-sd.$1');
+}
+// Si la versión ligera no existe, se regresa a la normal sin que se note
+function fallbackHQ(v, url) {
+  v.addEventListener('error', () => { const now = v.getAttribute('src') || ''; if (now !== url && isHQ(url)) { SD_MISSING.add(url); v.src = url; } });
+}
+// Miniatura de un video: si tiene portada, se usa la foto (carga al instante); si no, el primer cuadro del video
+function vthumb(url, cls) {
+  const p = posterOf(url);
+  if (p) { const im = h('img', { src: p, alt: '', loading: 'lazy', class: cls || null }); im.onerror = () => im.replaceWith(h('video', { src: url + '#t=0.5', muted: true, playsInline: true, preload: 'metadata', class: cls || null })); return im; }
+  return h('video', { src: url + '#t=0.5', muted: true, playsInline: true, preload: 'metadata', class: cls || null });
 }
 const SD_MAX_SEC = 60; // los sundowns duran hasta 1 minuto
 const videoExt = (blob, file) => blob !== file ? ((blob.type || '').includes('mp4') ? 'mp4' : 'webm') : (((file.name || '').split('.').pop() || 'mp4').toLowerCase().replace(/[^a-z0-9]/g, '') || 'mp4');
@@ -1760,7 +1849,7 @@ function animalTag(a) {
 function sdThumb(g) {
   const it = g.items.find(i => !seenSundowns.has(i.id)) || g.items[g.items.length - 1];
   const media = !it ? null : it.media_type === 'video'
-    ? h('video', { src: it.media_url + '#t=0.5', muted: true, playsInline: true, preload: 'metadata', class: 'sd-thumb' })
+    ? vthumb(it.media_url, 'sd-thumb')
     : h('img', { src: it.media_url, alt: '', loading: 'lazy', class: 'sd-thumb' });
   if (media && media.tagName === 'VIDEO') media.muted = true;
   return h('div', { class: 'sd-thumb-wrap' }, media || avatar(g.user, 56), media ? h('span', { class: 'sd-mini' }, avatar(g.user, 22)) : null);
@@ -2181,12 +2270,13 @@ const VIEW_IO = 'IntersectionObserver' in window ? new IntersectionObserver((es)
   else { try { v.pause(); } catch (_) {} }
 }), { threshold: [0, 0.6] }) : null;
 function lazyVideo(src, o = {}) {
-  const v = h('video', { playsInline: true, preload: 'none', class: o.class || null, controls: !!o.controls, loop: !!o.loop, muted: !!o.muted });
+  const v = h('video', { playsInline: true, preload: 'none', class: o.class || null, controls: !!o.controls, loop: !!o.loop, muted: !!o.muted, poster: posterOf(src) });
   if (o.muted) v.muted = true;
-  v.dataset.src = src;
-  if (NEAR_IO) NEAR_IO.observe(v); else { v.preload = 'metadata'; v.src = src; }
+  v.dataset.src = bestSrc(src);
+  fallbackHQ(v, src);
+  if (NEAR_IO) NEAR_IO.observe(v); else { v.preload = 'metadata'; v.src = v.dataset.src; }
   if (o.auto && VIEW_IO) VIEW_IO.observe(v);
-  keepWhenWatched(v, src);
+  keepWhenWatched(v, v.dataset.src);
   return v;
 }
 // Caché en el teléfono: cuando terminas de ver un video, se guarda para que la próxima vez no gaste datos
@@ -2287,7 +2377,7 @@ async function deletePost(p) {
   const { error } = await sb.from('posts').delete().eq('id', p.id);
   if (error) { toast('No se pudo borrar'); return false; }
   const path = !p.shared_id && p.media_url.split('/media/')[1];   // un compartido no borra la foto original
-  if (path) sb.storage.from('media').remove([decodeURIComponent(path)]);
+  if (path) sb.storage.from('media').remove(withVariants(decodeURIComponent(path)));
   toast('Borrado');
   return true;
 }
@@ -2544,7 +2634,7 @@ function gridOf(posts, onEmpty) {
     const body = h('div', { class: 'sheet-body', style: 'padding:12px 0' }, postCard(p));
     openSheet(p.profiles ? p.profiles.username : 'Publicación', body);
   } },
-    p.media_type === 'video' ? [h('video', { src: p.media_url + '#t=0.5', muted: true, playsInline: true, preload: 'metadata' }), h('span', { class: 'play', icon: 'play' })]
+    p.media_type === 'video' ? [vthumb(p.media_url), h('span', { class: 'play', icon: 'play' })]
                              : h('img', { src: p.media_url, alt: '', loading: 'lazy' }))));
 }
 
@@ -3208,12 +3298,16 @@ function startCreator(file, onDone, opts = {}) {
     shareBtn.disabled = true; shareBtn.textContent = 'Subiendo…';
     stopSong(); const endTrot = SFX.startUpload();
     try {
-      const blob = isVideo ? await prepVideo(file, (n) => { shareBtn.textContent = `Preparando video… ${n}%`; }, SD_MAX_SEC) : await compressImage(file);
+      const set = isVideo ? await prepVideoSet(file, (n) => { shareBtn.textContent = `Preparando video… ${n}%`; }, SD_MAX_SEC) : { hd: await compressImage(file) };
+      const blob = set.hd;
       if (isVideo) { shareBtn.textContent = 'Subiendo…'; if (tooBig(blob)) throw new Error('Tu teléfono no pudo achicar este video. Prueba con uno más corto (menos de 1 minuto).'); }
-      const ext = isVideo ? videoExt(blob, file) : (blob.type === 'image/png' ? 'png' : 'jpg');
-      const path = `${state.me.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-      const up = await sb.storage.from('media').upload(path, blob, { contentType: blob.type || file.type, cacheControl: '31536000' });
-      if (up.error) throw up.error;
+      let path;
+      if (isVideo) path = (await uploadVideoSet(set, file)).path;
+      else {
+        path = `${state.me.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${blob.type === 'image/png' ? 'png' : 'jpg'}`;
+        const up = await sb.storage.from('media').upload(path, blob, { contentType: blob.type || file.type, cacheControl: '31536000' });
+        if (up.error) throw up.error;
+      }
       const { data: pub } = sb.storage.from('media').getPublicUrl(path);
       const row = { user_id: state.me.id, media_url: pub.publicUrl, media_type: isVideo ? 'video' : 'image', caption: null, category: null, shop_links: [], kind: 'sundown' };
       const clean = items.map(o => ({ ...o, x: Math.round(o.x * 10) / 10, y: Math.round(o.y * 10) / 10, s: Math.round(o.s * 100) / 100, r: Math.round(o.r) }));
@@ -3221,7 +3315,7 @@ function startCreator(file, onDone, opts = {}) {
       if (HAS_SONG && song) Object.assign(row, { song_url: song.url, song_title: song.title, song_preview: song.preview, song_art: song.art || null, song_start: song.start || 0 });
       let ins = await sb.from('posts').insert(row);
       if (ins.error && /overlays/i.test(ins.error.message || '')) { HAS_OVERLAYS = false; delete row.overlays; ins = await sb.from('posts').insert(row); }
-      if (ins.error) { sb.storage.from('media').remove([path]); throw ins.error; }
+      if (ins.error) { sb.storage.from('media').remove(withVariants(path)); throw ins.error; }
       endTrot(true); close();
       toast(opts.total && opts.step < opts.total ? `Sundown ${opts.step} de ${opts.total} publicado ✓` : 'Sundown publicado. Se va con el sol en 24 h');
       if (onDone) onDone();
@@ -3380,7 +3474,8 @@ function openSundowns(groups, gi, onClose) {
     paintPause();
     if (it.media_type === 'video') {
       isImg = false;
-      video = h('video', { src: it.media_url, playsInline: true, autoplay: true });
+      video = h('video', { src: bestSrc(it.media_url), poster: posterOf(it.media_url), playsInline: true, autoplay: true });
+      fallbackHQ(video, it.media_url);
       video.muted = SD_MUTED || !!ytId || !!it.song_preview;
       video.addEventListener('timeupdate', () => { if (video && video.duration && fill) fill.style.width = (video.currentTime / video.duration * 100) + '%'; });
       video.addEventListener('ended', () => next());
@@ -3471,8 +3566,9 @@ function rideCard(p, preload) {
   const prof = p.profiles || {};
   const commentCount = (p.comments && p.comments[0] && p.comments[0].count) || 0;
   const { likeBtn, countEl, setLike } = likeControls(p, true);
-  const video = h('video', { src: p.media_url, loop: true, playsInline: true, muted: state.ridesMuted, preload: preload || (SAVER.on ? 'none' : 'metadata') });
-  keepWhenWatched(video, p.media_url);
+  const video = h('video', { src: bestSrc(p.media_url), poster: posterOf(p.media_url), loop: true, playsInline: true, muted: state.ridesMuted, preload: preload || (SAVER.on ? 'none' : 'metadata') });
+  fallbackHQ(video, p.media_url);
+  keepWhenWatched(video, video.getAttribute('src'));
   const warm = (lvl) => { const order = { none: 0, metadata: 1, auto: 2 }; if ((order[lvl] || 0) > (order[video.preload] || 0)) video.preload = lvl; };
   let allowed = !SAVER.on;  // con ahorro de datos, el video espera a que lo toques
   video.muted = state.ridesMuted;
@@ -3617,23 +3713,27 @@ function renderUpload() {
   const dropBg = () => {
     if (!bg) return;
     const old = bg; old.dead = true; bg = null; paintUp();
-    old.promise.then(r => { if (r && r.path) { sb.storage.from('media').remove([r.path]).catch(() => {}); forgetPending(); } }).catch(() => {});
+    old.promise.then(r => { if (r && r.path) { sb.storage.from('media').remove(withVariants(r.path)).catch(() => {}); forgetPending(); } }).catch(() => {});
   };
   const startBg = (f) => {
     dropBg();
     const job = { file: f, isVideo: f.type.startsWith('video/'), pct: 0, stage: 'prep', dead: false };
     job.promise = (async () => {
-      const blob = job.isVideo ? await prepVideo(f, (n) => { job.pct = n; if (bg === job) paintUp(); }, 0) : await compressImage(f);
+      const set = job.isVideo ? await prepVideoSet(f, (n) => { job.pct = n; if (bg === job) paintUp(); }, 0) : { hd: await compressImage(f) };
+      const blob = set.hd;
       if (job.dead) return null;
       if (job.isVideo && tooBig(blob)) throw new Error('El video es muy largo. Prueba con uno más corto (menos de 3 minutos).');
       job.stage = 'up'; if (bg === job) paintUp();
-      const ext = job.isVideo ? videoExt(blob, f) : (blob.type === 'image/gif' ? 'gif' : (blob.type === 'image/png' ? 'png' : 'jpg'));
-      const path = `${state.me.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-      const up = await sb.storage.from('media').upload(path, blob, { contentType: blob.type || f.type, cacheControl: '31536000' });
-      if (up.error) throw up.error;
+      let path;
+      if (job.isVideo) path = (await uploadVideoSet(set, f)).path;
+      else {
+        path = `${state.me.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${blob.type === 'image/gif' ? 'gif' : (blob.type === 'image/png' ? 'png' : 'jpg')}`;
+        const up = await sb.storage.from('media').upload(path, blob, { contentType: blob.type || f.type, cacheControl: '31536000' });
+        if (up.error) throw up.error;
+      }
       // Por si cierras sin publicar: la próxima vez se borra ese archivo que quedó suelto
       try { localStorage.setItem('rf_pending_up', path); } catch (_) {}
-      if (job.dead) { sb.storage.from('media').remove([path]).catch(() => {}); forgetPending(); return null; }
+      if (job.dead) { sb.storage.from('media').remove(withVariants(path)).catch(() => {}); forgetPending(); return null; }
       job.stage = 'ok'; if (bg === job) paintUp();
       return { path, url: sb.storage.from('media').getPublicUrl(path).data.publicUrl, isVideo: job.isVideo };
     })();
@@ -3641,7 +3741,7 @@ function renderUpload() {
     bg = job; paintUp();
   };
   // Si quedó un archivo de una vez que no se publicó, se limpia
-  try { const left = localStorage.getItem('rf_pending_up'); if (left && left.startsWith(state.me.id + '/')) { sb.storage.from('media').remove([left]).catch(() => {}); forgetPending(); } } catch (_) {}
+  try { const left = localStorage.getItem('rf_pending_up'); if (left && left.startsWith(state.me.id + '/')) { sb.storage.from('media').remove(withVariants(left)).catch(() => {}); forgetPending(); } } catch (_) {}
   fileInput.addEventListener('change', () => {
     const f = fileInput.files[0]; if (!f) return;
     if (f.type.startsWith('video/') && f.size > MAX_VIDEO_MB * 1048576) { file = null; return toast(`El video pesa mucho (máx. ${MAX_VIDEO_MB} MB). Prueba uno más corto.`); }
@@ -3813,7 +3913,7 @@ function renderUpload() {
       if (HAS_SONG && picked) { row.song_url = picked.url; row.song_title = picked.title || null; if (picked.preview) { row.song_preview = picked.preview; row.song_art = picked.art || null; row.song_start = picked.start || 0; } else if (picked.yt) row.song_start = picked.start || 0; }
       stopSong();
       const ins = await sb.from('posts').insert(row);
-      if (ins.error) { bg = null; forgetPending(); sb.storage.from('media').remove([path]); throw ins.error; }
+      if (ins.error) { bg = null; forgetPending(); sb.storage.from('media').remove(withVariants(path)); throw ins.error; }
       forgetPending(); bg = null;
       endTrot(true);
       toast(kind === 'sundown' ? 'Sundown publicado. Se va con el sol en 24 h' : kind === 'ride' ? '¡Ride publicado! ¡Ajúa!' : '¡Publicado! ¡Ajúa!');
@@ -4017,7 +4117,7 @@ async function renderProfile() {
     const bubble = (x) => {
       const items = (x.post_ids || []).map(pid => byId[pid]).filter(Boolean);
       const cover = items[items.length - 1];
-      const pic = cover ? (cover.media_type === 'video' ? h('video', { src: cover.media_url + '#t=0.5', muted: true, playsInline: true, preload: 'metadata' }) : h('img', { src: cover.media_url, alt: '' })) : h('span', {}, '🌅');
+      const pic = cover ? (cover.media_type === 'video' ? vthumb(cover.media_url) : h('img', { src: cover.media_url, alt: '' })) : h('span', {}, '🌅');
       const b = h('button', { class: 'pf-hl', onclick: () => { if (!items.length) return toast('Este destacado está vacío'); openSundowns([{ user: prof, items, unseen: false }], 0, () => {}); } },
         h('div', { class: 'c' }, h('i', {}, pic)), h('small', {}, x.title));
       if (isMe) { let t; b.addEventListener('pointerdown', () => { t = setTimeout(() => manageHighlight(x, items), 550); }); ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => b.addEventListener(ev, () => clearTimeout(t))); b.addEventListener('contextmenu', e => e.preventDefault()); }
@@ -4106,7 +4206,7 @@ async function newHighlight(preselect) {
   const title = h('input', { class: 'input', maxlength: '30', placeholder: 'Nombre, ej. Jaripeos', 'aria-label': 'Nombre del destacado' });
   const grid = h('div', { class: 'pf-pick' }, list.map(p => {
     const t = h('button', { type: 'button', class: 'pf-pick-it' + (chosen.has(p.id) ? ' on' : ''), onclick: () => { chosen.has(p.id) ? chosen.delete(p.id) : chosen.add(p.id); t.classList.toggle('on', chosen.has(p.id)); } },
-      p.media_type === 'video' ? h('video', { src: p.media_url + '#t=0.5', muted: true, playsInline: true, preload: 'metadata' }) : h('img', { src: p.media_url, alt: '', loading: 'lazy' }), h('span', { class: 'ck' }, '✓'));
+      p.media_type === 'video' ? vthumb(p.media_url) : h('img', { src: p.media_url, alt: '', loading: 'lazy' }), h('span', { class: 'ck' }, '✓'));
     return t;
   }));
   const save = h('button', { class: 'btn', style: 'width:100%;margin-top:12px' }, 'Guardar destacado');
@@ -5006,7 +5106,7 @@ async function renderNotifs() {
   items.forEach(i => {
     const g = i.at > seen ? 'Nuevas' : new Date(i.at).toDateString() === today ? 'Hoy' : 'Anteriores';
     if (g !== lastGroup) { kids.push(h('h3', { class: 'n-group' }, g)); lastGroup = g; }
-    const thumb = i.post && i.post.media_url ? (i.post.media_type === 'video' ? h('video', { src: i.post.media_url + '#t=0.5', muted: true, playsInline: true, preload: 'metadata' }) : h('img', { src: i.post.media_url, alt: '', loading: 'lazy' })) : null;
+    const thumb = i.post && i.post.media_url ? (i.post.media_type === 'video' ? vthumb(i.post.media_url) : h('img', { src: i.post.media_url, alt: '', loading: 'lazy' })) : null;
     kids.push(h('div', { class: 'notif' + (i.at > seen ? ' new' : ''), role: 'button', tabindex: '0', onclick: () => i.t === 'compa_req' ? go('compas') : (i.t === 'follow' || i.t === 'compa_ok') ? go('profile', { profileId: i.uid }) : i.t === 'share' ? openPostById(i.shareId) : i.post && openPostById(i.post.id) },
       h('span', { class: 'av-react' }, avatar(i.who, 48), i.t === 'react' ? reactIcon(i.react, 'badge') : h('span', { class: 'n-badge' }, i.t === 'comment' ? '💬' : i.t === 'reply' ? '↩️' : i.t === 'mention' || i.t === 'pmention' ? '@' : i.t === 'compa_req' || i.t === 'compa_ok' ? '🤝' : i.t === 'follow' ? '🤠' : '🔁')),
       h('div', { class: 'n-txt' }, h('p', {}, h('b', {}, i.who.username || ''), ' ', ...what(i)), h('small', {}, timeAgo(i.at))),
@@ -5140,7 +5240,7 @@ async function renderAdmin() {
         const KL = { post: '📷 Publicación', user: '👤 Persona', listing: '🛒 Anuncio', comment: '💬 Comentario' };
         const thumb = kind === 'listing' ? (r.listing_photo ? h('img', { src: r.listing_photo, alt: '' }) : h('span', {}, '🛒'))
           : kind === 'comment' ? h('span', {}, '💬') : kind === 'user' ? h('span', {}, '👤')
-          : r.media_url ? (r.media_type === 'video' ? h('video', { src: r.media_url + '#t=0.5', muted: true, playsInline: true, preload: 'metadata' }) : h('img', { src: r.media_url, alt: '' })) : h('span', {}, '🗑️');
+          : r.media_url ? (r.media_type === 'video' ? vthumb(r.media_url) : h('img', { src: r.media_url, alt: '' })) : h('span', {}, '🗑️');
         const openIt = () => kind === 'listing' ? (r.listing_id && openListingById(r.listing_id)) : kind === 'user' ? (r.owner_id && go('profile', { profileId: r.owner_id })) : (r.post_id && openPostById(r.post_id));
         const delBtn = kind === 'post' && r.post_id ? ['¿Borrar esta publicación para siempre?', 'admin_delete_post', { pid: r.post_id }, 'Publicación borrada']
           : kind === 'listing' && r.listing_id ? ['¿Borrar este anuncio?', 'admin_delete_listing', { lid: r.listing_id }, 'Anuncio borrado']
