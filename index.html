@@ -82,6 +82,60 @@ main{flex:1;padding-bottom:calc(104px + env(safe-area-inset-bottom))}
 .up-status.ok{background:rgba(30,110,60,.88)}
 .picker .up-status span{color:#fff;font-weight:700}
 .picker{position:relative}
+.rc-cam .rc-live{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000}
+.rc-cam .rc-live.mirror{transform:scaleX(-1)}
+.rc-cam .sdc-top{align-items:flex-start}
+.rc-song{pointer-events:auto;margin-top:4px;max-width:58%;height:38px;padding:0 16px;border:none;border-radius:19px;background:rgba(0,0,0,.5);color:#fff;font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rc-song.on{background:rgba(243,189,104,.92);color:#172531}
+.rc-cam .sdc-tools{pointer-events:auto}
+.rc-cam .sdc-tool.on span{filter:drop-shadow(0 0 6px #F3BD68)}
+.rc-cam .sdc-x{pointer-events:auto}
+.rc-bottom{position:absolute;left:0;right:0;bottom:0;z-index:3;padding:10px 20px calc(22px + env(safe-area-inset-bottom));background:linear-gradient(transparent,rgba(0,0,0,.5))}
+.rc-durs{display:flex;justify-content:center;gap:6px;margin-bottom:14px}
+.rc-durs button{border:none;background:none;color:rgba(255,255,255,.7);font-weight:700;font-size:14px;padding:6px 12px;border-radius:14px}
+.rc-durs button.on{background:#fff;color:#172531}
+.rc-cam.recording .rc-durs,.rc-cam.recording .rc-gal,.rc-cam.recording .sdc-tools,.rc-cam.recording .rc-song{visibility:hidden}
+.rc-row3{display:flex;align-items:center;justify-content:space-between}
+.rc-gal{width:56px;display:flex;flex-direction:column;align-items:center;gap:3px;border:none;background:none;color:#fff;font-size:26px;padding:0}
+.rc-gal small{font-size:12px;font-weight:600}
+.rc-rec{width:84px;height:84px;border-radius:50%;border:none;background:none;padding:0;position:relative}
+.rc-ring{--p:0;position:absolute;inset:0;border-radius:50%;background:conic-gradient(#F3BD68 calc(var(--p)*360deg),rgba(255,255,255,.55) 0);display:flex;align-items:center;justify-content:center}
+.rc-ring::before{content:'';position:absolute;inset:6px;border-radius:50%;background:rgba(0,0,0,.25)}
+.rc-ring span{position:relative;width:62px;height:62px;border-radius:50%;background:#E8323C;transition:all .2s}
+.rc-cam.recording .rc-ring span{width:30px;height:30px;border-radius:8px}
+.rc-time{position:absolute;top:calc(70px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:3;background:rgba(232,50,60,.9);color:#fff;font-weight:800;font-size:14px;padding:4px 12px;border-radius:12px}
+.rc-count{position:absolute;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;font:900 120px 'Work Sans',system-ui,sans-serif;color:#fff;text-shadow:0 4px 20px rgba(0,0,0,.6);animation:up .3s ease-out;pointer-events:none}
+.rc-msg{position:absolute;left:24px;right:24px;top:38%;z-index:2;text-align:center;background:rgba(0,0,0,.6);padding:18px;border-radius:18px}
+.rc-msg p{margin:0 0 12px;line-height:1.4}
+.rc-edit .sdc-x{font-size:30px;line-height:1}
+.sdc .sdc-pane.rc-post{background:#FFFDF8;color:#172531;padding:calc(10px + env(safe-area-inset-top)) 0 0}
+.rc-post-top{display:flex;align-items:center;justify-content:space-between;padding:0 12px 10px;border-bottom:1px solid #EFE6D4}
+.rc-post-top b{font-size:17px}
+.sdc .rc-post .rc-back{width:40px;height:40px;padding:0;font-size:30px;line-height:1;background:none;color:#172531}
+.rc-post-body{flex:1;overflow-y:auto;padding:14px 16px}
+.rc-row{display:flex;gap:12px;margin-bottom:12px}
+.rc-cap{flex:1;min-height:150px;resize:none}
+.rc-th{width:96px;flex:none;display:flex;flex-direction:column;gap:4px}
+.rc-thumb{width:96px;height:150px;object-fit:cover;border-radius:12px;background:#000}
+.rc-th small{font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rc-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.rc-tags .chip{font-size:13px;padding:5px 10px}
+.rc-status{display:flex;align-items:center;gap:10px;margin:14px 0 4px;padding:10px 12px;border-radius:12px;background:#F4EBDB;font-size:14px;font-weight:600}
+.rc-status i{flex:1;height:6px;border-radius:3px;background:rgba(0,0,0,.1);overflow:hidden}
+.rc-status i b{display:block;height:100%;background:#C7843B;transition:width .3s}
+.rc-status.ok{background:#E3F2E5;color:#1E6E3C}
+.rc-status.bad{background:#FBE4E4;color:#B3261E}
+.rc-post-foot{padding:10px 16px calc(12px + env(safe-area-inset-bottom));border-top:1px solid #EFE6D4}
+.rc-pub{width:100%}
+.ride-ovl{container-type:inline-size}
+.fx-ph.vid{position:relative}
+.fx-ph video{width:100%;height:100%;object-fit:cover}
+.fx-ph-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;font-size:13px;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.fx-vid{position:absolute;left:8px;bottom:8px;background:rgba(0,0,0,.6);color:#fff;font-size:12px;font-weight:700;padding:3px 8px;border-radius:10px}
+.fx-pic video{width:100%;height:100%;object-fit:cover}
+.fx-car-vid{flex:0 0 100%;width:100%;height:100%;object-fit:contain;background:#000;scroll-snap-align:center}
+
+
 @keyframes pulse{50%{opacity:.45}}
 .reels-ov .ride-side{bottom:calc(32px + env(safe-area-inset-bottom))}
 .burst{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;opacity:0}
@@ -1223,7 +1277,7 @@ async function shrinkVideo(file, onProgress, o = {}) {
   if (!mime) return file;
   const side = o.side || 720, vbps = o.vbps || 1500000;
   // Que los otros videos de la pantalla no se peleen por el procesador del teléfono
-  document.querySelectorAll('video').forEach(x => { if (x.closest('.picker')) return; try { x.pause(); } catch (_) {} });
+  document.querySelectorAll('video').forEach(x => { if (x.closest('.picker,.sdc')) return; try { x.pause(); } catch (_) {} });
   const url = URL.createObjectURL(file);
   const v = document.createElement('video');
   let actx = null, raf = null, lock = null;
@@ -1401,7 +1455,7 @@ if (SUPABASE_URL.startsWith('PEGA') || !window.supabase) {
   throw new Error('config');
 }
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-const state = { session: null, me: null, view: 'feed', category: 'Todo', profileId: null, authMode: 'login', uploadKind: 'post', ridesMuted: true };
+const state = { session: null, me: null, view: 'feed', category: 'Todo', profileId: null, authMode: 'login', uploadKind: 'post', ridesMuted: false };
 const DAY = 864e5;
 const SEEN_KEY = 'yeehaw_seen_sundowns';
 let seenSundowns = new Set();
@@ -1647,9 +1701,10 @@ let HAS_SHARE = true;   // compartir publicaciones
 let HAS_VIEWS = true;   // "Visto por" en Sundowns
 const SHARE_EMBED = ',shared_id,orig:shared_id(id,user_id,caption,media_type,created_at,profiles!user_id(id,username,full_name,avatar_url))';
 function postSelect() {
-  return POST_SELECT.replace('likes(user_id)', HAS_REACT ? 'likes(user_id,reaction)' : 'likes(user_id)') + (HAS_KIND ? ',kind' : '') + (HAS_SONG ? ',song_url,song_title,song_preview,song_art,song_start' : '') + (HAS_ANIMALS ? ANIMAL_EMBED : '') + (HAS_SHARE ? SHARE_EMBED : '') + (HAS_OVERLAYS ? ',overlays' : '');
+  return POST_SELECT.replace('likes(user_id)', HAS_REACT ? 'likes(user_id,reaction)' : 'likes(user_id)') + (HAS_KIND ? ',kind' : '') + (HAS_SONG ? ',song_url,song_title,song_preview,song_art,song_start' : '') + (HAS_ANIMALS ? ANIMAL_EMBED : '') + (HAS_SHARE ? SHARE_EMBED : '') + (HAS_OVERLAYS ? ',overlays' : '') + (HAS_ORIG ? ',orig_muted' : '');
 }
 function fixMissing(m) {   // si falta algún SQL, la app sigue funcionando sin esa parte
+  if (HAS_ORIG && /orig_muted/i.test(m)) { HAS_ORIG = false; return true; }
   if (HAS_OVERLAYS && /overlays/i.test(m)) { HAS_OVERLAYS = false; return true; }
   if (HAS_SHARE && /shared|orig/i.test(m)) { HAS_SHARE = false; return true; }
   if (HAS_REACT && /reaction/i.test(m)) { HAS_REACT = false; return true; }
@@ -1779,6 +1834,7 @@ function openSong(url, title, after) {
   return close;
 }
 let HAS_ANIMALS = true;
+let HAS_ORIG = true;   // ¿el ride lleva apagado su sonido original? (cuando le pusieron canción)
 const ANIMAL_EMBED = ',animal_id,animals!animal_id(id,name,species,photo_url)';
 async function fetchPosts({ category, userId, userIds, tag, text, kinds = ['post', 'ride'], since, animalId, before, limit = 60, exclude } = {}) {
   const build = () => {
@@ -1868,6 +1924,7 @@ async function fetchSundownGroups(userId) {
 
 // ---------- navegación ----------
 function go(view, extra) {
+  if (typeof stopRideSong === 'function') stopRideSong();
   document.querySelectorAll('.reels-ov').forEach(x => x._close ? x._close(true) : x.remove());
   if (view !== state.view) state.prevView = state.view;
   state.view = view;
@@ -1897,7 +1954,7 @@ function navBar() {
 }
 // Botones de arriba (como Facebook): publicar, buscar, menú y mensajes
 function plusButton() {
-  return h('button', { class: 'iconbtn dm-btn top-plus', 'aria-label': 'Publicar', icon: 'plus', onclick: () => { if (needLogin('Crea tu cuenta para subir tus fotos y videos')) return; state.uploadKind = state.view === 'rides' ? 'ride' : 'post'; go('upload'); } });
+  return h('button', { class: 'iconbtn dm-btn top-plus', 'aria-label': 'Publicar', icon: 'plus', onclick: () => { if (needLogin('Crea tu cuenta para subir tus fotos y videos')) return; if (state.view === 'rides') return openRideCreator(); state.uploadKind = 'post'; go('upload'); } });
 }
 function topActions() {
   return h('div', { class: 'top-actions' }, plusButton(), searchButton(), menuButton(), dmButton());
@@ -3130,35 +3187,65 @@ async function makeCollage(files) {
   return new File([blob], 'collage.jpg', { type: 'image/jpeg' });
 }
 function startCreator(file, onDone, opts = {}) {
+  const RIDE = opts.mode === 'ride';
   const isVideo = (file.type || '').startsWith('video/');
+  if (RIDE && !isVideo) return toast('Los rides son videos. Escoge un video.');
   if (!isVideo && !(file.type || '').startsWith('image/')) return toast('Escoge una foto o un video');
   if (file.size > MAX_VIDEO_MB * 1024 * 1024) return toast(`El video es muy pesado (máx. ${MAX_VIDEO_MB} MB)`);
   const url = URL.createObjectURL(file);
   const items = [];            // { t:'text'|'emoji'|'music', x, y, s, r, ... }
-  let song = null;             // { url, title, preview, art, start }
+  let song = RIDE ? (opts.song || null) : null;             // { url, title, preview, art, start }
+  let origMuted = RIDE ? (opts.origMuted != null ? !!opts.origMuted : !!song) : true;   // rides: ¿se oye el sonido del video?
   const media = isVideo ? h('video', { src: url, autoplay: true, loop: true, muted: true, playsInline: true }) : h('img', { src: url, alt: '' });
   if (isVideo) { media.muted = true; media.play().catch(() => {}); }
+  // Rides: el video se empieza a preparar y subir desde ya, mientras lo editas (como TikTok)
+  let prep = null;
+  const prepState = { pct: 0, done: false, err: null };
+  if (RIDE) {
+    prep = prepVideoSet(file, (n) => { prepState.pct = n; if (prepState.paint) prepState.paint(); }, RIDE_MAX_SEC)
+      .then(set => { if (tooBig(set.hd)) throw new Error('El video es muy largo. Prueba con uno más corto (máx. 3 minutos).'); return uploadVideoSet(set, file); })
+      .then(r => { prepState.done = true; try { localStorage.setItem('rf_pending_up', r.path); } catch (_) {} if (prepState.paint) prepState.paint(); return r; });
+    prep.catch(e => { prepState.err = e; if (prepState.paint) prepState.paint(); });
+  }
+  // Rides: la canción suena con el video al editar, y vuelve a empezar cuando el video da la vuelta
+  let lastT = 0;
+  const previewSound = () => {
+    if (!RIDE || !isVideo) return;
+    media.muted = origMuted;
+    stopSong();
+    if (song && song.preview) playSong(song.preview, null, song.start || 0);
+    try { media.currentTime = 0; media.play().catch(() => {}); } catch (_) {}
+  };
+  if (RIDE && isVideo) media.addEventListener('timeupdate', () => { if (song && SONG.audio && media.currentTime < lastT - 1) try { SONG.audio.currentTime = song.start || 0; } catch (_) {} lastT = media.currentTime; });
   const layer = h('div', { class: 'sdo-layer edit' });
   const canvas = h('div', { class: 'sd-canvas' }, media, layer);
   const trash = h('div', { class: 'sdc-trash', 'aria-hidden': 'true' }, '🗑️');
-  const shareLabel = opts.total ? `Compartir ${opts.step} de ${opts.total}` : 'Compartir sundown';
+  const shareLabel = RIDE ? 'Siguiente ›' : opts.total ? `Compartir ${opts.step} de ${opts.total}` : 'Compartir sundown';
   const shareBtn = h('button', { class: 'sdc-share', type: 'button' }, shareLabel);
   const tool = (label, title, fn) => h('button', { class: 'sdc-tool', type: 'button', 'aria-label': title, onclick: fn }, h('span', {}, label), h('small', {}, title));
-  const root = h('div', { class: 'sdc', role: 'dialog', 'aria-label': 'Crear sundown' },
+  const origTool = RIDE ? tool('🔊', 'Original', () => { origMuted = !origMuted; paintOrig(); media.muted = origMuted; toast(origMuted ? 'Sonido original apagado' : 'Sonido original encendido'); }) : null;
+  const paintOrig = () => { if (!origTool) return; origTool.firstChild.textContent = origMuted ? '🔇' : '🔊'; origTool.style.display = song ? '' : 'none'; };
+  const root = h('div', { class: 'sdc' + (RIDE ? ' rc-edit' : ''), role: 'dialog', 'aria-label': RIDE ? 'Editar ride' : 'Crear sundown' },
     h('div', { class: 'sd-bg', style: isVideo ? 'background:#000' : `background-image:url("${url}")` }),
     h('div', { class: 'sdc-stage' }, canvas),
     h('div', { class: 'sdc-top' },
-      h('button', { class: 'sdc-x', type: 'button', 'aria-label': 'Cancelar', onclick: () => closeAsk() }, '✕'),
-      h('div', { class: 'sdc-tools' }, tool('Aa', 'Texto', () => editText(null)), tool('😊', 'Emojis', () => openEmojis()), tool('🎵', 'Música', () => openMusic()))),
+      h('button', { class: 'sdc-x', type: 'button', 'aria-label': 'Cancelar', onclick: () => closeAsk() }, RIDE ? '‹' : '✕'),
+      h('div', { class: 'sdc-tools' }, tool('🎵', RIDE ? 'Sonidos' : 'Música', () => openMusic()), tool('Aa', 'Texto', () => editText(null)), tool('😊', 'Emojis', () => openEmojis()), origTool)),
     trash,
     h('div', { class: 'sdc-bottom' }, shareBtn));
   document.body.append(root);
   root.addEventListener('scroll', () => { root.scrollTop = 0; root.scrollLeft = 0; });
-  const hint = h('div', { class: 'sdc-hint' }, 'Agrega texto, emojis o música. Arrástralos con el dedo; con dos dedos los haces grandes o los giras.');
+  const hint = h('div', { class: 'sdc-hint' }, RIDE ? 'Ponle sonido, texto o emojis. Cuando quede, toca Siguiente.' : 'Agrega texto, emojis o música. Arrástralos con el dedo; con dos dedos los haces grandes o los giras.');
   root.append(hint); setTimeout(() => hint.remove(), 4500);
+  if (RIDE) { paintOrig(); previewSound(); }
 
-  const close = () => { stopSong(); URL.revokeObjectURL(url); root.remove(); };
-  const closeAsk = () => { if ((items.length || song) && !confirm('¿Descartar este sundown?')) return; close(); };
+  let published = false;
+  const close = () => {
+    stopSong(); try { media.pause(); } catch (_) {} URL.revokeObjectURL(url); root.remove();
+    // Si no se publicó, se borra lo que ya se había subido
+    if (prep && !published) prep.then(r => { sb.storage.from('media').remove(withVariants(r.path)).catch(() => {}); try { localStorage.removeItem('rf_pending_up'); } catch (_) {} }).catch(() => {});
+  };
+  const closeAsk = () => { if ((RIDE || items.length || song) && !confirm(RIDE ? '¿Descartar este ride?' : '¿Descartar este sundown?')) return; close(); };
   root._close = closeAsk;   // para el botón "atrás" del teléfono
 
   // ---- dibujar y mover los elementos ----
@@ -3258,7 +3345,8 @@ function startCreator(file, onDone, opts = {}) {
     const cut = h('div');
     const body = h('div', { class: 'sdc-sheet-body' }, input, cut, list);
     const pane = h('div', { class: 'sdc-sheet tall' },
-      h('div', { class: 'sdc-sheet-head' }, h('b', {}, '🎵 Música'), h('button', { class: 'sdc-done', type: 'button', onclick: () => { stopSong(); pane.remove(); paint(); } }, 'Listo')), body);
+      h('div', { class: 'sdc-sheet-head' }, h('b', {}, RIDE ? '🎵 Sonidos' : '🎵 Música'), h('button', { class: 'sdc-done', type: 'button', onclick: () => { stopSong(); pane.remove(); paint(); if (RIDE) { paintOrig(); previewSound(); } } }, 'Listo')), body);
+    if (RIDE) { try { media.pause(); } catch (_) {} }
     root.append(pane);
     const showCut = () => {
       cut.replaceChildren();
@@ -3271,7 +3359,7 @@ function startCreator(file, onDone, opts = {}) {
       cut.append(h('div', { class: 'song-cut' },
         h('div', { class: 'song-cut-top' }, h('span', {}, '🎵 ' + song.title)),
         h('div', { class: 'song-cut-top' }, h('span', {}, '✂️ Empieza en '), lab), range,
-        h('div', { class: 'song-cut-help' }, h('button', { type: 'button', class: 'linkbtn', style: 'text-decoration:underline', onclick: () => { stopSong(); song = null; const i = items.findIndex(x => x.t === 'music'); if (i >= 0) items.splice(i, 1); showCut(); } }, 'Quitar canción'),
+        h('div', { class: 'song-cut-help' }, h('button', { type: 'button', class: 'linkbtn', style: 'text-decoration:underline', onclick: () => { stopSong(); song = null; origMuted = false; const i = items.findIndex(x => x.t === 'music'); if (i >= 0) items.splice(i, 1); showCut(); } }, 'Quitar canción'),
           h('button', { type: 'button', class: 'song-play', 'aria-label': 'Escuchar desde ahí', onclick: listen }, '▶'))));
     };
     let timer, seq = 0;
@@ -3286,8 +3374,10 @@ function startCreator(file, onDone, opts = {}) {
           const title = (x.trackName + ' · ' + x.artistName).slice(0, 120), art = (x.artworkUrl100 || '').replace('100x100', '120x120');
           const play = h('button', { type: 'button', class: 'song-play', 'aria-label': 'Escuchar ' + x.trackName, onclick: (e) => { e.stopPropagation(); playSong(x.previewUrl, play); } }, '▶');
           return h('div', { class: 'song-row', role: 'button', tabindex: '0', onclick: () => {
+            const hadSong = !!song;
             song = { url: x.trackViewUrl.split('&uo=')[0], title, preview: x.previewUrl, art, start: 0 };
-            if (!items.some(i => i.t === 'music')) items.push({ t: 'music', x: 50, y: 74, s: 1, r: 0 });
+            if (RIDE && !hadSong) origMuted = true;   // como TikTok: al ponerle canción se apaga el sonido original (se puede volver a prender)
+            if (!RIDE && !items.some(i => i.t === 'music')) items.push({ t: 'music', x: 50, y: 74, s: 1, r: 0 });
             input.value = ''; list.replaceChildren(); showCut(); stopSong(); playSong(song.preview, null, 0);
           } }, h('img', { src: art, alt: '' }), h('div', { class: 'who' }, h('b', {}, x.trackName), h('small', {}, x.artistName)), play);
         }) : [h('small', { class: 'hint' }, 'No encontramos esa canción. Prueba con el nombre del artista.')]));
@@ -3297,7 +3387,82 @@ function startCreator(file, onDone, opts = {}) {
     showCut(); setTimeout(() => input.focus({ preventScroll: true }), 50);
   }
   // ---- publicar ----
-  shareBtn.addEventListener('click', async () => {
+  if (RIDE) shareBtn.addEventListener('click', () => ridePostPane());
+  // ---- Rides: pantalla de publicar (descripción, sección, quién sale) ----
+  function ridePostPane() {
+    try { media.pause(); } catch (_) {} stopSong();
+    const thumb = h('video', { src: url, muted: true, playsInline: true, autoplay: true, loop: true, class: 'rc-thumb' });
+    thumb.muted = true; thumb.play().catch(() => {});
+    const cap = mentionAssist(h('textarea', { class: 'input rc-cap', maxlength: '1000', placeholder: 'Describe tu ride… usa #hashtags y menciona con @' }));
+    if (opts.caption) cap.value = opts.caption;
+    const tags = ['#jaripeo', '#caballos', '#rancho', '#baile', '#charreria', '#cabalgata', '#vaqueros'];
+    const tagRow = h('div', { class: 'rc-tags' }, tags.map(t => h('button', { type: 'button', class: 'chip', onclick: () => { cap.value = (cap.value.trim() + ' ' + t + ' ').trimStart(); cap.focus(); } }, t)));
+    let category = state.rideCat || 'Caballos';
+    const cats = h('div', { class: 'chips', style: 'padding:0;flex-wrap:wrap' });
+    const paintCats = () => cats.replaceChildren(...CATEGORIES.map(c => h('button', { type: 'button', class: 'chip' + (c === category ? ' on' : ''), onclick: () => { category = c; state.rideCat = c; paintCats(); } }, c)));
+    paintCats();
+    let animalId = null;
+    const animalChips = h('div', { class: 'chips', style: 'padding:0;flex-wrap:wrap' });
+    const animalField = h('div', { class: 'field', hidden: true }, h('label', {}, '¿Quién sale? (opcional)'), animalChips);
+    fetchAnimals({ ownerId: state.me.id }).then(list => {
+      if (!list.length) return;
+      const paintA = () => animalChips.replaceChildren(...list.map(a => h('button', { type: 'button', class: 'chip' + (animalId === a.id ? ' on' : ''), style: 'display:flex;align-items:center;gap:6px;padding-left:6px', onclick: () => { animalId = animalId === a.id ? null : a.id; paintA(); } }, animalPic(a, 26), a.name)));
+      paintA(); animalField.hidden = false;
+    }).catch(() => {});
+    const status = h('div', { class: 'rc-status' });
+    prepState.paint = () => {
+      status.className = 'rc-status' + (prepState.done ? ' ok' : prepState.err ? ' bad' : '');
+      status.replaceChildren(prepState.err ? '⚠️ ' + friendlyError(prepState.err) : prepState.done ? '✓ Video listo' : prepState.pct >= 99 ? 'Subiendo video…' : `Preparando video… ${prepState.pct}%`,
+        !prepState.done && !prepState.err ? h('i', {}, h('b', { style: `width:${Math.max(4, prepState.pct)}%` })) : '');
+    };
+    prepState.paint();
+    const err = h('p', { class: 'err', role: 'alert' });
+    const pub = h('button', { class: 'btn rc-pub', type: 'button' }, 'Publicar');
+    const back = () => { pane.remove(); prepState.paint = null; previewSound(); };
+    const pane = h('div', { class: 'sdc-pane rc-post' },
+      h('div', { class: 'rc-post-top' }, h('button', { type: 'button', class: 'sdc-done rc-back', 'aria-label': 'Regresar a editar', onclick: back }, '‹'), h('b', {}, 'Publicar ride'), h('span', { style: 'width:40px' })),
+      h('div', { class: 'rc-post-body' },
+        h('div', { class: 'rc-row' }, cap, h('div', { class: 'rc-th' }, thumb, song ? h('small', {}, '🎵 ' + song.title.split(' · ')[0]) : null)),
+        tagRow,
+        h('div', { class: 'field' }, h('label', {}, 'Sección')), cats,
+        animalField, status, err),
+      h('div', { class: 'rc-post-foot' }, pub));
+    pub.addEventListener('click', async () => {
+      err.textContent = ''; pub.disabled = true; const endTrot = SFX.startUpload();
+      const tick = setInterval(() => { pub.textContent = prepState.done ? 'Publicando…' : prepState.pct >= 99 ? 'Subiendo…' : `Preparando… ${prepState.pct}%`; }, 300);
+      try {
+        const r = await prep;
+        const clean = items.map(o => ({ ...o, x: Math.round(o.x * 10) / 10, y: Math.round(o.y * 10) / 10, s: Math.round(o.s * 100) / 100, r: Math.round(o.r) }));
+        const row = { user_id: state.me.id, media_url: r.url, media_type: 'video', caption: cap.value.trim() || null, category, shop_links: [], kind: 'ride' };
+        if (HAS_OVERLAYS && clean.length) row.overlays = clean;
+        if (animalId) row.animal_id = animalId;
+        if (HAS_SONG && song) Object.assign(row, { song_url: song.url, song_title: song.title, song_preview: song.preview, song_art: song.art || null, song_start: song.start || 0 });
+        if (HAS_ORIG && song) row.orig_muted = origMuted;
+        let ins = await sb.from('posts').insert(row);
+        for (let i = 0; i < 3 && ins.error; i++) {
+          const m = ins.error.message || '';
+          if (/orig_muted/i.test(m)) { HAS_ORIG = false; delete row.orig_muted; }
+          else if (/overlays/i.test(m)) { HAS_OVERLAYS = false; delete row.overlays; }
+          else break;
+          ins = await sb.from('posts').insert(row);
+        }
+        if (ins.error) throw ins.error;
+        published = true; try { localStorage.removeItem('rf_pending_up'); } catch (_) {}
+        clearInterval(tick); endTrot(true); close();
+        toast('¡Ride publicado! ¡Ajúa!');
+        if (onDone) onDone(); else go('rides');
+      } catch (ex) {
+        clearInterval(tick); endTrot(false); pub.disabled = false; pub.textContent = 'Publicar'; err.textContent = friendlyError(ex);
+        if (prepState.err) {   // si falló la preparación, se intenta de nuevo
+          prepState.err = null; prepState.pct = 0;
+          prep = prepVideoSet(file, (n) => { prepState.pct = n; if (prepState.paint) prepState.paint(); }, RIDE_MAX_SEC).then(set => uploadVideoSet(set, file)).then(r => { prepState.done = true; if (prepState.paint) prepState.paint(); return r; });
+          prep.catch(e => { prepState.err = e; if (prepState.paint) prepState.paint(); });
+        }
+      }
+    });
+    root.append(pane);
+  }
+  if (!RIDE) shareBtn.addEventListener('click', async () => {
     shareBtn.disabled = true; shareBtn.textContent = 'Subiendo…';
     stopSong(); const endTrot = SFX.startUpload();
     try {
@@ -3325,6 +3490,153 @@ function startCreator(file, onDone, opts = {}) {
     } catch (ex) { endTrot(false); shareBtn.disabled = false; shareBtn.textContent = shareLabel; toast(friendlyError(ex)); }
   });
   paint();
+}
+
+// ---------- Crear ride como en TikTok: cámara, sonido, grabar o subir de la galería ----------
+const RIDE_MAX_SEC = 180;
+function openRideCreator(onDone) {
+  if (needLogin('Crea tu cuenta para subir tus rides')) return;
+  if (document.querySelector('.rc-cam')) return;
+  let stream = null, facing = 'user', rec = null, chunks = [], t0 = 0, raf = 0, maxSec = 60, timer = false, song = null, counting = false;
+  const live = h('video', { class: 'rc-live mirror', muted: true, playsInline: true, autoplay: true });
+  live.muted = true;
+  const gallery = h('input', { type: 'file', accept: 'video/*', hidden: true });
+  const msg = h('div', { class: 'rc-msg', hidden: true });
+  const ring = h('div', { class: 'rc-ring' }, h('span'));
+  const recBtn = h('button', { class: 'rc-rec', type: 'button', 'aria-label': 'Grabar' }, ring);
+  const timeLab = h('div', { class: 'rc-time', hidden: true }, '0:00');
+  const songBtn = h('button', { class: 'rc-song', type: 'button' }, '🎵 Agregar sonido');
+  const lens = h('div', { class: 'rc-lens' });
+  const side = (ico, label, fn) => { const b = h('button', { class: 'sdc-tool', type: 'button', 'aria-label': label, onclick: fn }, h('span', {}, ico), h('small', {}, label)); return b; };
+  const flipBtn = side('🔄', 'Voltear', () => { if (rec) return; facing = facing === 'user' ? 'environment' : 'user'; startCam(); });
+  const timerBtn = side('⏱️', 'Temporizador', () => { timer = !timer; timerBtn.classList.toggle('on', timer); toast(timer ? 'Grabará después de contar 3' : 'Temporizador apagado'); });
+  const durs = h('div', { class: 'rc-durs' });
+  const paintDurs = () => durs.replaceChildren(...[[15, '15 s'], [60, '60 s'], [180, '3 min']].map(([v, l]) => h('button', { type: 'button', class: v === maxSec ? 'on' : '', onclick: () => { if (!rec) { maxSec = v; paintDurs(); } } }, l)));
+  paintDurs();
+  const root = h('div', { class: 'sdc rc-cam', role: 'dialog', 'aria-label': 'Crear ride' },
+    lens, live, msg,
+    h('div', { class: 'sdc-top' },
+      h('button', { class: 'sdc-x', type: 'button', 'aria-label': 'Cerrar', onclick: () => root._close() }, '✕'),
+      songBtn,
+      h('div', { class: 'sdc-tools' }, flipBtn, timerBtn)),
+    timeLab,
+    h('div', { class: 'rc-bottom' }, durs,
+      h('div', { class: 'rc-row3' },
+        h('button', { class: 'rc-gal', type: 'button', onclick: () => gallery.click() }, h('span', {}, '🖼️'), h('small', {}, 'Subir')),
+        recBtn,
+        h('span', { style: 'width:56px' }))),
+    gallery);
+  document.body.append(root);
+  const stopCam = () => { if (stream) stream.getTracks().forEach(t => t.stop()); stream = null; };
+  const close = () => { cancelAnimationFrame(raf); try { if (rec && rec.state !== 'inactive') { rec.onstop = null; rec.stop(); } } catch (_) {} stopCam(); stopSong(); root.remove(); };
+  root._close = close;
+  const paintSong = () => { songBtn.textContent = song ? '🎵 ' + song.title.split(' · ')[0].slice(0, 26) : '🎵 Agregar sonido'; songBtn.classList.toggle('on', !!song); };
+  async function startCam() {
+    stopCam(); msg.hidden = true;
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { showMsg('Tu teléfono no deja usar la cámara aquí. Sube un video de tu galería.'); return; }
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: facing, width: { ideal: 720 }, height: { ideal: 1280 }, aspectRatio: { ideal: 9 / 16 }, frameRate: { ideal: 30 } }, audio: true });
+      if (!root.isConnected) return stopCam();
+      live.srcObject = stream; live.classList.toggle('mirror', facing === 'user'); live.play().catch(() => {});
+    } catch (e) {
+      showMsg(e && e.name === 'NotAllowedError' ? 'Para grabar, Ranchfolk necesita permiso de la cámara y el micrófono.' : 'No se pudo abrir la cámara. Puedes subir un video de tu galería.', e && e.name === 'NotAllowedError');
+    }
+  }
+  function showMsg(t, perm) {
+    msg.hidden = false;
+    msg.replaceChildren(h('p', {}, t), perm ? h('button', { class: 'btn small', type: 'button', onclick: () => { close(); permHelp('camera', () => openRideCreator(onDone)); } }, 'Cómo dar permiso') : '',
+      h('button', { class: 'btn small ghost', type: 'button', style: 'margin-top:8px', onclick: () => gallery.click() }, '🖼️ Subir de la galería'));
+  }
+  gallery.addEventListener('change', () => {
+    const f = gallery.files[0]; if (!f) return;
+    if (!(f.type || '').startsWith('video/')) return toast('Los rides son videos. Escoge un video.');
+    close(); startCreator(f, onDone, { mode: 'ride', song, origMuted: song ? true : false });
+  });
+  songBtn.addEventListener('click', () => { if (rec) return; rideSongSheet(root, song, (s2) => { song = s2; paintSong(); }); });
+  const fmt = (sec) => Math.floor(sec / 60) + ':' + String(Math.floor(sec % 60)).padStart(2, '0');
+  function tick() {
+    const sec = (performance.now() - t0) / 1000;
+    ring.style.setProperty('--p', Math.min(1, sec / maxSec));
+    timeLab.textContent = fmt(sec) + ' / ' + fmt(maxSec);
+    if (sec >= maxSec) return stopRec();
+    raf = requestAnimationFrame(tick);
+  }
+  function beginRec() {
+    const mime = ['video/mp4;codecs=avc1.42E01E,mp4a.40.2', 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'].find(t => { try { return MediaRecorder.isTypeSupported(t); } catch (_) { return false; } });
+    try { rec = new MediaRecorder(stream, mime ? { mimeType: mime, videoBitsPerSecond: 4000000 } : undefined); } catch (_) { rec = null; return toast('Tu teléfono no puede grabar aquí. Sube un video de la galería.'); }
+    chunks = [];
+    rec.ondataavailable = (e) => { if (e.data && e.data.size) chunks.push(e.data); };
+    rec.onstop = () => {
+      const type = (rec.mimeType || mime || 'video/webm').split(';')[0];
+      const blob = new Blob(chunks, { type }); rec = null;
+      stopSong();
+      if (!blob.size) return toast('No se grabó nada. Intenta otra vez.');
+      const f = new File([blob], 'ride.' + (type.includes('mp4') ? 'mp4' : 'webm'), { type });
+      close(); startCreator(f, onDone, { mode: 'ride', song, origMuted: !!song });
+    };
+    rec.start(500); t0 = performance.now();
+    if (song && song.preview) playSong(song.preview, null, song.start || 0);
+    root.classList.add('recording'); recBtn.setAttribute('aria-label', 'Detener'); timeLab.hidden = false;
+    raf = requestAnimationFrame(tick);
+  }
+  function stopRec() { cancelAnimationFrame(raf); root.classList.remove('recording'); try { rec && rec.state !== 'inactive' && rec.stop(); } catch (_) {} }
+  recBtn.addEventListener('click', async () => {
+    if (rec) return stopRec();
+    if (counting) return;
+    if (!stream) return startCam();
+    if (timer) {
+      counting = true;
+      for (let n = 3; n > 0; n--) { const c = h('div', { class: 'rc-count' }, String(n)); root.append(c); await new Promise(r => setTimeout(r, 900)); c.remove(); if (!root.isConnected) return; }
+      counting = false;
+    }
+    beginRec();
+  });
+  startCam();
+}
+// Buscar sonido para el ride (canciones de Apple Music, 30 s)
+function rideSongSheet(host, current, onPick) {
+  let song = current;
+  const input = h('input', { class: 'input', type: 'search', placeholder: 'Busca por canción o artista…', autocomplete: 'off', enterkeyhint: 'search' });
+  const list = h('div', { class: 'song-list' });
+  const cut = h('div');
+  const done = () => { stopSong(); pane.remove(); onPick(song); };
+  const pane = h('div', { class: 'sdc-sheet tall' },
+    h('div', { class: 'sdc-sheet-head' }, h('b', {}, '🎵 Sonidos'), h('button', { class: 'sdc-done', type: 'button', onclick: done }, 'Listo')),
+    h('div', { class: 'sdc-sheet-body' }, input, cut, list));
+  host.append(pane);
+  const showCut = () => {
+    cut.replaceChildren(); if (!song) return;
+    const lab = h('b', {}, '0:' + String(song.start || 0).padStart(2, '0'));
+    const range = h('input', { type: 'range', min: '0', max: '25', step: '1', value: String(song.start || 0), class: 'song-range', 'aria-label': 'Desde qué segundo empieza la canción' });
+    const listen = () => { stopSong(); playSong(song.preview, null, song.start); };
+    range.addEventListener('input', () => { song.start = Number(range.value); lab.textContent = '0:' + String(song.start).padStart(2, '0'); });
+    range.addEventListener('change', listen);
+    cut.append(h('div', { class: 'song-cut' },
+      h('div', { class: 'song-cut-top' }, h('span', {}, '🎵 ' + song.title)),
+      h('div', { class: 'song-cut-top' }, h('span', {}, '✂️ Empieza en '), lab), range,
+      h('div', { class: 'song-cut-help' }, h('button', { type: 'button', class: 'linkbtn', style: 'text-decoration:underline', onclick: () => { stopSong(); song = null; showCut(); } }, 'Quitar sonido'),
+        h('button', { type: 'button', class: 'song-play', 'aria-label': 'Escuchar desde ahí', onclick: listen }, '▶'))));
+  };
+  let tm, seq = 0;
+  const search = async () => {
+    const q = input.value.trim(); const sq = ++seq; list.replaceChildren(); if (q.length < 2) return;
+    list.append(h('small', { class: 'hint' }, 'Buscando…'));
+    try {
+      const r = await fetch('https://itunes.apple.com/search?' + new URLSearchParams({ term: q, country: 'MX', media: 'music', entity: 'song', limit: '12' }));
+      const j = await r.json(); if (sq !== seq) return;
+      const res = (j.results || []).filter(x => x.previewUrl && x.trackViewUrl);
+      list.replaceChildren(...(res.length ? res.map(x => {
+        const title = (x.trackName + ' · ' + x.artistName).slice(0, 120), art = (x.artworkUrl100 || '').replace('100x100', '120x120');
+        const play = h('button', { type: 'button', class: 'song-play', 'aria-label': 'Escuchar ' + x.trackName, onclick: (e) => { e.stopPropagation(); playSong(x.previewUrl, play); } }, '▶');
+        return h('div', { class: 'song-row', role: 'button', tabindex: '0', onclick: () => {
+          song = { url: x.trackViewUrl.split('&uo=')[0], title, preview: x.previewUrl, art, start: 0 };
+          input.value = ''; list.replaceChildren(); showCut(); stopSong(); playSong(song.preview, null, 0);
+        } }, h('img', { src: art, alt: '' }), h('div', { class: 'who' }, h('b', {}, x.trackName), h('small', {}, x.artistName)), play);
+      }) : [h('small', { class: 'hint' }, 'No encontramos esa canción. Prueba con el nombre del artista.')]));
+    } catch (_) { if (sq === seq) list.replaceChildren(h('small', { class: 'err' }, 'No se pudo buscar. Revisa tu conexión.')); }
+  };
+  input.addEventListener('input', () => { clearTimeout(tm); tm = setTimeout(search, 450); });
+  showCut(); setTimeout(() => input.focus({ preventScroll: true }), 50);
 }
 
 // ---------- Sundowns (desaparecen en 24 horas) ----------
@@ -3502,16 +3814,25 @@ function openSundowns(groups, gi, onClose) {
 async function renderRides() {
   const wrap = h('div', { class: 'rides' }, h('div', { class: 'spinner', style: 'margin-top:45vh' }));
   $app.append(h('div', { class: 'rides-top' }, h('div', { class: 'logo', style: 'font-size:26px' }, 'Rides'),
-    h('button', { class: 'iconbtn', style: 'color:#fff;background:rgba(0,0,0,.35)', 'aria-label': 'Subir un ride', icon: 'plus', onclick: () => { state.uploadKind = 'ride'; go('upload'); } })), wrap);
+    h('button', { class: 'iconbtn', style: 'color:#fff;background:rgba(0,0,0,.35)', 'aria-label': 'Subir un ride', icon: 'plus', onclick: () => { openRideCreator(); } })), wrap);
   let rides = [];
   try { rides = await fetchPosts({ kinds: ['ride'] }); } catch (e) { return wrap.replaceChildren(h('div', { class: 'empty', style: 'margin-top:35vh' }, friendlyError(e))); }
   if (!HAS_KIND) return wrap.replaceChildren(h('div', { class: 'empty', style: 'margin-top:30vh' }, 'Los Rides todavía no están activados en la base de datos. Corre el SQL de actualización en Supabase.'));
   if (!rides.length) return wrap.replaceChildren(h('div', { class: 'empty', style: 'margin-top:30vh' },
     h('span', { class: 'logo', style: 'font-size:34px' }, 'Rides'), 'Videos cortos y verticales del rancho. ¡Sube el primero!',
-    h('div', { style: 'margin-top:18px' }, h('button', { class: 'btn small', onclick: () => { state.uploadKind = 'ride'; go('upload'); } }, 'Subir mi ride'))));
+    h('div', { style: 'margin-top:18px' }, h('button', { class: 'btn small', onclick: () => { openRideCreator(); } }, 'Subir mi ride'))));
   ridesScroller(wrap, rides, (before) => fetchPosts({ kinds: ['ride'], limit: RIDE_PAGE, before }));
 }
 const RIDE_PAGE = 8;
+let RIDE_SONG = null;
+function setRidesMuted(m) {
+  state.ridesMuted = m;
+  document.querySelectorAll('.ride video').forEach(v => { v.muted = m || !!v._origMuted; });
+  document.querySelectorAll('.ride .mutebtn').forEach(b => { b.innerHTML = ICONS[m ? 'mute' : 'sound']; });
+  if (RIDE_SONG) RIDE_SONG.muted = m;
+}
+const stopRideSong = () => { if (RIDE_SONG) try { RIDE_SONG.pause(); } catch (_) {} };
+document.addEventListener('visibilitychange', () => { if (document.hidden) { stopRideSong(); document.querySelectorAll('.ride video').forEach(v => { try { v.pause(); } catch (_) {} }); } });
 // Lista de rides tipo reels: se reproduce el que está en pantalla, se precargan los 2 que siguen
 // y, al ir llegando al final, se cargan más solitos.
 function ridesScroller(wrap, first, loadMore, o = {}) {
@@ -3574,19 +3895,42 @@ function rideCard(p, preload) {
   keepWhenWatched(video, video.getAttribute('src'));
   const warm = (lvl) => { const order = { none: 0, metadata: 1, auto: 2 }; if ((order[lvl] || 0) > (order[video.preload] || 0)) video.preload = lvl; };
   let allowed = !SAVER.on;  // con ahorro de datos, el video espera a que lo toques
-  video.muted = state.ridesMuted;
+  // Canción del ride: suena sola junto con el video, como en TikTok (y se reinicia cuando el video vuelve a empezar)
+  const songSrc = HAS_SONG && p.song_preview ? p.song_preview : null;
+  const songStart = Math.max(0, Math.min(25, Number(p.song_start) || 0));
+  video._origMuted = !!songSrc && p.orig_muted !== false;   // con canción, el sonido original va apagado (a menos que lo hayan dejado)
+  let sa = null, lastT = 0;
+  const songOn = () => {
+    if (!songSrc) return;
+    if (!sa) {
+      sa = new Audio(songSrc); sa.preload = 'auto';
+      sa.addEventListener('loadedmetadata', () => { try { sa.currentTime = songStart; } catch (_) {} }, { once: true });
+      sa.addEventListener('ended', () => { try { sa.currentTime = songStart; sa.play().catch(() => {}); } catch (_) {} });
+    }
+    if (RIDE_SONG && RIDE_SONG !== sa) try { RIDE_SONG.pause(); } catch (_) {}
+    RIDE_SONG = sa; sa.muted = state.ridesMuted;
+    sa.play().then(() => songChipEl && songChipEl.classList.add('playing')).catch(() => {});
+  };
+  const songOff = () => { if (sa) try { sa.pause(); } catch (_) {} if (songChipEl) songChipEl.classList.remove('playing'); };
+  video.addEventListener('timeupdate', () => { if (sa && video.currentTime < lastT - 1) try { sa.currentTime = songStart; } catch (_) {} lastT = video.currentTime; });
+  video.addEventListener('pause', songOff);
+  video.addEventListener('playing', () => { if (songSrc) songOn(); });
+  video.addEventListener('waiting', () => { if (sa) try { sa.pause(); } catch (_) {} });
+  video.muted = state.ridesMuted || video._origMuted;
   const burst = burstEl();
   const paused = h('div', { class: 'ride-paused', style: 'display:none' }, h('span', { icon: 'playbig' }));
   const muteBtn = h('button', { class: 'iconbtn', 'aria-label': 'Sonido', icon: state.ridesMuted ? 'mute' : 'sound' });
-  muteBtn.addEventListener('click', () => {
-    state.ridesMuted = !state.ridesMuted;
-    document.querySelectorAll('.ride video').forEach(v => { v.muted = state.ridesMuted; });
-    document.querySelectorAll('.ride .mutebtn').forEach(b => { b.innerHTML = ICONS[state.ridesMuted ? 'mute' : 'sound']; });
-  });
+  muteBtn.addEventListener('click', () => setRidesMuted(!state.ridesMuted));
   muteBtn.classList.add('mutebtn');
+  let songChipEl = null;
   let wantPlay = false;
-  const play = () => { if (!allowed) { paused.style.display = 'flex'; return; } wantPlay = true; video.muted = state.ridesMuted; video.play().then(() => { paused.style.display = 'none'; }).catch(() => { video.muted = true; video.play().catch(() => { paused.style.display = 'flex'; }); }); };
-  const pause = () => { wantPlay = false; video.pause(); };
+  const play = () => {
+    if (!allowed) { paused.style.display = 'flex'; return; }
+    wantPlay = true; video.muted = state.ridesMuted || video._origMuted;
+    video.play().then(() => { paused.style.display = 'none'; })
+      .catch(() => { video.muted = true; if (!state.ridesMuted && !video._origMuted) setRidesMuted(true); video.play().catch(() => { paused.style.display = 'flex'; }); });
+  };
+  const pause = () => { wantPlay = false; video.pause(); songOff(); };
   let last = 0, tapTimer = null;
   const tapLayer = h('button', { 'aria-label': 'Pausar o reproducir. Doble toque para dar ajúa', style: 'position:absolute;inset:0;z-index:1;border:none;background:none;padding:0' });
   tapLayer.addEventListener('click', () => {
@@ -3598,13 +3942,18 @@ function rideCard(p, preload) {
       else { video.pause(); paused.style.display = 'flex'; }
     }, 300);
   });
+  const ovl = Array.isArray(p.overlays) && p.overlays.length ? h('div', { class: 'sdo-layer ride-ovl' }, p.overlays.map(o => sdOverlayEl(o, songSrc ? { title: p.song_title, art: p.song_art } : null)).filter(Boolean)) : null;
   const el = h('section', { class: 'ride', 'aria-label': 'Ride de ' + (prof.username || '') },
-    video, tapLayer, burst, paused,
+    video, ovl, tapLayer, burst, paused,
     h('div', { class: 'ride-info' },
       h('button', { class: 'who', onclick: () => go('profile', { profileId: p.user_id }) }, avatar(prof, 40), h('b', {}, prof.username || 'usuario', vb(p.user_id))),
       p.animals && h('div', { style: 'margin-bottom:8px' }, animalTag(p.animals)),
       p.caption && h('p', {}, ...richText(p.caption)),
-      p.song_url && h('div', { style: 'margin-bottom:8px' }, songChip(p.song_url, p.song_title, { dark: true, preview: p.song_preview, art: p.song_art, start: p.song_start, before: () => { if (!p.song_preview) try { video.pause(); } catch (_) {} } })),
+      p.song_url && h('div', { style: 'margin-bottom:8px' }, songSrc
+        ? (songChipEl = h('button', { class: 'song-chip dark', type: 'button', 'aria-label': 'Canción: ' + (p.song_title || '') + '. Toca para quitar o poner el sonido', onclick: (e) => { e.stopPropagation(); setRidesMuted(!state.ridesMuted); } },
+            p.song_art ? h('img', { src: p.song_art, alt: '' }) : h('span', { class: 'song-sp am', 'aria-hidden': 'true' }, '♫'),
+            h('span', { class: 'song-eq', 'aria-hidden': 'true' }, h('i'), h('i'), h('i')), h('span', { class: 'song-t' }, p.song_title || 'Canción')))
+        : songChip(p.song_url, p.song_title, { dark: true, before: () => { try { video.pause(); } catch (_) {} } })),
       h('div', { style: 'display:flex;gap:8px;align-items:center' }, p.category && h('span', { class: 'tag' }, p.category), h('small', { style: 'color:rgba(255,255,255,.8)' }, timeAgo(p.created_at)))),
     h('div', { class: 'ride-side' },
       likeBtn, countEl,
@@ -3682,7 +4031,7 @@ async function renderExplore() {
 
 function renderUpload() {
   let file = null; let category = 'Bailes';
-  let kind = state.uploadKind || 'post';
+  let kind = state.uploadKind === 'ride' ? 'post' : (state.uploadKind || 'post');
   const main = h('main', { class: 'page' });
   $app.append(h('header', { class: 'topbar' }, h('div', { class: 'logo', style: 'font-size:24px' }, 'Subir')), main);
 
@@ -3876,6 +4225,7 @@ function renderUpload() {
   const paintKind = () => {
     kindBar.replaceChildren(...KINDS.map(([k, label, icon]) => h('button', { type: 'button', role: 'tab', 'aria-selected': String(k === kind), class: k === kind ? 'on' : '', onclick: () => {
       if (k === 'sundown') return openSundownCreator(() => go('feed'));
+      if (k === 'ride') return openRideCreator();
       kind = k; state.uploadKind = k;
       if (k === 'ride' && file && !file.type.startsWith('video/')) { file = null; fileInput.value = ''; dropBg(); picker.replaceChildren(...pickerEmpty()); }
       paintKind();
@@ -4162,7 +4512,7 @@ async function renderProfile() {
       h('button', { class: 'pf-think', onclick: () => { state.uploadKind = 'post'; go('upload'); } }, '¿Qué está pasando en el rancho?'),
       h('button', { class: 'pf-think-ph', 'aria-label': 'Subir foto', onclick: () => { state.uploadKind = 'post'; go('upload'); } }, '🖼️')),
     h('div', { class: 'pf-compose-acts' },
-      h('button', { onclick: () => { state.uploadKind = 'ride'; go('upload'); } }, h('span', { icon: 'horseshoe' }), 'Ride'),
+      h('button', { onclick: () => { openRideCreator(); } }, h('span', { icon: 'horseshoe' }), 'Ride'),
       h('button', { onclick: () => openSundownCreator(() => render()) }, '🌅 Sundown'),
       HAS_ANIMALS ? h('button', { onclick: () => editAnimal(null) }, '🐴 Animal') : null)) : null;
   const paintTabs = () => {
@@ -4648,6 +4998,15 @@ const SPEC_FIELDS = [
 const SPEC_CATS = ['Caballos', 'Ganado', 'Perros y mascotas'];
 const specFor = (f, cat) => !f[4] || (Array.isArray(f[4]) ? f[4].includes(cat) : f[4] === cat);
 const MAX_LPHOTOS = 20;
+const MAX_LVIDEOS = 2, LVIDEO_SEC = 120;   // videos en un anuncio: hasta 2, de máximo 2 minutos
+const isVidUrl = (u) => /\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(String(u || ''));
+// Portada del anuncio: la primera foto; si solo hay video, la portada del video
+function listingCover(l, cls) {
+  const ps = (l.photos || []).filter(Boolean); if (!ps.length) return null;
+  const img = ps.find(u => !isVidUrl(u));
+  if (img && img === ps[0]) return h('img', { src: img, alt: '', loading: 'lazy', class: cls || null });
+  return isVidUrl(ps[0]) ? vthumb(ps[0], cls) : h('img', { src: ps[0], alt: '', loading: 'lazy', class: cls || null });
+}
 const money = (n) => n == null ? 'Precio a tratar' : '$' + Number(n).toLocaleString('es-MX', { maximumFractionDigits: 0 });
 const isFeat = (x) => !!(x && x.featured_until && new Date(x.featured_until) > new Date());
 const feriaMissing = (e) => /listings|events|event_going|relation|schema/i.test((e && e.message) || '');
@@ -4714,9 +5073,11 @@ function renderMercado(main) {
   load();
 }
 function listingCard(l) {
-  const pic = l.photos && l.photos[0];
+  const pic = listingCover(l);
+  const hasVid = (l.photos || []).some(isVidUrl);
   return h('button', { class: 'fx-card' + (l.status === 'vendido' ? ' sold' : ''), onclick: () => openListing(l) },
-    h('div', { class: 'fx-pic' }, pic ? h('img', { src: pic, alt: '', loading: 'lazy' }) : h('span', {}, LCAT_EMO[l.category] || '📦'),
+    h('div', { class: 'fx-pic' }, pic || h('span', {}, LCAT_EMO[l.category] || '📦'),
+      hasVid ? h('span', { class: 'fx-vid' }, '▶ Video') : null,
       isFeat(l) ? h('span', { class: 'fx-feat' }, '⭐ Destacado') : null,
       l.status === 'vendido' ? h('span', { class: 'fx-sold' }, 'VENDIDO') : null),
     h('div', { class: 'fx-info' }, h('b', { class: 'fx-price' }, money(l.price)), h('span', { class: 'fx-title' }, l.title),
@@ -4735,7 +5096,13 @@ function openListing(l) {
   const prof = l.profiles || {};
   const photos = (l.photos || []).filter(Boolean);
   const dots = h('div', { class: 'fx-dots' }, photos.length > 1 ? photos.map((_, i) => h('i', { class: i ? '' : 'on' })) : []);
-  const car = h('div', { class: 'fx-car' }, photos.length ? photos.map(u => h('img', { src: u, alt: '' })) : h('div', { class: 'fx-car-ph' }, LCAT_EMO[l.category] || '📦'));
+  const car = h('div', { class: 'fx-car' }, photos.length ? photos.map(u => {
+    if (!isVidUrl(u)) return h('img', { src: u, alt: '' });
+    const v = h('video', { src: bestSrc(u), poster: posterOf(u), controls: true, playsInline: true, preload: 'metadata', class: 'fx-car-vid' });
+    fallbackHQ(v, u); return v;
+  }) : h('div', { class: 'fx-car-ph' }, LCAT_EMO[l.category] || '📦'));
+  // Al deslizar a otra foto, el video se pausa
+  car.addEventListener('scroll', () => car.querySelectorAll('video').forEach(v => { const r = v.getBoundingClientRect(), c = car.getBoundingClientRect(); if (Math.abs(r.left - c.left) > c.width / 2) v.pause(); }), { passive: true });
   car.addEventListener('scroll', () => { const i = Math.round(car.scrollLeft / car.clientWidth); [...dots.children].forEach((d, k) => d.classList.toggle('on', k === i)); }, { passive: true });
   car.addEventListener('click', (e) => { if (e.target.tagName === 'IMG') openMediaViewer(e.target.src, 'image'); });
   const link = location.origin + location.pathname + '#l=' + l.id;
@@ -4745,7 +5112,7 @@ function openListing(l) {
     h('div', { style: 'display:flex;gap:8px;margin-top:8px' },
       h('button', { class: 'btn ghost', style: 'flex:1', onclick: () => { close(); listingForm(l); } }, '✏️ Editar'),
       h('button', { class: 'btn ghost', style: 'flex:1', onclick: share }, '📤 Compartir'),
-      h('button', { class: 'btn ghost', style: 'flex:1;color:#C2183A', onclick: async () => { if (!confirm('¿Borrar este anuncio?')) return; const { error } = await sb.from('listings').delete().eq('id', l.id); if (error) return toast('No se pudo borrar'); const paths = photos.map(u => u.split('/media/')[1]).filter(Boolean).map(decodeURIComponent); if (paths.length) sb.storage.from('media').remove(paths); close(); toast('Anuncio borrado'); if (state.view === 'feria') render(); } }, '🗑️'))] : [
+      h('button', { class: 'btn ghost', style: 'flex:1;color:#C2183A', onclick: async () => { if (!confirm('¿Borrar este anuncio?')) return; const { error } = await sb.from('listings').delete().eq('id', l.id); if (error) return toast('No se pudo borrar'); const paths = photos.map(u => u.split('/media/')[1]).filter(Boolean).map(decodeURIComponent).flatMap(withVariants); if (paths.length) sb.storage.from('media').remove(paths); close(); toast('Anuncio borrado'); if (state.view === 'feria') render(); } }, '🗑️'))] : [
     l.status !== 'vendido' && h('button', { class: 'btn fx-gold', onclick: () => interested(l) }, '💬 Me interesa'),
     h('button', { class: 'btn ghost', style: 'margin-top:8px', onclick: share }, '📤 Compartir anuncio')];
   const sellerRow = h('div', { class: 'fx-rating' });
@@ -4789,13 +5156,31 @@ function listingForm(l) {
   const files = [];
   let cat = (l && l.category) || state.feriaCat || 'Caballos';
   const photosBox = h('div', { class: 'fx-ph-grid' });
-  const picker = h('input', { type: 'file', accept: 'image/*', multiple: true, hidden: true });
+  const picker = h('input', { type: 'file', accept: 'image/*,video/*', multiple: true, hidden: true });
+  const isVidFile = (f) => (f.type || '').startsWith('video/');
+  const vidCount = () => kept.filter(isVidUrl).length + files.filter(isVidFile).length;
   const paintPhotos = () => {
-    const tiles = [...kept.map((u, i) => ({ src: u, rm: () => { kept.splice(i, 1); paintPhotos(); } })), ...files.map((f, i) => ({ src: f._url, rm: () => { files.splice(i, 1); paintPhotos(); } }))];
-    photosBox.replaceChildren(...tiles.map(t => h('div', { class: 'fx-ph' }, h('img', { src: t.src, alt: '' }), h('button', { type: 'button', 'aria-label': 'Quitar foto', onclick: t.rm }, '✕'))),
-      tiles.length < MAX_LPHOTOS ? h('button', { type: 'button', class: 'fx-ph add', onclick: () => picker.click() }, h('span', {}, '📷'), h('small', {}, tiles.length ? `Agregar (${tiles.length}/${MAX_LPHOTOS})` : 'Fotos (hasta ' + MAX_LPHOTOS + ')')) : null);
+    const tiles = [...kept.map((u, i) => ({ src: u, vid: isVidUrl(u), rm: () => { kept.splice(i, 1); paintPhotos(); } })), ...files.map((f, i) => ({ src: f._url, vid: isVidFile(f), local: true, rm: () => { files.splice(i, 1); paintPhotos(); } }))];
+    photosBox.replaceChildren(...tiles.map(t => h('div', { class: 'fx-ph' + (t.vid ? ' vid' : '') },
+        t.vid ? (t.local ? h('video', { src: t.src + '#t=0.3', muted: true, playsInline: true, preload: 'metadata' }) : vthumb(t.src)) : h('img', { src: t.src, alt: '' }),
+        t.vid ? h('span', { class: 'fx-ph-play' }, '▶') : null,
+        h('button', { type: 'button', 'aria-label': t.vid ? 'Quitar video' : 'Quitar foto', onclick: t.rm }, '✕'))),
+      tiles.length < MAX_LPHOTOS ? h('button', { type: 'button', class: 'fx-ph add', onclick: () => picker.click() }, h('span', {}, '📷🎥'), h('small', {}, tiles.length ? `Agregar (${tiles.length}/${MAX_LPHOTOS})` : 'Fotos o video')) : null);
   };
-  picker.addEventListener('change', () => { [...picker.files].slice(0, MAX_LPHOTOS - kept.length - files.length).forEach(f => { f._url = URL.createObjectURL(f); files.push(f); }); picker.value = ''; paintPhotos(); });
+  picker.addEventListener('change', async () => {
+    const chosen = [...picker.files]; picker.value = '';
+    for (const f of chosen) {
+      if (kept.length + files.length >= MAX_LPHOTOS) break;
+      if (isVidFile(f)) {
+        if (vidCount() >= MAX_LVIDEOS) { toast(`Máximo ${MAX_LVIDEOS} videos por anuncio`); continue; }
+        if (f.size > MAX_VIDEO_MB * 1048576) { toast(`El video pesa mucho (máx. ${MAX_VIDEO_MB} MB)`); continue; }
+        const d = await videoDuration(f);
+        if (d > LVIDEO_SEC + 1) toast('El video se recortará a los primeros 2 minutos');
+      } else if (!(f.type || '').startsWith('image/')) continue;
+      f._url = URL.createObjectURL(f); files.push(f);
+    }
+    paintPhotos();
+  });
   paintPhotos();
   const title = h('input', { class: 'input', maxlength: '80', placeholder: 'ej. Yegua cuarto de milla, 5 años', value: (l && l.title) || '' });
   const catChips = h('div', { class: 'chips', style: 'padding:0 0 12px;flex-wrap:wrap' });
@@ -4840,13 +5225,22 @@ function listingForm(l) {
     const endTrot = SFX.startUpload();
     try {
       const urls = [...kept];
+      const total = kept.length + files.length;
       for (const f of files) {
+        if (isVidFile(f)) {
+          const set = await prepVideoSet(f, (n) => { save.textContent = `Preparando video… ${n}%`; }, LVIDEO_SEC);
+          if (tooBig(set.hd)) throw new Error('El video es muy largo. Prueba con uno más corto.');
+          save.textContent = 'Subiendo video…';
+          urls.push((await uploadVideoSet(set, f)).url);
+          save.textContent = `Subiendo ${urls.length}/${total}…`;
+          continue;
+        }
         const blob = await compressImage(f, 1280);
         const path = `${state.me.id}/feria-${Date.now()}-${Math.random().toString(36).slice(2, 7)}.jpg`;
         const up = await sb.storage.from('media').upload(path, blob, { contentType: 'image/jpeg', cacheControl: '31536000' });
         if (up.error) throw up.error;
         urls.push(sb.storage.from('media').getPublicUrl(path).data.publicUrl);
-        save.textContent = `Subiendo fotos ${urls.length}/${kept.length + files.length}…`;
+        save.textContent = `Subiendo ${urls.length}/${total}…`;
       }
       const row = { title: tt, category: cat, price: p, location: loc.value.trim() || null, description: desc.value.trim() || null, photos: urls.slice(0, MAX_LPHOTOS) };
       if (HAS_NOV) {
@@ -4863,7 +5257,7 @@ function listingForm(l) {
     } catch (ex) { endTrot(false); save.disabled = false; save.textContent = isNew ? 'Publicar anuncio' : 'Guardar cambios'; err.textContent = feriaMissing(ex) ? 'La Feria todavía no está activada.' : /photos|check/i.test((ex && ex.message) || '') ? 'Por ahora el máximo es de 6 fotos por anuncio.' : friendlyError(ex); }
   } },
     picker, photosBox,
-    h('small', { class: 'hint', style: 'display:block;margin:-4px 0 12px' }, '📸 Puedes escoger varias fotos a la vez. La primera es la portada.'),
+    h('small', { class: 'hint', style: 'display:block;margin:-4px 0 12px' }, '📸 Puedes escoger varias fotos a la vez (la primera es la portada) y hasta 2 videos de 2 minutos. Un video del animal caminando vende más rápido.'),
     h('div', { class: 'field' }, h('label', {}, '¿Qué vendes?'), title, h('small', { class: 'hint' }, 'Ganado, caballos, perros, equipo, pastura y servicios del campo. No se permite fauna silvestre.')),
     h('div', { class: 'field' }, h('label', {}, 'Categoría')), catChips, petBox,
     h('div', { class: 'field' }, h('label', {}, 'Precio (pesos)'), price, h('label', { class: 'fx-check' }, nego, ' Precio a tratar')),
@@ -5019,7 +5413,7 @@ function feriaShowcase() {
       evs[0] ? h('button', { class: 'fx-next', onclick: () => openEvent(evs[0]) }, h('span', { class: 'fx-next-emo' }, EKIND_EMO[evs[0].kind] || '🎉'),
         h('div', {}, h('small', {}, 'Próximo evento · ' + dayLabel(evs[0].starts_at) + ' ' + hourLabel(evs[0].starts_at)), h('b', {}, evs[0].title)), h('span', { class: 'fx-chev' }, '›')) : null,
       act.length ? h('div', { class: 'fx-show-row' }, act.map(l => h('button', { class: 'fx-mini', onclick: () => openListing(l) },
-        h('div', { class: 'fx-pic' }, l.photos && l.photos[0] ? h('img', { src: l.photos[0], alt: '', loading: 'lazy' }) : h('span', {}, LCAT_EMO[l.category] || '📦'), isFeat(l) ? h('span', { class: 'fx-feat' }, '⭐') : null),
+        h('div', { class: 'fx-pic' }, listingCover(l) || h('span', {}, LCAT_EMO[l.category] || '📦'), isFeat(l) ? h('span', { class: 'fx-feat' }, '⭐') : null),
         h('b', {}, money(l.price)), h('small', {}, l.title)))) : h('button', { class: 'fx-sell-cta', onclick: goF('mercado') }, '🐎 ¿Vendes algo del rancho? Publícalo gratis ›')].filter(Boolean));
     box.hidden = false;
   })();
@@ -5686,8 +6080,9 @@ function voicePlayer(src, dur) {
 // ---------- Si alguien dijo "No permitir" y luego sí quiere ----------
 // El teléfono ya no vuelve a preguntar, así que explicamos cómo activarlo a mano según el teléfono.
 function permHelp(kind, retry) {
-  const isMic = kind === 'mic';
-  const what = isMic ? 'Micrófono' : 'Notificaciones';
+  const isCam = kind === 'camera';
+  const isMic = kind === 'mic' || isCam;
+  const what = isCam ? 'Cámara (y Micrófono)' : isMic ? 'Micrófono' : 'Notificaciones';
   const ua = navigator.userAgent || '';
   const ios = /iPhone|iPad|iPod/i.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
   const installed = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone;
@@ -5696,7 +6091,7 @@ function permHelp(kind, retry) {
   const steps = ios ? (isMic ? [
       step(1, ['Abre ', B('Ajustes'), ' del iPhone (el engrane ⚙️).']),
       step(2, ['Baja y toca ', B('Safari'), '.']),
-      step(3, ['Toca ', B('Micrófono'), ' y escoge ', B('Preguntar'), ' o ', B('Permitir'), '.']),
+      step(3, ['Toca ', B(isCam ? 'Cámara' : 'Micrófono'), ' y escoge ', B('Preguntar'), ' o ', B('Permitir'), isCam ? '. Haz lo mismo con Micrófono.' : '.']),
       step(4, ['Cierra Ranchfolk por completo y vuelve a abrirla.'])] : [
       step(1, ['Abre ', B('Ajustes'), ' del iPhone (el engrane ⚙️).']),
       step(2, ['Baja hasta ', B('Notificaciones'), ' y busca ', B('Ranchfolk'), '.']),
@@ -5712,8 +6107,8 @@ function permHelp(kind, retry) {
       step(2, ['Toca ', B('Permisos'), ' (o ', B('Configuración del sitio'), ').']),
       step(3, ['Busca ', B(what), ' y escoge ', B('Permitir'), '.']),
       step(4, ['Recarga la página.'])];
-  const close = openSheet(isMic ? '🎤 Activa el micrófono' : '🔔 Activa los avisos', h('div', { class: 'sheet-body ph' },
-    h('p', { class: 'ph-lead' }, isMic ? 'Le dijiste al teléfono que no usara el micrófono, por eso no se pueden grabar notas de voz. Se arregla así:' : 'Le dijiste al teléfono que no mostrara avisos de Ranchfolk. Se arregla así:'),
+  const close = openSheet(isCam ? '🎥 Activa la cámara' : isMic ? '🎤 Activa el micrófono' : '🔔 Activa los avisos', h('div', { class: 'sheet-body ph' },
+    h('p', { class: 'ph-lead' }, isCam ? 'Le dijiste al teléfono que no usara la cámara o el micrófono, por eso no se pueden grabar rides. Se arregla así:' : isMic ? 'Le dijiste al teléfono que no usara el micrófono, por eso no se pueden grabar notas de voz. Se arregla así:' : 'Le dijiste al teléfono que no mostrara avisos de Ranchfolk. Se arregla así:'),
     ...steps,
     !ios && installed ? h('p', { class: 'hint', style: 'margin:4px 0 12px' }, 'Si no aparece ahí: abre ', B('Chrome'), ' › ⋮ › ', B('Configuración'), ' › ', B('Configuración de sitios'), ' › ', B(what), ' y quita a ', B('jaibo2026.github.io'), ' de la lista de bloqueados.') : null,
     h('button', { class: 'btn pf-gold', style: 'width:100%;margin-top:6px', onclick: async () => { close(); if (retry) retry(); } }, 'Ya lo activé, probar otra vez'),
