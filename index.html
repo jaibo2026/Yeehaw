@@ -3620,7 +3620,9 @@ function openRideCreator(onDone) {
   async function startCam() {
     stopCam(); msg.hidden = true;
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { showMsg('Tu teléfono no deja usar la cámara aquí. Sube un video de tu galería.'); return; }
-    const vid = { facingMode: facing, width: { ideal: 720 }, height: { ideal: 1280 }, aspectRatio: { ideal: 9 / 16 }, frameRate: { ideal: 30 } };
+    // Resolución completa de la cámara, sin recortar (pedirla en vertical hacía que Chrome recortara y agrandara la imagen).
+    // El teléfono la gira solo cuando lo tienes parado; en pantalla se acomoda sin deformarse.
+    const vid = { facingMode: facing, width: { ideal: 1920 }, height: { ideal: 1080 }, frameRate: { ideal: 30 }, resizeMode: 'none' };
     try {
       try { stream = await navigator.mediaDevices.getUserMedia({ video: vid, audio: true }); }
       catch (e1) {
@@ -3630,6 +3632,14 @@ function openRideCreator(onDone) {
         toast('🎤 El micrófono está bloqueado: se grabará sin sonido. Puedes ponerle canción.');
       }
       if (!root.isConnected) return stopCam();
+      // Si de todos modos llegó chiquita, se pide la mejor que tenga la cámara
+      try {
+        const tr = stream.getVideoTracks()[0], st = tr.getSettings ? tr.getSettings() : {};
+        if (st.width && Math.min(st.width, st.height) < 700 && tr.getCapabilities) {
+          const cap = tr.getCapabilities();
+          if (cap.width && cap.width.max >= 1280) await tr.applyConstraints({ width: { ideal: Math.min(1920, cap.width.max) }, height: { ideal: Math.min(1080, (cap.height && cap.height.max) || 1080) }, frameRate: { ideal: 30 } });
+        }
+      } catch (_) {}
       live.srcObject = stream; live.classList.toggle('mirror', facing === 'user'); live.play().catch(() => {});
     } catch (e) {
       const denied = e && (e.name === 'NotAllowedError' || e.name === 'SecurityError');
