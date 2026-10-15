@@ -1320,6 +1320,15 @@ main{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
 .fx-next-emo{font-size:30px!important}
 .fb-pill{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .feed-mode-note{margin:0 14px 10px;padding:9px 14px;border-radius:12px;background:#F4EBDB;color:#172531;font-weight:700;font-size:14px}
+.ride-yt{position:absolute;left:10px;top:calc(66px + env(safe-area-inset-top));z-index:6;width:200px;height:200px;border-radius:12px;overflow:hidden;background:#000;box-shadow:0 6px 18px rgba(0,0,0,.5)}
+.ride-yt iframe{width:200px;height:200px;border:0;display:block}
+.sdc>.ride-yt,.rc-cam>.ride-yt{z-index:7}
+.sdc-sheet~.ride-yt,.sdc .sdc-sheet+.ride-yt{top:calc(66px + env(safe-area-inset-top))}
+.rs-yt{display:flex;flex-direction:column;gap:6px;padding:10px 12px;border:1px solid #E2CFAF;border-radius:14px;background:#FBF3E4;margin-bottom:10px}
+.rs-yt b{font-size:14px}
+.rs-or{text-align:center;font-size:12px;color:#4D6473;margin:4px 0 8px}
+.rs-thumb{width:44px;height:33px;border-radius:6px;object-fit:cover;flex-shrink:0;margin-right:8px}
+.song-cut-top{display:flex;align-items:center}
 </style>
 <div id="app"></div>
 <script>(function(){var t0=Date.now();function go(){var s=document.getElementById('splash');if(!s)return;setTimeout(function(){s.classList.add('out');setTimeout(function(){s.remove()},400)},Math.max(0,900-(Date.now()-t0)))}if(document.readyState==='complete')go();else window.addEventListener('load',go);setTimeout(go,4000)})();</script>
@@ -1856,7 +1865,9 @@ const HIDDEN_KEY = 'yeehaw_hidden_posts';
 let hiddenPosts = new Set();
 try { hiddenPosts = new Set(JSON.parse(localStorage.getItem(HIDDEN_KEY) || '[]')); } catch (_) {}
 function hidePost(id) { hiddenPosts.add(id); try { localStorage.setItem(HIDDEN_KEY, JSON.stringify([...hiddenPosts].slice(-500))); } catch (_) {} }
-function visible(list) { const b = state.blocked || new Set(); return (list || []).filter(p => !b.has(p.user_id) && !hiddenPosts.has(p.id)); }
+// Las canciones viejas de Apple Music ya no suenan solas: quedan como enlace para escucharla en Apple Music
+function noApple(p) { if (p && p.song_preview) { p.song_preview = null; p.song_art = null; } return p; }
+function visible(list) { const b = state.blocked || new Set(); return (list || []).filter(p => !b.has(p.user_id) && !hiddenPosts.has(p.id)).map(noApple); }
 let HAS_KIND = true;
 let HAS_SONG = true;
 let HAS_REACT = true;   // reacciones (me encanta, me divierte…)
@@ -1955,6 +1966,17 @@ function ytMini(id, start, host) {
   grip.addEventListener('click', (e) => e.stopPropagation());
   return box;
 }
+// Ventanita de YouTube para rides (reglas de YouTube: mínimo 200×200, visible y sin nada encima; uno a la vez)
+function ytRideMini(id, start, muted) {
+  document.querySelectorAll('.ride-yt').forEach(x => x.remove());   // solo uno sonando a la vez
+  const st = Math.max(0, Math.floor(start || 0));
+  const src = `https://www.youtube-nocookie.com/embed/${id}?` + new URLSearchParams({ autoplay: '1', playsinline: '1', rel: '0', start: String(st), loop: '1', playlist: id, mute: muted ? '1' : '0', enablejsapi: '1', origin: location.origin });
+  const frame = h('iframe', { src, allow: 'autoplay; encrypted-media; picture-in-picture', title: 'Canción de YouTube' });
+  const el = h('div', { class: 'ride-yt' }, frame);
+  el._mute = (m) => ytCmd(frame, m ? 'mute' : 'unMute');
+  return el;
+}
+const ytIdOfSong = (url) => { const sg = url ? parseSong(url) : null; return sg && sg.type === 'yt' ? sg.id : null; };
 function ytCmd(frame, func) { try { frame.contentWindow.postMessage(JSON.stringify({ event: 'command', func, args: [] }), '*'); } catch (_) {} }
 function stopSong() {
   if (SONG.audio) { try { SONG.audio.pause(); } catch (_) {} }
@@ -1973,6 +1995,7 @@ function playSong(preview, chip, start) {
   return true;
 }
 function songChip(url, title, opts = {}) {
+  opts = Object.assign({}, opts, { preview: null });   // ya no se usan los avances de Apple Music
   if (opts.preview) {
     const chip = h('button', { class: 'song-chip' + (opts.dark ? ' dark' : ''), type: 'button', 'aria-label': 'Escuchar: ' + (title || 'canción'), onclick: (e) => { e.stopPropagation(); if (playSong(opts.preview, chip, opts.start) && opts.before) opts.before(); } },
       opts.art ? h('img', { src: opts.art, alt: '' }) : h('span', { class: 'song-sp am', 'aria-hidden': 'true' }, '♫'),
@@ -1982,6 +2005,8 @@ function songChip(url, title, opts = {}) {
     return chip;
   }
   const sg = parseSong(url); if (!sg) return null;
+  if (sg.type === 'am') return h('a', { class: 'song-chip' + (opts.dark ? ' dark' : ''), href: sg.url, target: '_blank', rel: 'noopener', onclick: (e) => e.stopPropagation(), 'aria-label': 'Escuchar en Apple Music: ' + (title || 'canción') },
+    h('span', { class: 'song-sp am', 'aria-hidden': 'true' }, '♫'), h('span', { class: 'song-t' }, (title || 'Canción') + ' · Apple Music ↗'));
   const thumb = sg.type === 'yt' ? h('img', { src: `https://i.ytimg.com/vi/${sg.id}/default.jpg`, alt: '' }) : h('span', { class: 'song-sp', 'aria-hidden': 'true' }, '♫');
   return h('button', { class: 'song-chip' + (opts.dark ? ' dark' : ''), type: 'button', 'aria-label': 'Escuchar canción: ' + (title || 'canción'), onclick: (e) => { e.stopPropagation(); if (opts.before) opts.before(); openSong(url, title, opts.after); } },
     thumb, h('span', { class: 'song-note', 'aria-hidden': 'true' }, '🎵'), h('span', { class: 'song-t' }, title || (sg.type === 'yt' ? 'Canción de YouTube' : 'Canción de Spotify')));
@@ -2027,7 +2052,7 @@ async function fetchPosts({ category, userId, userIds, tag, text, kinds = ['post
 async function fetchPost(id) {
   for (let i = 0; i < 6; i++) {
     const { data, error } = await sb.from('posts').select(postSelect()).eq('id', id).maybeSingle();
-    if (!error) return data;
+    if (!error) return noApple(data);
     if (fixMissing(error.message || '')) continue;
     return null;
   }
@@ -3411,7 +3436,8 @@ function sdOverlayEl(o, song) {
 function sdCanvas(mediaEl, it) {
   const layer = h('div', { class: 'sdo-layer' });
   const list = Array.isArray(it && it.overlays) ? it.overlays : [];
-  const song = it && it.song_preview ? { title: it.song_title, art: it.song_art } : null;
+  const ytS = it && it.song_url ? ytIdOfSong(it.song_url) : null;
+  const song = it && it.song_title && (it.song_preview || ytS) ? { title: it.song_title, art: it.song_art || (ytS ? `https://i.ytimg.com/vi/${ytS}/default.jpg` : null) } : null;
   list.forEach(o => { const el = sdOverlayEl(o, song); if (el) layer.append(el); });
   return h('div', { class: 'sd-canvas' }, mediaEl, layer);
 }
@@ -3489,7 +3515,9 @@ function startCreator(file, onDone, opts = {}) {
     if (!RIDE || !isVideo) return;
     media.muted = origMuted;
     stopSong();
+    document.querySelectorAll('.ride-yt').forEach(x => x.remove());
     if (song && song.preview) playSong(song.preview, null, song.start || 0);
+    else if (song && song.yt && root) root.append(ytRideMini(song.yt, song.start || 0, false));
     try { media.currentTime = 0; media.play().catch(() => {}); } catch (_) {}
   };
   if (RIDE && isVideo) media.addEventListener('timeupdate', () => { if (song && SONG.audio && media.currentTime < lastT - 1) try { SONG.audio.currentTime = song.start || 0; } catch (_) {} lastT = media.currentTime; });
@@ -3506,7 +3534,7 @@ function startCreator(file, onDone, opts = {}) {
     h('div', { class: 'sdc-stage' }, canvas),
     h('div', { class: 'sdc-top' },
       h('button', { class: 'sdc-x', type: 'button', 'aria-label': 'Cancelar', onclick: () => closeAsk() }, RIDE ? '‹' : '✕'),
-      h('div', { class: 'sdc-tools' }, tool('🎵', RIDE ? 'Sonidos' : 'Música', () => openMusic()), tool('Aa', 'Texto', () => editText(null)), tool('😊', 'Emojis', () => openEmojis()), origTool)),
+      h('div', { class: 'sdc-tools' }, tool('🎵', RIDE ? 'Sonidos' : 'Música', () => RIDE ? (document.querySelectorAll('.ride-yt').forEach(x => x.remove()), stopSong(), rideSongSheet(root, song, (s2) => { const had = !!song; song = s2; if (song && !had) origMuted = true; if (!song) origMuted = false; paintOrig(); previewSound(); })) : openMusic()), tool('Aa', 'Texto', () => editText(null)), tool('😊', 'Emojis', () => openEmojis()), origTool)),
     trash,
     h('div', { class: 'sdc-bottom' }, shareBtn));
   document.body.append(root);
@@ -3517,7 +3545,7 @@ function startCreator(file, onDone, opts = {}) {
 
   let published = false;
   const close = () => {
-    stopSong(); try { media.pause(); } catch (_) {} URL.revokeObjectURL(url); root.remove();
+    stopSong(); document.querySelectorAll('.ride-yt').forEach(x => x.remove()); try { media.pause(); } catch (_) {} URL.revokeObjectURL(url); root.remove();
     // Si no se publicó, se borra lo que ya se había subido
     if (prep && !published) prep.then(r => { sb.storage.from('media').remove(withVariants(r.path)).catch(() => {}); try { localStorage.removeItem('rf_pending_up'); } catch (_) {} }).catch(() => {});
   };
@@ -3614,59 +3642,23 @@ function startCreator(file, onDone, opts = {}) {
     root.append(pane);
     paintE();
   }
-  // ---- música (Apple Music, 30 s) ----
   function openMusic() {
-    const input = h('input', { class: 'input', type: 'search', placeholder: 'Busca por canción o artista…', autocomplete: 'off', enterkeyhint: 'search' });
-    const list = h('div', { class: 'song-list' });
-    const cut = h('div');
-    const body = h('div', { class: 'sdc-sheet-body' }, input, cut, list);
-    const pane = h('div', { class: 'sdc-sheet tall' },
-      h('div', { class: 'sdc-sheet-head' }, h('b', {}, RIDE ? '🎵 Sonidos' : '🎵 Música'), h('button', { class: 'sdc-done', type: 'button', onclick: () => { stopSong(); pane.remove(); paint(); if (RIDE) { paintOrig(); previewSound(); } } }, 'Listo')), body);
-    if (RIDE) { try { media.pause(); } catch (_) {} }
-    root.append(pane);
-    const showCut = () => {
-      cut.replaceChildren();
-      if (!song) return;
-      const lab = h('b', {}, '0:' + String(song.start || 0).padStart(2, '0'));
-      const range = h('input', { type: 'range', min: '0', max: '25', step: '1', value: String(song.start || 0), class: 'song-range', 'aria-label': 'Desde qué segundo empieza la canción' });
-      const listen = () => { stopSong(); playSong(song.preview, null, song.start); };
-      range.addEventListener('input', () => { song.start = Number(range.value); lab.textContent = '0:' + String(song.start).padStart(2, '0'); });
-      range.addEventListener('change', listen);
-      cut.append(h('div', { class: 'song-cut' },
-        h('div', { class: 'song-cut-top' }, h('span', {}, '🎵 ' + song.title)),
-        h('div', { class: 'song-cut-top' }, h('span', {}, '✂️ Empieza en '), lab), range,
-        h('div', { class: 'song-cut-help' }, h('button', { type: 'button', class: 'linkbtn', style: 'text-decoration:underline', onclick: () => { stopSong(); song = null; origMuted = false; const i = items.findIndex(x => x.t === 'music'); if (i >= 0) items.splice(i, 1); showCut(); } }, 'Quitar canción'),
-          h('button', { type: 'button', class: 'song-play', 'aria-label': 'Escuchar desde ahí', onclick: listen }, '▶'))));
-    };
-    let timer, seq = 0;
-    const search = async () => {
-      const q = input.value.trim(); const s = ++seq; list.replaceChildren(); if (q.length < 2) return;
-      list.append(h('small', { class: 'hint' }, 'Buscando…'));
-      try {
-        const r = await fetch('https://itunes.apple.com/search?' + new URLSearchParams({ term: q, country: 'MX', media: 'music', entity: 'song', limit: '10' }));
-        const j = await r.json(); if (s !== seq) return;
-        const res = (j.results || []).filter(x => x.previewUrl && x.trackViewUrl);
-        list.replaceChildren(...(res.length ? res.map(x => {
-          const title = (x.trackName + ' · ' + x.artistName).slice(0, 120), art = (x.artworkUrl100 || '').replace('100x100', '120x120');
-          const play = h('button', { type: 'button', class: 'song-play', 'aria-label': 'Escuchar ' + x.trackName, onclick: (e) => { e.stopPropagation(); playSong(x.previewUrl, play); } }, '▶');
-          return h('div', { class: 'song-row', role: 'button', tabindex: '0', onclick: () => {
-            const hadSong = !!song;
-            song = { url: x.trackViewUrl.split('&uo=')[0], title, preview: x.previewUrl, art, start: 0 };
-            if (RIDE && !hadSong) origMuted = true;   // como TikTok: al ponerle canción se apaga el sonido original (se puede volver a prender)
-            if (!RIDE && !items.some(i => i.t === 'music')) items.push({ t: 'music', x: 50, y: 74, s: 1, r: 0 });
-            input.value = ''; list.replaceChildren(); showCut(); stopSong(); playSong(song.preview, null, 0);
-          } }, h('img', { src: art, alt: '' }), h('div', { class: 'who' }, h('b', {}, x.trackName), h('small', {}, x.artistName)), play);
-        }) : [h('small', { class: 'hint' }, 'No encontramos esa canción. Prueba con el nombre del artista.')]));
-      } catch (_) { if (s === seq) list.replaceChildren(h('small', { class: 'err' }, 'No se pudo buscar. Revisa tu conexión.')); }
-    };
-    input.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(search, 450); });
-    showCut(); setTimeout(() => input.focus({ preventScroll: true }), 50);
+    // Vivencias: la canción es de YouTube y se ve en chiquito; en el recuadro queda la etiqueta con el nombre
+    document.querySelectorAll('.ride-yt').forEach(x => x.remove()); stopSong();
+    rideSongSheet(root, song, (s2) => {
+      song = s2;
+      const i = items.findIndex(x => x.t === 'music');
+      if (song && i < 0) items.push({ t: 'music', x: 50, y: 74, s: 1, r: 0 });
+      if (!song && i >= 0) items.splice(i, 1);
+      paint();
+      if (!RIDE && song && song.yt) root.append(ytRideMini(song.yt, song.start || 0, false));
+    });
   }
   // ---- publicar ----
   if (RIDE) shareBtn.addEventListener('click', () => ridePostPane());
   // ---- Rides: pantalla de publicar (descripción, sección, quién sale) ----
   function ridePostPane() {
-    try { media.pause(); } catch (_) {} stopSong();
+    try { media.pause(); } catch (_) {} stopSong(); document.querySelectorAll('.ride-yt').forEach(x => x.remove());
     const thumb = h('video', { src: url, muted: true, playsInline: true, autoplay: true, loop: true, class: 'rc-thumb' });
     thumb.muted = true; thumb.play().catch(() => {});
     const cap = mentionAssist(h('textarea', { class: 'input rc-cap', maxlength: '1000', placeholder: 'Describe tu ride… usa #hashtags y menciona con @' }));
@@ -3698,7 +3690,7 @@ function startCreator(file, onDone, opts = {}) {
     const pane = h('div', { class: 'sdc-pane rc-post' },
       h('div', { class: 'rc-post-top' }, h('button', { type: 'button', class: 'sdc-done rc-back', 'aria-label': 'Regresar a editar', onclick: back }, '‹'), h('b', {}, 'Publicar ride'), h('span', { style: 'width:40px' })),
       h('div', { class: 'rc-post-body' },
-        h('div', { class: 'rc-row' }, cap, h('div', { class: 'rc-th' }, thumb, song ? h('small', {}, '🎵 ' + song.title.split(' · ')[0]) : null)),
+        h('div', { class: 'rc-row' }, cap, h('div', { class: 'rc-th' }, thumb, song ? h('small', {}, '🎵 ' + String(song.title || 'Canción').split(' · ')[0]) : null)),
         tagRow,
         h('div', { class: 'field' }, h('label', {}, 'Sección')), cats,
         animalField, status, err),
@@ -3712,7 +3704,7 @@ function startCreator(file, onDone, opts = {}) {
         const row = { user_id: state.me.id, media_url: r.url, media_type: 'video', caption: cap.value.trim() || null, category, shop_links: [], kind: 'ride' };
         if (HAS_OVERLAYS && clean.length) row.overlays = clean;
         if (animalId) row.animal_id = animalId;
-        if (HAS_SONG && song) Object.assign(row, { song_url: song.url, song_title: song.title, song_preview: song.preview, song_art: song.art || null, song_start: song.start || 0 });
+        if (HAS_SONG && song) Object.assign(row, { song_url: song.url, song_title: song.title || null, song_preview: song.preview || null, song_art: song.art || null, song_start: song.start || 0 });
         if (HAS_ORIG && song) row.orig_muted = origMuted;
         let ins = await sb.from('posts').insert(row);
         for (let i = 0; i < 3 && ins.error; i++) {
@@ -3804,9 +3796,9 @@ function openRideCreator(onDone) {
     gallery);
   document.body.append(root);
   const stopCam = () => { if (stream) stream.getTracks().forEach(t => t.stop()); stream = null; };
-  const close = () => { cancelAnimationFrame(raf); try { if (rec && rec.state !== 'inactive') { rec.onstop = null; rec.stop(); } } catch (_) {} stopCam(); stopSong(); root.remove(); };
+  const close = () => { cancelAnimationFrame(raf); try { if (rec && rec.state !== 'inactive') { rec.onstop = null; rec.stop(); } } catch (_) {} stopCam(); stopSong(); document.querySelectorAll('.ride-yt').forEach(x => x.remove()); root.remove(); };
   root._close = close;
-  const paintSong = () => { songBtn.textContent = song ? '🎵 ' + song.title.split(' · ')[0].slice(0, 26) : '🎵 Agregar sonido'; songBtn.classList.toggle('on', !!song); };
+  const paintSong = () => { songBtn.textContent = song ? '🎵 ' + String(song.title || 'Canción').split(' · ')[0].slice(0, 26) : '🎵 Agregar sonido'; songBtn.classList.toggle('on', !!song); };
   async function startCam() {
     stopCam(); msg.hidden = true;
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { showMsg('Tu teléfono no deja usar la cámara aquí. Sube un video de tu galería.'); return; }
@@ -3865,13 +3857,14 @@ function openRideCreator(onDone) {
     rec.onstop = () => {
       const type = (rec.mimeType || mime || 'video/webm').split(';')[0];
       const blob = new Blob(chunks, { type }); rec = null;
-      stopSong();
+      stopSong(); document.querySelectorAll('.ride-yt').forEach(x => x.remove());
       if (!blob.size) return toast('No se grabó nada. Intenta otra vez.');
       const f = new File([blob], 'ride.' + (type.includes('mp4') ? 'mp4' : 'webm'), { type });
       close(); startCreator(f, onDone, { mode: 'ride', song, origMuted: !!song });
     };
     rec.start(500); t0 = performance.now();
     if (song && song.preview) playSong(song.preview, null, song.start || 0);
+    else if (song && song.yt) root.append(ytRideMini(song.yt, song.start || 0, false));
     root.classList.add('recording'); recBtn.setAttribute('aria-label', 'Detener'); timeLab.hidden = false;
     raf = requestAnimationFrame(tick);
   }
@@ -3889,50 +3882,65 @@ function openRideCreator(onDone) {
   });
   startCam();
 }
-// Buscar sonido para el ride (canciones de Apple Music, 30 s)
+// Canciones: solo de YouTube (se escuchan con su video en chiquito, como lo pide YouTube).
+// Con llave de YouTube se puede buscar por nombre; sin llave, se pega el enlace.
 function rideSongSheet(host, current, onPick) {
   let song = current;
-  const input = h('input', { class: 'input', type: 'search', placeholder: 'Busca por canción o artista…', autocomplete: 'off', enterkeyhint: 'search' });
+  const clearYt = () => document.querySelectorAll('.ride-yt').forEach(x => x.remove());
+  const done = () => { stopSong(); clearYt(); pane.remove(); onPick(song); };
+  const search = h('input', { class: 'input', type: 'search', placeholder: 'Busca la canción en YouTube…', autocomplete: 'off', enterkeyhint: 'search' });
   const list = h('div', { class: 'song-list' });
+  const linkIn = h('input', { class: 'input', type: 'url', inputmode: 'url', placeholder: 'O pega el enlace de YouTube de la canción', autocomplete: 'off' });
+  const linkMsg = h('small', { class: 'hint' }, 'En YouTube: Compartir › Copiar enlace, y pégalo aquí.');
   const cut = h('div');
-  const done = () => { stopSong(); pane.remove(); onPick(song); };
   const pane = h('div', { class: 'sdc-sheet tall' },
-    h('div', { class: 'sdc-sheet-head' }, h('b', {}, '🎵 Sonidos'), h('button', { class: 'sdc-done', type: 'button', onclick: done }, 'Listo')),
-    h('div', { class: 'sdc-sheet-body' }, input, cut, list));
+    h('div', { class: 'sdc-sheet-head' }, h('b', {}, '▶ Música de YouTube'), h('button', { class: 'sdc-done', type: 'button', onclick: done }, 'Listo')),
+    h('div', { class: 'sdc-sheet-body' }, YT_KEY ? search : null, cut, list, h('div', { class: 'rs-yt' }, linkIn, linkMsg),
+      h('small', { class: 'hint', style: 'display:block;margin-top:8px' }, 'La canción se escucha con su video de YouTube en una ventanita.')));
   host.append(pane);
+  const listen = () => { clearYt(); if (song && song.yt) host.append(ytRideMini(song.yt, song.start || 0, false)); };
+  const pick = async (id, title) => {
+    song = { url: 'https://www.youtube.com/watch?v=' + id, title: String(title || 'Canción de YouTube').slice(0, 120), preview: null, art: null, start: 0, yt: id, dur: 0 };
+    showCut(); listen();
+    if (YT_KEY) { song.dur = await ytDuration(id); showCut(); }
+  };
   const showCut = () => {
-    cut.replaceChildren(); if (!song) return;
-    const lab = h('b', {}, '0:' + String(song.start || 0).padStart(2, '0'));
-    const range = h('input', { type: 'range', min: '0', max: '25', step: '1', value: String(song.start || 0), class: 'song-range', 'aria-label': 'Desde qué segundo empieza la canción' });
-    const listen = () => { stopSong(); playSong(song.preview, null, song.start); };
-    range.addEventListener('input', () => { song.start = Number(range.value); lab.textContent = '0:' + String(song.start).padStart(2, '0'); });
+    cut.replaceChildren(); if (!song || !song.yt) return;
+    const lab = h('b', {}, fmtSec(song.start || 0));
+    const max = Math.max(0, Math.min(600, (song.dur || 255) - 15));
+    const range = h('input', { type: 'range', min: '0', max: String(max), step: '1', value: String(song.start || 0), class: 'song-range', 'aria-label': 'Desde qué segundo empieza la canción' });
+    range.addEventListener('input', () => { song.start = Number(range.value); lab.textContent = fmtSec(song.start); });
     range.addEventListener('change', listen);
     cut.append(h('div', { class: 'song-cut' },
-      h('div', { class: 'song-cut-top' }, h('span', {}, '🎵 ' + song.title)),
+      h('div', { class: 'song-cut-top' }, h('img', { src: `https://i.ytimg.com/vi/${song.yt}/default.jpg`, alt: '', class: 'rs-thumb' }), h('span', {}, song.title)),
       h('div', { class: 'song-cut-top' }, h('span', {}, '✂️ Empieza en '), lab), range,
-      h('div', { class: 'song-cut-help' }, h('button', { type: 'button', class: 'linkbtn', style: 'text-decoration:underline', onclick: () => { stopSong(); song = null; showCut(); } }, 'Quitar sonido'),
+      h('div', { class: 'song-cut-help' }, h('button', { type: 'button', class: 'linkbtn', style: 'text-decoration:underline', onclick: () => { clearYt(); song = null; linkIn.value = ''; showCut(); } }, 'Quitar canción'),
         h('button', { type: 'button', class: 'song-play', 'aria-label': 'Escuchar desde ahí', onclick: listen }, '▶'))));
   };
+  linkIn.addEventListener('input', async () => {
+    const v = linkIn.value.trim(); if (!v) return;
+    const sg = parseSong(v);
+    if (!sg || sg.type !== 'yt') { linkMsg.textContent = 'Ese enlace no es de YouTube.'; linkMsg.className = 'hint bad'; return; }
+    linkMsg.textContent = 'Cargando…'; linkMsg.className = 'hint';
+    const t = await songTitle(sg.url).catch(() => null);
+    await pick(sg.id, t);
+    linkMsg.textContent = '✓ Lista'; linkMsg.className = 'hint ok';
+  });
   let tm, seq = 0;
-  const search = async () => {
-    const q = input.value.trim(); const sq = ++seq; list.replaceChildren(); if (q.length < 2) return;
-    list.append(h('small', { class: 'hint' }, 'Buscando…'));
-    try {
-      const r = await fetch('https://itunes.apple.com/search?' + new URLSearchParams({ term: q, country: 'MX', media: 'music', entity: 'song', limit: '12' }));
-      const j = await r.json(); if (sq !== seq) return;
-      const res = (j.results || []).filter(x => x.previewUrl && x.trackViewUrl);
-      list.replaceChildren(...(res.length ? res.map(x => {
-        const title = (x.trackName + ' · ' + x.artistName).slice(0, 120), art = (x.artworkUrl100 || '').replace('100x100', '120x120');
-        const play = h('button', { type: 'button', class: 'song-play', 'aria-label': 'Escuchar ' + x.trackName, onclick: (e) => { e.stopPropagation(); playSong(x.previewUrl, play); } }, '▶');
-        return h('div', { class: 'song-row', role: 'button', tabindex: '0', onclick: () => {
-          song = { url: x.trackViewUrl.split('&uo=')[0], title, preview: x.previewUrl, art, start: 0 };
-          input.value = ''; list.replaceChildren(); showCut(); stopSong(); playSong(song.preview, null, 0);
-        } }, h('img', { src: art, alt: '' }), h('div', { class: 'who' }, h('b', {}, x.trackName), h('small', {}, x.artistName)), play);
-      }) : [h('small', { class: 'hint' }, 'No encontramos esa canción. Prueba con el nombre del artista.')]));
-    } catch (_) { if (sq === seq) list.replaceChildren(h('small', { class: 'err' }, 'No se pudo buscar. Revisa tu conexión.')); }
-  };
-  input.addEventListener('input', () => { clearTimeout(tm); tm = setTimeout(search, 450); });
-  showCut(); setTimeout(() => input.focus({ preventScroll: true }), 50);
+  search.addEventListener('input', () => {
+    clearTimeout(tm);
+    tm = setTimeout(async () => {
+      const q = search.value.trim(); const sq = ++seq; list.replaceChildren(); if (q.length < 2) return;
+      list.append(h('small', { class: 'hint' }, 'Buscando en YouTube…'));
+      try {
+        const items = await ytSearch(q); if (sq !== seq) return;
+        list.replaceChildren(...(items.length ? items.map(x => h('div', { class: 'song-row', role: 'button', tabindex: '0', onclick: () => { search.value = ''; list.replaceChildren(); pick(x.id, x.title + (x.who && !x.title.toLowerCase().includes(x.who.toLowerCase()) ? ' · ' + x.who : '')); } },
+          h('img', { src: x.thumb, alt: '', class: 'yt' }), h('div', { class: 'who' }, h('b', {}, x.title), h('small', {}, x.who)))) : [h('small', { class: 'hint' }, 'No salió nada. Prueba con otro nombre.')]));
+      } catch (_) { if (sq === seq) list.replaceChildren(h('small', { class: 'err' }, 'No se pudo buscar ahorita. Pega el enlace de YouTube abajo.')); }
+    }, 450);
+  });
+  showCut();
+  setTimeout(() => (YT_KEY ? search : linkIn).focus({ preventScroll: true }), 50);
 }
 
 // ---------- Sundowns (desaparecen en 24 horas) ----------
@@ -4126,8 +4134,9 @@ function setRidesMuted(m) {
   document.querySelectorAll('.ride video').forEach(v => { v.muted = m || !!v._origMuted; });
   document.querySelectorAll('.ride .mutebtn').forEach(b => { b.innerHTML = ICONS[m ? 'mute' : 'sound']; });
   if (RIDE_SONG) RIDE_SONG.muted = m;
+  document.querySelectorAll('.ride-yt').forEach(x => x._mute && x._mute(m));
 }
-const stopRideSong = () => { if (RIDE_SONG) try { RIDE_SONG.pause(); } catch (_) {} };
+const stopRideSong = () => { if (RIDE_SONG) try { RIDE_SONG.pause(); } catch (_) {} document.querySelectorAll('.ride-yt').forEach(x => x.remove()); };
 document.addEventListener('visibilitychange', () => { if (document.hidden) { stopRideSong(); document.querySelectorAll('.ride video').forEach(v => { try { v.pause(); } catch (_) {} }); } });
 // Lista de rides tipo reels: se reproduce el que está en pantalla, se precargan los 2 que siguen
 // y, al ir llegando al final, se cargan más solitos.
@@ -4158,7 +4167,7 @@ function ridesScroller(wrap, first, loadMore, o = {}) {
   }
   wrap.replaceChildren(); add(first);
   if (o.keepGoing) more();
-  return { stop: () => { io.disconnect(); cards.forEach(c => c.pause()); wrap.querySelectorAll('video').forEach(v => { try { v.pause(); v.removeAttribute('src'); v.load(); } catch (_) {} }); } };
+  return { stop: () => { io.disconnect(); cards.forEach(c => c.pause()); document.querySelectorAll('.ride-yt').forEach(x => x.remove()); wrap.querySelectorAll('video').forEach(v => { try { v.pause(); v.removeAttribute('src'); v.load(); } catch (_) {} }); } };
 }
 // Tocas un ride en el inicio y se abre en pantalla completa, como los reels; deslizas para ver los demás
 function openReels(start) {
@@ -4192,9 +4201,13 @@ function rideCard(p, preload) {
   const warm = (lvl) => { const order = { none: 0, metadata: 1, auto: 2 }; if ((order[lvl] || 0) > (order[video.preload] || 0)) video.preload = lvl; };
   let allowed = !SAVER.on;  // con ahorro de datos, el video espera a que lo toques
   // Canción del ride: suena sola junto con el video, como en TikTok (y se reinicia cuando el video vuelve a empezar)
-  const songSrc = HAS_SONG && p.song_preview ? p.song_preview : null;
+  const songSrc = null;   // (los avances de Apple Music ya no suenan solos)
   const songStart = Math.max(0, Math.min(25, Number(p.song_start) || 0));
-  video._origMuted = !!songSrc && p.orig_muted !== false;   // con canción, el sonido original va apagado (a menos que lo hayan dejado)
+  const ytSong = HAS_SONG && !p.song_preview ? ytIdOfSong(p.song_url) : null;   // canción de YouTube: suena con su video en chiquito
+  let ytEl = null;
+  const ytOn = () => { if (!ytSong) return; if (!ytEl || !ytEl.isConnected) { ytEl = ytRideMini(ytSong, p.song_start || 0, state.ridesMuted); el.append(ytEl); } };
+  const ytOff = () => { if (ytEl) { ytEl.remove(); ytEl = null; } };
+  video._origMuted = (!!songSrc || !!ytSong) && p.orig_muted !== false;   // con canción, el sonido original va apagado (a menos que lo hayan dejado)
   let sa = null, lastT = 0;
   const songOn = () => {
     if (!songSrc) return;
@@ -4210,7 +4223,7 @@ function rideCard(p, preload) {
   const songOff = () => { if (sa) try { sa.pause(); } catch (_) {} if (songChipEl) songChipEl.classList.remove('playing'); };
   video.addEventListener('timeupdate', () => { if (sa && video.currentTime < lastT - 1) try { sa.currentTime = songStart; } catch (_) {} lastT = video.currentTime; });
   video.addEventListener('pause', songOff);
-  video.addEventListener('playing', () => { if (songSrc) songOn(); });
+  video.addEventListener('playing', () => { if (songSrc) songOn(); ytOn(); });
   video.addEventListener('waiting', () => { if (sa) try { sa.pause(); } catch (_) {} });
   video.muted = state.ridesMuted || video._origMuted;
   const burst = burstEl();
@@ -4226,7 +4239,7 @@ function rideCard(p, preload) {
     video.play().then(() => { paused.style.display = 'none'; })
       .catch(() => { video.muted = true; if (!state.ridesMuted && !video._origMuted) setRidesMuted(true); video.play().catch(() => { paused.style.display = 'flex'; }); });
   };
-  const pause = () => { wantPlay = false; video.pause(); songOff(); };
+  const pause = () => { wantPlay = false; video.pause(); songOff(); ytOff(); };
   let last = 0, tapTimer = null;
   const tapLayer = h('button', { 'aria-label': 'Pausar o reproducir. Doble toque para dar ajúa', style: 'position:absolute;inset:0;z-index:1;border:none;background:none;padding:0' });
   tapLayer.addEventListener('click', () => {
@@ -4249,6 +4262,8 @@ function rideCard(p, preload) {
         ? (songChipEl = h('button', { class: 'song-chip dark', type: 'button', 'aria-label': 'Canción: ' + (p.song_title || '') + '. Toca para quitar o poner el sonido', onclick: (e) => { e.stopPropagation(); setRidesMuted(!state.ridesMuted); } },
             p.song_art ? h('img', { src: p.song_art, alt: '' }) : h('span', { class: 'song-sp am', 'aria-hidden': 'true' }, '♫'),
             h('span', { class: 'song-eq', 'aria-hidden': 'true' }, h('i'), h('i'), h('i')), h('span', { class: 'song-t' }, p.song_title || 'Canción')))
+        : ytSong ? h('button', { class: 'song-chip dark playing', type: 'button', 'aria-label': 'Canción: ' + (p.song_title || '') + '. Toca para quitar o poner el sonido', onclick: (e) => { e.stopPropagation(); setRidesMuted(!state.ridesMuted); } },
+            h('img', { src: `https://i.ytimg.com/vi/${ytSong}/default.jpg`, alt: '' }), h('span', { class: 'song-eq', 'aria-hidden': 'true' }, h('i'), h('i'), h('i')), h('span', { class: 'song-t' }, p.song_title || 'Canción de YouTube'))
         : songChip(p.song_url, p.song_title, { dark: true, before: () => { try { video.pause(); } catch (_) {} } })),
       h('div', { style: 'display:flex;gap:8px;align-items:center' }, p.category && h('span', { class: 'tag' }, p.category), h('small', { style: 'color:rgba(255,255,255,.8)' }, timeAgo(p.created_at)))),
     h('div', { class: 'ride-side' },
@@ -4444,10 +4459,10 @@ function renderUpload() {
   paintCats();
 
   // Canción: buscar por nombre (catálogo de Apple Music, avance de 30 s) o pegar enlace de YouTube/Spotify
-  const songInput = h('input', { class: 'input', id: 'song', type: 'search', placeholder: 'Busca por canción o artista…', autocomplete: 'off', enterkeyhint: 'search' });
+  const songInput = h('input', { class: 'input', id: 'song', type: 'search', placeholder: YT_KEY ? 'Busca la canción en YouTube…' : 'Pega el enlace de YouTube…', autocomplete: 'off', enterkeyhint: 'search' });
   const songList = h('div', { class: 'song-list' });
   const songPick = h('div', { class: 'song-prev' });
-  const songHelp = h('small', { class: 'hint' }, 'Escribe el nombre y elige. También puedes pegar un enlace de YouTube o Spotify.');
+  const songHelp = h('small', { class: 'hint' }, YT_KEY ? 'Busca la canción en YouTube o pega su enlace.' : 'Pega el enlace de YouTube de la canción (en YouTube: Compartir › Copiar enlace).');
   let picked = null, songTimer, songSeq = 0;
   const showPick = () => {
     songPick.replaceChildren();
@@ -4506,32 +4521,18 @@ function renderUpload() {
     const q = songInput.value.trim(); const seq = ++songSeq;
     songList.replaceChildren();
     if (!q) return;
+    // Solo canciones de YouTube (se ven con su video en chiquito)
     const link = parseSong(q);
-    if (link) {
+    if (link && link.type === 'yt') {
       songList.append(h('small', { class: 'hint' }, 'Buscando el nombre…'));
       const t = await songTitle(link.url); if (seq !== songSeq) return;
-      picked = { url: link.url, title: t, preview: null, art: null }; songInput.value = ''; songList.replaceChildren(); showPick(); return;
+      const dur = YT_KEY ? await ytDuration(link.id) : 0;
+      picked = { url: link.url, title: t || 'Canción de YouTube', preview: null, art: null, start: 0, yt: link.id, dur }; songInput.value = ''; songList.replaceChildren(); showPick(); return;
     }
-    if (/^https?:/i.test(q)) { songList.append(h('small', { class: 'err', style: 'margin:0' }, 'Ese enlace no es de una canción de YouTube o Spotify.')); return; }
+    if (/^https?:/i.test(q)) { songList.append(h('small', { class: 'err', style: 'margin:0' }, 'Ese enlace no es de YouTube. Pega el enlace de la canción en YouTube.')); return; }
     if (q.length < 2) return;
-    songList.append(h('small', { class: 'hint' }, 'Buscando…'));
-    try {
-      const r = await fetch('https://itunes.apple.com/search?' + new URLSearchParams({ term: q, country: 'MX', media: 'music', entity: 'song', limit: '10' }));
-      const j = await r.json(); if (seq !== songSeq) return;
-      const items = (j.results || []).filter(x => x.previewUrl && x.trackViewUrl);
-      songList.replaceChildren();
-      if (!items.length) { songList.append(...[h('small', { class: 'hint' }, 'No encontramos esa canción. Prueba con el nombre del artista.'), ytButton(q)].filter(Boolean)); return; }
-      items.forEach(x => {
-        const title = (x.trackName + ' · ' + x.artistName).slice(0, 120);
-        const art = (x.artworkUrl100 || '').replace('100x100', '120x120');
-        const play = h('button', { type: 'button', class: 'song-play', 'aria-label': 'Escuchar ' + x.trackName, onclick: (e) => { e.stopPropagation(); playSong(x.previewUrl, play); } }, '▶');
-        songList.append(h('div', { class: 'song-row', role: 'button', tabindex: '0', onclick: () => {
-          picked = { url: x.trackViewUrl.split('&uo=')[0], title, preview: x.previewUrl, art, start: 0 };
-          stopSong(); songInput.value = ''; songList.replaceChildren(); showPick();
-        } }, h('img', { src: art, alt: '' }), h('div', { class: 'who' }, h('b', {}, x.trackName), h('small', {}, x.artistName)), play));
-      });
-      songList.append(...[h('small', { class: 'hint', style: 'display:block;margin-top:6px' }, 'Avances de 30 s de Apple Music.'), ytButton(q)].filter(Boolean));
-    } catch (_) { if (seq === songSeq) songList.replaceChildren(h('small', { class: 'err', style: 'margin:0' }, 'No se pudo buscar. Revisa tu conexión.')); }
+    if (YT_KEY) return searchYouTube(q);
+    songList.append(h('small', { class: 'hint' }, 'Para poner canción: abre YouTube, busca la canción, toca Compartir › Copiar enlace y pégalo aquí.'));
   };
   songInput.addEventListener('input', () => { clearTimeout(songTimer); songTimer = setTimeout(searchSongs, 450); });
   const songField = HAS_SONG ? h('div', { class: 'field' }, h('label', { for: 'song' }, '🎵 Canción (opcional)'), songInput, songHelp, songList, songPick) : null;
