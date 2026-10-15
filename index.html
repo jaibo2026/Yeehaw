@@ -1300,6 +1300,25 @@ main{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
 #splash b{font-family:'Rye','Work Sans',serif;font-size:34px;color:#172531;letter-spacing:.5px}
 #splash small{font-size:14px;color:#8a6a3c}
 #splash.out{opacity:0;pointer-events:none}
+/* Ajustes del inicio: tarjetas un poco más chicas, colores invertidos en Para ti / secciones, evento más legible */
+.stories .vc-create{height:180px!important;width:88px}
+.stories .vc-new{flex:0 0 86px!important;height:86px!important;max-height:86px!important;width:88px!important;gap:6px!important}
+.stories .vc-new b{font-size:12.5px!important;line-height:1.15;text-align:center;padding:0 4px}
+.stories .vc-ico{width:28px;height:28px}
+.stories .vc-ico i{font-size:20px!important}
+.stories .vc-new.ride .vc-ico svg{width:26px!important;height:26px!important}
+.stories .vc-card{width:100px!important;height:180px!important}
+.stories .vc-card .vc-name{font-size:12.5px!important}
+.fx-seg.feed-seg{background:linear-gradient(180deg,#2C4657,#172531)!important}
+.fx-seg.feed-seg button{color:#F1E4CC!important}
+.fx-seg.feed-seg button.on{background:#FFFDF8!important;color:#172531!important;box-shadow:0 2px 8px rgba(0,0,0,.25)!important}
+.feed-chips .chip{background:linear-gradient(180deg,#2C4657,#172531)!important;color:#F1E4CC!important;border-color:#2C4657!important}
+.feed-chips .chip.on{background:#FFFDF8!important;color:#172531!important;border:2px solid #C7843B!important}
+.fx-next{padding:11px 12px!important}
+.fx-next small{font-size:13.5px!important;font-weight:600}
+.fx-next b{font-size:16.5px!important}
+.fx-next-emo{font-size:30px!important}
+.fb-pill{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 </style>
 <div id="app"></div>
 <script>(function(){var t0=Date.now();function go(){var s=document.getElementById('splash');if(!s)return;setTimeout(function(){s.classList.add('out');setTimeout(function(){s.remove()},400)},Math.max(0,900-(Date.now()-t0)))}if(document.readyState==='complete')go();else window.addEventListener('load',go);setTimeout(go,4000)})();</script>
@@ -2210,7 +2229,7 @@ async function renderFeed() {
   $app.append(h('header', { class: 'topbar' }, h('div', { class: 'logo' }, 'Ranchfolk'), topActions()), main);
 
   const stories = h('div', { class: 'stories' });
-  const chips = h('div', { class: 'chips' }, ['Todo', ...CATEGORIES].map(c =>
+  const chips = h('div', { class: 'chips feed-chips' }, ['Todo', ...CATEGORIES].map(c =>
     h('button', { class: 'chip' + (state.category === c ? ' on' : ''), onclick: () => { state.category = c; render(); } }, c)));
   const list = h('div', {}, h('div', { class: 'spinner' }));
   const mode = HAS_FOLLOW && !isGuest() ? (state.feedMode || 'all') : 'all';
@@ -2220,7 +2239,7 @@ async function renderFeed() {
   const banned = state.me && state.me.banned_until && new Date(state.me.banned_until) > new Date();
   const think = isGuest() ? null : h('div', { class: 'fb-think' },
     h('button', { class: 'fb-av', 'aria-label': 'Tu perfil', onclick: () => go('profile', { profileId: state.me.id }) }, avatar(state.me, 42)),
-    h('button', { class: 'fb-pill', onclick: () => { state.uploadKind = 'post'; go('upload'); } }, '¿Qué estás pensando?'),
+    h('button', { class: 'fb-pill', onclick: () => { state.uploadKind = 'post'; go('upload'); } }, '¿Qué hay de nuevo?'),
     h('button', { class: 'fb-photo', 'aria-label': 'Subir foto o video', onclick: () => { state.uploadKind = 'post'; state.uploadPick = true; go('upload'); } }, '🖼️'));
   main.append(...[banned ? h('div', { class: 'ban-note' }, '⛔ Tu cuenta está suspendida' + (new Date(state.me.banned_until).getFullYear() > 2100 ? '' : ' hasta el ' + new Date(state.me.banned_until).toLocaleDateString('es-MX')) + ' por no seguir las reglas. Puedes ver la app, pero no publicar, comentar ni mandar mensajes.') : null, think, stories, feriaShowcase(), welcomeCard(), seg, chips, list].filter(Boolean));
 
