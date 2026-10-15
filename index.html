@@ -1319,6 +1319,7 @@ main{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
 .fx-next b{font-size:16.5px!important}
 .fx-next-emo{font-size:30px!important}
 .fb-pill{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.feed-mode-note{margin:0 14px 10px;padding:9px 14px;border-radius:12px;background:#F4EBDB;color:#172531;font-weight:700;font-size:14px}
 </style>
 <div id="app"></div>
 <script>(function(){var t0=Date.now();function go(){var s=document.getElementById('splash');if(!s)return;setTimeout(function(){s.classList.add('out');setTimeout(function(){s.remove()},400)},Math.max(0,900-(Date.now()-t0)))}if(document.readyState==='complete')go();else window.addEventListener('load',go);setTimeout(go,4000)})();</script>
@@ -1330,7 +1331,7 @@ const SUPABASE_KEY = 'sb_publishable_-GRf3to9PdSARsBT_PXAnw_K2Kqgwtp';
 const YT_KEY = '';
 // =====================================================================
 
-const CATEGORIES = ['Bailes', 'Outfits', 'Caballos', 'Jaripeo', 'Ganado', 'Comida'];
+const CATEGORIES = ['Bailes', 'Ropa vaquera', 'Caballos', 'Jaripeo', 'Ganado', 'Comida'];
 const MAX_VIDEO_MB = 300;   // antes de comprimir (después debe quedar en menos de 50 MB)
 const MAX_UP_MB = 50;
 const CONTACT = 'ranchfolk.app@gmail.com'; // correo de contacto para la página de reglas (vacío = se usa la página de Facebook)
@@ -2230,12 +2231,20 @@ async function renderFeed() {
 
   const stories = h('div', { class: 'stories' });
   const chips = h('div', { class: 'chips feed-chips' }, ['Todo', ...CATEGORIES].map(c =>
-    h('button', { class: 'chip' + (state.category === c ? ' on' : ''), onclick: () => { state.category = c; render(); } }, c)));
+    h('button', { class: 'chip' + (state.category === c ? ' on' : ''), onclick: () => { state.category = c; state.feedJump = true; render(); } }, c)));
   const list = h('div', {}, h('div', { class: 'spinner' }));
+  // Al cambiar entre Para ti / Siguiendo o de sección, la pantalla baja sola hasta las publicaciones
+  const jump = () => {
+    if (!state.feedJump) return; state.feedJump = false;
+    const anchor = seg || chips; if (!anchor) return;
+    const bar = document.querySelector('.topbar');
+    const go2 = () => window.scrollTo({ top: Math.max(0, anchor.getBoundingClientRect().top + window.scrollY - (bar ? bar.offsetHeight : 60) - 6), behavior: 'instant' });
+    requestAnimationFrame(go2); setTimeout(go2, 450); setTimeout(go2, 1200);   // otra vez por si arriba terminó de cargar algo
+  };
   const mode = HAS_FOLLOW && !isGuest() ? (state.feedMode || 'all') : 'all';
   const seg = HAS_FOLLOW && !isGuest() ? h('div', { class: 'fx-seg feed-seg' },
-    h('button', { class: mode === 'all' ? 'on' : '', onclick: () => { state.feedMode = 'all'; render(); } }, '🌎 Para ti'),
-    h('button', { class: mode === 'following' ? 'on' : '', onclick: () => { state.feedMode = 'following'; render(); } }, '🤠 Siguiendo')) : null;
+    h('button', { class: mode === 'all' ? 'on' : '', onclick: () => { state.feedMode = 'all'; state.feedJump = true; render(); } }, '🌎 Para ti'),
+    h('button', { class: mode === 'following' ? 'on' : '', onclick: () => { state.feedMode = 'following'; state.feedJump = true; render(); } }, '🤠 Siguiendo')) : null;
   const banned = state.me && state.me.banned_until && new Date(state.me.banned_until) > new Date();
   const think = isGuest() ? null : h('div', { class: 'fb-think' },
     h('button', { class: 'fb-av', 'aria-label': 'Tu perfil', onclick: () => go('profile', { profileId: state.me.id }) }, avatar(state.me, 42)),
@@ -2273,14 +2282,17 @@ async function renderFeed() {
       list.replaceChildren(h('div', { class: 'empty', style: 'padding-bottom:8px' }, h('b', { style: 'display:block;font-size:17px;color:var(--text);margin-bottom:6px' }, 'Todavía no sigues a nadie'),
         'Sigue a la gente del rancho para ver aquí lo que suben.'), suggestionsCard('🤠 Empieza siguiendo a estos') || '',
         h('div', { style: 'padding:6px 16px 24px;text-align:center' }, h('button', { class: 'btn wa-btn', onclick: inviteFriends }, '💬 Invitar a mis compas')));
+      jump();
       return;
     }
     const FEED_PAGE = 12;
     const q = mode === 'following' ? { category: state.category, userIds: [...state.following, state.me.id] } : { category: state.category };
     const posts = await fetchPosts({ ...q, limit: FEED_PAGE });
     list.replaceChildren();
+    if (mode === 'following') list.append(h('div', { class: 'feed-mode-note' }, '🤠 Lo de la gente que sigues' + (state.category !== 'Todo' ? ' · ' + state.category : '')));
     if (!posts.length && mode === 'following') {
       list.append(h('div', { class: 'empty' }, 'La gente que sigues no ha subido nada' + (state.category !== 'Todo' ? ' de ' + state.category : '') + ' todavía.'), suggestionsCard() || '');
+      jump();
       return;
     }
     if (!posts.length) {
@@ -2290,6 +2302,7 @@ async function renderFeed() {
         h('div', { style: 'margin-top:18px' }, h('button', { class: 'btn small', onclick: () => go('upload') }, 'Subir algo'))));
     }
     posts.forEach((p, i) => { list.append(postCard(p)); if (i === 2 && mode === 'all' && state.following.size < 15) { const sc = suggestionsCard(); if (sc) list.append(sc); } });
+    jump();
     // Scroll infinito: cuando vas llegando al final, se cargan más solitas
     if (posts.length >= FEED_PAGE) infiniteList(list, posts[posts.length - 1].created_at, async (before) => {
       const more = await fetchPosts({ ...q, limit: FEED_PAGE, before });
@@ -4426,7 +4439,7 @@ function renderUpload() {
   const catChips = h('div', { class: 'chips', style: 'padding:0 0 14px;flex-wrap:wrap' });
   const paintCats = () => {
     catChips.replaceChildren(...CATEGORIES.map(c => h('button', { type: 'button', class: 'chip' + (c === category ? ' on' : ''), onclick: () => { category = c; paintCats(); } }, c)));
-    shopBox.style.display = kind !== 'sundown' && category === 'Outfits' ? 'block' : 'none';
+    shopBox.style.display = kind !== 'sundown' && category === 'Ropa vaquera' ? 'block' : 'none';
   };
   paintCats();
 
@@ -4558,7 +4571,7 @@ function renderUpload() {
     picker.style.aspectRatio = kind === 'post' ? '4/5' : '9/16';
     picker.style.maxHeight = kind === 'post' ? '' : '62vh';
     catField.style.display = kind === 'sundown' ? 'none' : 'block';
-    shopBox.style.display = kind !== 'sundown' && category === 'Outfits' ? 'block' : 'none';
+    shopBox.style.display = kind !== 'sundown' && category === 'Ropa vaquera' ? 'block' : 'none';
     caption.placeholder = kind === 'sundown' ? 'Escribe algo (opcional)' : kind === 'ride' ? 'Describe tu ride…' : '¿Qué está pasando en el rancho?';
     btn.textContent = kind === 'ride' ? 'Publicar ride' : kind === 'sundown' ? 'Publicar vivencia' : 'Publicar';
   };
@@ -4593,7 +4606,7 @@ function renderUpload() {
       const { path, isVideo } = res;
       const pub = { publicUrl: res.url };
       const fd = new FormData(form);
-      const shop_links = kind !== 'sundown' && category === 'Outfits' ? [0, 1, 2].map(i => ({ name: String(fd.get('shop_name_' + i) || '').trim(), url: String(fd.get('shop_url_' + i) || '').trim() })).filter(l => safeUrl(l.url)) : [];
+      const shop_links = kind !== 'sundown' && category === 'Ropa vaquera' ? [0, 1, 2].map(i => ({ name: String(fd.get('shop_name_' + i) || '').trim(), url: String(fd.get('shop_url_' + i) || '').trim() })).filter(l => safeUrl(l.url)) : [];
       const row = { user_id: state.me.id, media_url: pub.publicUrl, media_type: isVideo ? 'video' : 'image', caption: caption.value.trim() || null, category: kind === 'sundown' ? null : category, shop_links };
       if (kind !== 'post') row.kind = kind;
       if (animalId) row.animal_id = animalId;
