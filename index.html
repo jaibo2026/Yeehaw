@@ -187,6 +187,7 @@ main{flex:1;padding-bottom:calc(104px + env(safe-area-inset-bottom))}
 .fb-think{display:flex;align-items:center;gap:10px;padding:10px 14px 8px}
 .fb-av{border:none;background:none;padding:0;line-height:0}
 .fb-pill{flex:1;height:42px;border-radius:21px;border:1px solid #D9CBB0;background:#FFFDF8;color:#4D6473;font-size:15px;text-align:left;padding:0 16px}
+.gal-ico{flex-shrink:0;pointer-events:none}
 .fb-photo{border:none;background:none;font-size:26px;padding:4px}
 
 .composer{bottom:var(--kb,0px)!important}
@@ -1383,6 +1384,8 @@ const ICONS = {
 };
 
 // ---------- utilidades ----------
+// Ícono dorado de galería
+const galIco = (px) => h('img', { src: 'icon-galeria.svg', alt: '', class: 'gal-ico', width: px, height: px, style: 'width:' + px + 'px;height:' + px + 'px;display:inline-block;vertical-align:middle' });
 function h(tag, attrs, ...kids) {
   const el = document.createElement(tag);
   for (const [k, v] of Object.entries(attrs || {})) {
@@ -2274,7 +2277,7 @@ async function renderFeed() {
   const think = isGuest() ? null : h('div', { class: 'fb-think' },
     h('button', { class: 'fb-av', 'aria-label': 'Tu perfil', onclick: () => go('profile', { profileId: state.me.id }) }, avatar(state.me, 42)),
     h('button', { class: 'fb-pill', onclick: () => { state.uploadKind = 'post'; go('upload'); } }, '¿Qué hay de nuevo?'),
-    h('button', { class: 'fb-photo', 'aria-label': 'Subir foto o video', onclick: () => { state.uploadKind = 'post'; state.uploadPick = true; go('upload'); } }, '🖼️'));
+    h('button', { class: 'fb-photo', 'aria-label': 'Subir foto o video', onclick: () => { state.uploadKind = 'post'; state.uploadPick = true; go('upload'); } }, galIco(30)));
   main.append(...[banned ? h('div', { class: 'ban-note' }, '⛔ Tu cuenta está suspendida' + (new Date(state.me.banned_until).getFullYear() > 2100 ? '' : ' hasta el ' + new Date(state.me.banned_until).toLocaleDateString('es-MX')) + ' por no seguir las reglas. Puedes ver la app, pero no publicar, comentar ni mandar mensajes.') : null, think, stories, feriaShowcase(), welcomeCard(), seg, chips, list].filter(Boolean));
 
   // Sundowns: lo que subieron en las últimas 24 horas
@@ -3790,7 +3793,7 @@ function openRideCreator(onDone) {
     timeLab,
     h('div', { class: 'rc-bottom' }, durs,
       h('div', { class: 'rc-row3' },
-        h('button', { class: 'rc-gal', type: 'button', onclick: () => gallery.click() }, h('span', {}, '🖼️'), h('small', {}, 'Subir')),
+        h('button', { class: 'rc-gal', type: 'button', onclick: () => gallery.click() }, galIco(34), h('small', {}, 'Subir')),
         recBtn,
         h('span', { style: 'width:56px' }))),
     gallery);
@@ -3832,7 +3835,7 @@ function openRideCreator(onDone) {
     msg.hidden = false;
     msg.replaceChildren(h('p', {}, t), perm ? h('button', { class: 'btn small', type: 'button', onclick: () => { close(); permHelp('camera', () => openRideCreator(onDone)); } }, 'Cómo dar permiso') : '',
       h('button', { class: 'btn small ghost', type: 'button', style: 'margin-top:8px', onclick: () => startCam() }, '🔄 Probar otra vez'),
-      h('button', { class: 'btn small ghost', type: 'button', style: 'margin-top:8px', onclick: () => gallery.click() }, '🖼️ Subir de la galería'));
+      h('button', { class: 'btn small ghost', type: 'button', style: 'margin-top:8px', onclick: () => gallery.click() }, galIco(20), ' Subir de la galería'));
   }
   gallery.addEventListener('change', () => {
     const f = gallery.files[0]; if (!f) return;
@@ -4858,7 +4861,7 @@ async function renderProfile() {
   const composer = isMe ? h('div', { class: 'pf-compose' },
     h('div', { class: 'pf-compose-row' }, avatar(prof, 40),
       h('button', { class: 'pf-think', onclick: () => { state.uploadKind = 'post'; go('upload'); } }, '¿Qué está pasando en el rancho?'),
-      h('button', { class: 'pf-think-ph', 'aria-label': 'Subir foto', onclick: () => { state.uploadKind = 'post'; go('upload'); } }, '🖼️')),
+      h('button', { class: 'pf-think-ph', 'aria-label': 'Subir foto', onclick: () => { state.uploadKind = 'post'; go('upload'); } }, galIco(28))),
     h('div', { class: 'pf-compose-acts' },
       h('button', { onclick: () => { openRideCreator(); } }, h('span', { icon: 'horseshoe' }), 'Ride'),
       h('button', { onclick: () => openSundownCreator(() => render()) }, '🌅 Vivencia'),
@@ -5701,7 +5704,7 @@ function eventForm(ev) {
   const desc = h('textarea', { class: 'input', maxlength: '1000', placeholder: 'Quién toca, toros, precio de la entrada, horarios…' }); desc.value = (ev && ev.description) || '';
   const prev = h('div', { class: 'fx-ph-grid' });
   const picker = h('input', { type: 'file', accept: 'image/*', hidden: true });
-  const paintP = () => prev.replaceChildren(photo || (ev && ev.photo_url) ? h('div', { class: 'fx-ph', style: 'width:100%;aspect-ratio:16/9' }, h('img', { src: photo ? photo._url : ev.photo_url, alt: '' })) : h('button', { type: 'button', class: 'fx-ph add', style: 'width:100%;aspect-ratio:16/9', onclick: () => picker.click() }, h('span', {}, '🖼️'), h('small', {}, 'Póster o foto (opcional)')));
+  const paintP = () => prev.replaceChildren(photo || (ev && ev.photo_url) ? h('div', { class: 'fx-ph', style: 'width:100%;aspect-ratio:16/9' }, h('img', { src: photo ? photo._url : ev.photo_url, alt: '' })) : h('button', { type: 'button', class: 'fx-ph add', style: 'width:100%;aspect-ratio:16/9', onclick: () => picker.click() }, galIco(32), h('small', {}, 'Póster o foto (opcional)')));
   picker.addEventListener('change', () => { photo = picker.files[0] || null; if (photo) photo._url = URL.createObjectURL(photo); paintP(); });
   paintP();
   const err = h('p', { class: 'err', role: 'alert' });
@@ -6610,7 +6613,7 @@ async function renderChat() {
   const gallery = h('input', { type: 'file', accept: 'image/*,video/*', multiple: true, hidden: true });
   const camera = h('input', { type: 'file', accept: 'image/*,video/*', capture: 'environment', hidden: true });
   const camBtn = h('button', { class: 'mc-ico', type: 'button', 'aria-label': 'Cámara', icon: 'camera', onclick: () => camera.click() });
-  const galBtn = h('button', { class: 'mc-ico', type: 'button', 'aria-label': 'Fotos y videos', onclick: () => gallery.click() }, '🖼️');
+  const galBtn = h('button', { class: 'mc-ico', type: 'button', 'aria-label': 'Fotos y videos', onclick: () => gallery.click() }, galIco(28));
   const mic = h('button', { class: 'send mic', type: 'button', 'aria-label': 'Mantén presionado para grabar una nota de voz', icon: 'mic' });
   const more = h('button', { class: 'mc-more', type: 'button', 'aria-label': 'Más opciones', hidden: true, onclick: () => { form.classList.remove('typing'); } }, '›');
   const emo = emojiButton(input);
