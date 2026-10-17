@@ -191,6 +191,35 @@ main{flex:1;padding-bottom:calc(104px + env(safe-area-inset-bottom))}
 .auth-organic{margin:-6px auto 18px;max-width:320px;text-align:center;font-size:14px;font-weight:600;opacity:.85}
 .wl-organic{margin:4px auto 18px;max-width:360px;text-align:left;background:#FFF6E4;border:1px solid #E8CFA0;border-radius:14px;padding:12px 14px;color:#172531}
 .wl-organic b{display:block;font-size:16px;margin-bottom:4px}.wl-organic p{margin:4px 0 0;font-size:14px;line-height:1.4}
+.gbadge{display:inline-flex;align-items:center;justify-content:center;margin-left:.25em;font-size:.8em;line-height:1;vertical-align:.05em}
+.gbadge.big{display:inline-flex;margin:4px auto 6px;padding:5px 12px;border-radius:999px;background:#E9F6EC;border:1px solid #9BD3A8;color:#17602B;font-size:13px;font-weight:800}
+.fx-gan{position:absolute;right:6px;top:6px;background:rgba(23,96,43,.92);color:#fff;font-size:11px;font-weight:800;padding:3px 7px;border-radius:999px}
+.fx-live{background:rgba(198,40,40,.92)!important}
+.fx-ph-live{position:absolute;left:4px;bottom:4px;background:#C62828;color:#fff;font-size:10px;font-weight:800;padding:2px 6px;border-radius:999px}
+.fx-live-note{display:flex;flex-direction:column;gap:2px;width:100%;text-align:left;margin:10px 0 2px;padding:10px 12px;border-radius:12px;border:1px solid #F1B9B9;background:#FFF1F1;color:#5A1A1A;font:inherit}
+.fx-live-note b{font-size:14px}.fx-live-note span{font-size:13px;line-height:1.35}
+.fx-livebox{margin:0 0 14px;padding:12px;border-radius:12px;background:#FFF6E4;border:1px dashed #C7843B}
+.fx-livebox b{display:block;font-size:15px;margin-bottom:4px}.fx-livebox small{display:block;font-size:13px;line-height:1.4;color:var(--muted)}
+.fx-live-ok{font-weight:700;color:#17602B}
+.fx-hist{display:flex;flex-direction:column;gap:6px;margin:10px 0 14px;padding:12px;border-radius:12px;background:#FBF7EF;border:1px solid #E8DCC4}
+.fx-hist:empty{display:none}
+.fx-hist-i{display:flex;gap:8px;align-items:flex-start;font-size:14px;line-height:1.35}
+.fx-hist-i.ok{color:#17602B;font-weight:700}.fx-hist-i.warn{color:#9A5B00;font-weight:700}
+.msg-scam{align-self:center;max-width:92%;margin:8px auto;padding:10px 12px;border-radius:12px;background:#FFF4E0;border:1px solid #F0C27A;color:#5A3A00;font-size:13px;line-height:1.4;display:flex;flex-direction:column;gap:4px;text-align:left}
+.msg-scam b{font-size:14px}.msg-scam .linkbtn{align-self:flex-start;text-decoration:underline;font-size:13px;color:#B23A1E;padding:0}
+.lv-cam{background:#000}
+.lv-stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.lv-canvas{max-width:100%;max-height:100%;object-fit:contain}
+.lv-hint{flex:1;margin:0 10px;color:#fff;font-weight:800;font-size:14px;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.lv-hint small{display:block;font-weight:500;font-size:12px;opacity:.9}
+.gv-intro{text-align:center;margin-bottom:12px}.gv-intro p{font-size:14px;line-height:1.45;color:var(--muted);margin:8px 0 0}
+.gv-badge{display:inline-block;padding:6px 14px;border-radius:999px;background:#E9F6EC;border:1px solid #9BD3A8;color:#17602B;font-weight:800}
+.gv-status{margin:0 0 14px;padding:10px 12px;border-radius:12px;font-size:14px;font-weight:600;line-height:1.4}
+.gv-status.ok{background:#E9F6EC;color:#17602B}.gv-status.wait{background:#FFF6E4;color:#7A4B00}.gv-status.no{background:#FDECEC;color:#8B1E1E}
+.gv-doc{display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:12px;font-weight:700;color:#172531}
+.adm-gv{background:#fff;border:1px solid #E8DCC4;border-radius:14px;padding:12px;margin-bottom:12px}
+.adm-gv-docs{display:flex;gap:8px;overflow-x:auto;margin:8px 0}.adm-gv-docs img{width:120px;height:120px;object-fit:cover;border-radius:10px;border:1px solid #ddd;flex-shrink:0}
+.adm-gv dl{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;margin:8px 0;font-size:14px}.adm-gv dt{color:var(--muted)}.adm-gv dd{margin:0;font-weight:700}
 .gal-ico{flex-shrink:0;pointer-events:none}
 .fb-photo{border:none;background:none;font-size:26px;padding:4px}
 
@@ -4744,6 +4773,247 @@ function rateSeller(seller, prev, onSaved) {
     h('p', { class: 'hint', style: 'margin-top:10px' }, 'Tu calificación y tu nombre se ven en su perfil. Sé honesto y respetuoso.')));
   paintS();
 }
+// ---------- Confianza en La Feria: historial del vendedor, video en vivo, tratos y Ganadero verificado ----------
+let HAS_TRUST = true;
+let GANADEROS = new Set();
+try { GANADEROS = new Set(JSON.parse(localStorage.getItem('rf_ganaderos') || '[]')); } catch (_) {}
+async function loadGanaderos() {
+  const { data, error } = await sb.from('profiles').select('id').eq('ganadero', true).limit(1000);
+  if (error) { if (/ganadero/i.test(error.message || '')) HAS_TRUST = false; return; }
+  const before = [...GANADEROS].sort().join();
+  GANADEROS = new Set((data || []).map(x => x.id));
+  try { localStorage.setItem('rf_ganaderos', JSON.stringify([...GANADEROS])); } catch (_) {}
+  if (before !== [...GANADEROS].sort().join() && typeof started !== 'undefined' && started && state.me && ['feria', 'profile'].includes(state.view)) { try { render(); } catch (_) {} }
+}
+setTimeout(loadGanaderos, 0);
+// 🐄 insignia de Ganadero verificado (chica junto al nombre, o grande con texto)
+const gb = (id, big) => GANADEROS.has(id) ? h('span', { class: big ? 'gbadge big' : 'gbadge', title: 'Ganadero verificado: Ranchfolk revisó sus papeles de productor', 'aria-label': 'Ganadero verificado' }, big ? '🐄 Ganadero verificado' : '🐄') : null;
+
+// Historial del vendedor: desde cuándo está, cuánto ha vendido y tratos confirmados por compradores
+function sellerHistory(uid) {
+  const box = h('div', { class: 'fx-hist' });
+  if (!HAS_TRUST) return box;
+  sb.rpc('seller_stats', { uid }).then(({ data, error }) => {
+    if (error || !data) { if (error && /seller_stats|function/i.test(error.message || '')) HAS_TRUST = false; box.remove(); return; }
+    const since = data.since ? new Date(data.since) : null;
+    const nuevo = since && Date.now() - since < 30 * 864e5;
+    const item = (emo, txt, cls) => h('div', { class: 'fx-hist-i' + (cls ? ' ' + cls : '') }, h('span', {}, emo), h('span', {}, txt));
+    box.replaceChildren(...[
+      data.ganadero ? item('🐄', 'Ganadero verificado: Ranchfolk revisó sus papeles de productor', 'ok') : null,
+      nuevo ? item('🆕', 'Cuenta nueva: tiene menos de un mes en Ranchfolk', 'warn')
+        : since ? item('🗓️', 'En Ranchfolk desde ' + MESES[since.getMonth()] + ' de ' + since.getFullYear()) : null,
+      item('🛒', data.listings === 1 ? '1 anuncio publicado' : data.listings + ' anuncios publicados'),
+      data.sold ? item('✅', data.sold === 1 ? '1 vendido' : data.sold + ' vendidos') : null,
+      item('🤝', data.deals_ok ? (data.deals_ok === 1 ? '1 trato confirmado por el comprador' : data.deals_ok + ' tratos confirmados por compradores') : 'Ningún trato confirmado todavía', data.deals_ok ? 'ok' : '')].filter(Boolean));
+  }, () => box.remove());
+  return box;
+}
+
+// Video en vivo: se graba con la cámara de Ranchfolk y lleva marcados la fecha, la hora y el usuario
+function recordLiveVideo(maxSec = 60) {
+  return new Promise((resolve) => {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder) { toast('Tu teléfono no deja grabar aquí. Prueba en Chrome.'); return resolve(null); }
+    let stream = null, rec = null, chunks = [], raf = 0, t0 = 0, facing = 'environment', finished = false;
+    const cam = h('video', { muted: true, playsInline: true, autoplay: true }); cam.muted = true;
+    const canvas = h('canvas', { class: 'lv-canvas' });
+    const ctx = canvas.getContext('2d');
+    const timeLab = h('div', { class: 'rc-time', hidden: true }, '0:00');
+    const msg = h('div', { class: 'rc-msg', hidden: true });
+    const ring = h('div', { class: 'rc-ring' }, h('span'));
+    const recBtn = h('button', { class: 'rc-rec', type: 'button', 'aria-label': 'Grabar' }, ring);
+    const flipBtn = h('button', { class: 'sdc-tool', type: 'button', 'aria-label': 'Voltear', onclick: () => { if (!rec) { facing = facing === 'user' ? 'environment' : 'user'; startCam(); } } }, h('span', {}, '🔄'), h('small', {}, 'Voltear'));
+    const stampTxt = () => 'Ranchfolk · @' + (state.me.username || '') + ' · ' + new Date().toLocaleString('es-MX', { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+    const root = h('div', { class: 'sdc rc-cam lv-cam', role: 'dialog', 'aria-label': 'Grabar video en vivo' },
+      h('div', { class: 'lv-stage' }, canvas), msg,
+      h('div', { class: 'sdc-top' },
+        h('button', { class: 'sdc-x', type: 'button', 'aria-label': 'Cerrar', onclick: () => end(null) }, '✕'),
+        h('div', { class: 'lv-hint' }, '🎥 Video en vivo · máx. ' + maxSec + ' s', h('small', {}, 'Graba al animal caminando. Se marcan la fecha y tu usuario.')),
+        h('div', { class: 'sdc-tools' }, flipBtn)),
+      timeLab,
+      h('div', { class: 'rc-bottom' }, h('div', { class: 'rc-row3' }, h('span', { style: 'width:56px' }), recBtn, h('span', { style: 'width:56px' }))));
+    document.body.append(root);
+    const draw = () => {
+      if (cam.videoWidth) {
+        const scale = Math.min(1, 720 / Math.max(cam.videoWidth, cam.videoHeight));
+        const w = Math.round(cam.videoWidth * scale / 2) * 2, hh = Math.round(cam.videoHeight * scale / 2) * 2;
+        if (canvas.width !== w || canvas.height !== hh) { canvas.width = w; canvas.height = hh; }
+        if (facing === 'user') { ctx.save(); ctx.translate(w, 0); ctx.scale(-1, 1); ctx.drawImage(cam, 0, 0, w, hh); ctx.restore(); } else ctx.drawImage(cam, 0, 0, w, hh);
+        const fs = Math.max(14, Math.round(w / 30)), txt = stampTxt();
+        ctx.font = `700 ${fs}px Inter, Arial, sans-serif`;
+        const tw = ctx.measureText(txt).width, pad = fs * 0.5;
+        ctx.fillStyle = 'rgba(0,0,0,.55)'; ctx.fillRect(pad, hh - fs * 2.1, tw + pad * 2, fs * 1.6);
+        ctx.fillStyle = '#fff'; ctx.fillText(txt, pad * 2, hh - fs * 0.95);
+        if (rec) { ctx.fillStyle = '#E53935'; ctx.beginPath(); ctx.arc(w - fs * 1.4, fs * 1.4, fs * 0.45, 0, 7); ctx.fill(); }
+      }
+      if (rec) { const s = Math.floor((Date.now() - t0) / 1000); timeLab.textContent = Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); ring.style.setProperty('--p', Math.min(1, (Date.now() - t0) / (maxSec * 1000))); if (s >= maxSec) stop(); }
+      raf = requestAnimationFrame(draw);
+    };
+    const stopTracks = () => { if (stream) stream.getTracks().forEach(t => t.stop()); stream = null; };
+    async function startCam() {
+      stopTracks(); msg.hidden = true;
+      const v = { facingMode: facing, width: { ideal: 1280 }, height: { ideal: 720 } };
+      try { stream = await navigator.mediaDevices.getUserMedia({ video: v, audio: true }); }
+      catch (e) {
+        try { stream = await navigator.mediaDevices.getUserMedia({ video: v, audio: false }); toast('Sin micrófono: el video se grabará sin sonido'); }
+        catch (e2) { msg.hidden = false; msg.replaceChildren(h('p', {}, 'No se pudo abrir la cámara. Revisa que Ranchfolk tenga permiso de usarla.'), h('button', { class: 'btn small', type: 'button', onclick: () => permHelp('camera', startCam) }, 'Cómo dar permiso')); return; }
+      }
+      cam.srcObject = stream; try { await cam.play(); } catch (_) {}
+    }
+    function start() {
+      if (!stream || !canvas.width) return toast('Espera a que abra la cámara');
+      const out = canvas.captureStream(30);
+      stream.getAudioTracks().forEach(t => out.addTrack(t));
+      const withMic = stream.getAudioTracks().length > 0;
+      const mime = (withMic ? ['video/mp4;codecs=avc1.42E01E,mp4a.40.2', 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'] : ['video/mp4;codecs=avc1.42E01E', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm']).find(t => { try { return MediaRecorder.isTypeSupported(t); } catch (_) { return false; } });
+      try { rec = new MediaRecorder(out, mime ? { mimeType: mime, videoBitsPerSecond: 2500000 } : undefined); } catch (_) { rec = null; return toast('Tu teléfono no puede grabar aquí'); }
+      chunks = []; rec.ondataavailable = (e) => { if (e.data && e.data.size) chunks.push(e.data); };
+      rec.onstop = () => {
+        const type = (rec && rec.mimeType) || mime || 'video/webm';
+        const blob = new Blob(chunks, { type: type.split(';')[0] });
+        rec = null;
+        if (Date.now() - t0 < 2000 || !blob.size) { toast('Graba al menos 2 segundos'); root.classList.remove('recording'); timeLab.hidden = true; return; }
+        const ext = /mp4/.test(type) ? 'mp4' : 'webm';
+        end(new File([blob], 'en-vivo-' + Date.now() + '.' + ext, { type: blob.type }));
+      };
+      t0 = Date.now(); rec.start(1000); root.classList.add('recording'); timeLab.hidden = false; flipBtn.disabled = true;
+      try { navigator.vibrate && navigator.vibrate(20); } catch (_) {}
+    }
+    function stop() { if (rec && rec.state === 'recording') rec.stop(); }
+    recBtn.addEventListener('click', () => rec ? stop() : start());
+    function end(file) {
+      if (finished) return; finished = true;
+      cancelAnimationFrame(raf); try { if (rec && rec.state === 'recording') { rec.onstop = null; rec.stop(); } } catch (_) {}
+      stopTracks(); root.remove(); resolve(file);
+    }
+    root._close = () => end(null);
+    startCam(); raf = requestAnimationFrame(draw);
+  });
+}
+const liveDate = (d) => { const x = new Date(d); return x.getDate() + ' de ' + MESES[x.getMonth()] + ' de ' + x.getFullYear(); };
+
+// Tratos: al marcar "vendido", el vendedor dice a quién le vendió; el comprador lo confirma y lo califica
+async function askBuyer(l) {
+  if (!HAS_TRUST) return;
+  const { data: msgs } = await sb.from('messages').select('sender_id').ilike('body', `%#l=${l.id}%`).neq('sender_id', state.me.id).limit(50);
+  const ids = [...new Set((msgs || []).map(m => m.sender_id))].filter(id => id !== state.me.id && !(state.blocked && state.blocked.has(id)));
+  if (!ids.length) return;
+  const { data: found } = await sb.from('profiles').select(PROF_MINI).in('id', ids);
+  const people = (found || []).filter(p => ids.includes(p.id));
+  if (!people.length) return;
+  const close = openSheet('¿A quién se lo vendiste?', h('div', { class: 'sheet-body menu' },
+    h('p', { style: 'margin:0 0 10px;color:var(--muted);font-size:14px' }, 'Le pediremos que confirme el trato. Cada trato confirmado aparece en tu historial y da confianza a otros compradores.'),
+    ...people.map(p => h('button', { class: 'mn-row', type: 'button', onclick: async () => {
+      close();
+      const { error } = await sb.rpc('deal_create', { lid: l.id, buyer: p.id });
+      if (error) return toast(/platicaste/i.test(error.message || '') ? 'Solo con alguien con quien ya platicaste' : 'No se pudo guardar el trato');
+      try {
+        const { data: cid } = await sb.rpc('open_conversation', { other: p.id });
+        if (cid) await sb.from('messages').insert({ conversation_id: cid, sender_id: state.me.id, body: `🤝 Marqué “${l.title}” como vendido a ti. Ranchfolk te va a preguntar si se hizo el trato para que me califiques. ¡Gracias!` });
+      } catch (_) {}
+      toast('Listo. Le pediremos a @' + (p.username || '') + ' que confirme 🤝');
+    } }, avatar(p, 40), h('div', {}, h('b', {}, p.full_name || p.username || ''), h('small', {}, '@' + (p.username || ''))))),
+    h('button', { class: 'mn-row', type: 'button', onclick: () => close() }, h('span', { class: 'mn-emo sm' }, '🤷'), h('div', {}, h('b', {}, 'Fue alguien de fuera de Ranchfolk'), h('small', {}, 'O prefiero no decir')))));
+}
+async function checkDeals() {
+  if (!HAS_TRUST || isGuest() || !state.me) return;
+  let asked = []; try { asked = JSON.parse(sessionStorage.getItem('rf_deals_asked') || '[]'); } catch (_) {}
+  const { data, error } = await sb.from('deals').select('id,listing_id,listing_title,seller_id,created_at').eq('buyer_id', state.me.id).is('buyer_answer', null).order('created_at', { ascending: false }).limit(5);
+  if (error) { if (/deals|relation|schema/i.test(error.message || '')) HAS_TRUST = false; return; }
+  const d = (data || []).find(x => !asked.includes(x.id));
+  if (!d || document.querySelector('.sheet-bg') || ['welcome', 'upload', 'chat'].includes(state.view)) return;
+  asked.push(d.id); try { sessionStorage.setItem('rf_deals_asked', JSON.stringify(asked)); } catch (_) {}
+  const { data: seller } = await sb.from('profiles').select(PROF_MINI).eq('id', d.seller_id).maybeSingle();
+  if (!seller) return;
+  const answer = async (ok) => {
+    close();
+    const { error: e2 } = await sb.rpc('deal_answer', { did: d.id, ok });
+    if (e2) return toast('No se pudo guardar');
+    if (ok) { toast('¡Gracias! Ahora califícalo ⭐'); setTimeout(() => rateSeller(seller, null, () => {}), 350); }
+    else toast('Gracias por avisar. Si algo salió mal, puedes reportarlo.');
+  };
+  const close = openSheet('🤝 ¿Se hizo el trato?', h('div', { class: 'sheet-body', style: 'text-align:center' },
+    avatar(seller, 64),
+    h('p', { style: 'margin:10px 0 4px' }, h('b', {}, '@' + (seller.username || '')), ' dice que te vendió:'),
+    h('p', { style: 'margin:0 0 16px;font-weight:800;font-size:18px' }, '“' + d.listing_title + '”'),
+    h('button', { class: 'btn fx-gold', type: 'button', onclick: () => answer(true) }, '✅ Sí, se hizo el trato'),
+    h('button', { class: 'btn ghost', type: 'button', style: 'margin-top:8px', onclick: () => answer(false) }, 'No, no le compré'),
+    h('button', { class: 'linkbtn', type: 'button', style: 'margin-top:10px;font-size:14px', onclick: () => close() }, 'Preguntarme después'),
+    h('p', { class: 'hint', style: 'margin-top:10px' }, 'Tu respuesta ayuda a que otros sepan con quién es seguro tratar.')));
+}
+
+// Avisos contra estafas en el chat
+const SCAM_RE = /\b(anticipo|anticipos|dep[oó]sit[oa]?|depositar|depos[ií]tame|transfer(encia|ir|[ií]me)|spei|clabe|oxxo|western ?union|elektra|coppel|apartar(lo|la)? con|para apartar|env[ií]o pagado|pago por adelantado|adelanto)\b/i;
+function scamWarnEl(fromOther, onReport) {
+  return h('div', { class: 'msg-scam', role: 'note' },
+    h('b', {}, '⚠️ Ojo con los anticipos'),
+    h('span', {}, 'Nunca deposites ni transfieras antes de ver el animal o el producto en persona. Si te apuran o te piden "apartarlo" con dinero, puede ser estafa.'),
+    fromOther ? h('button', { type: 'button', class: 'linkbtn', onclick: onReport }, '🚩 Reportar a esta persona') : null);
+}
+
+// Solicitud de Ganadero verificado
+async function openRancherVerify() {
+  if (needLogin('Crea tu cuenta para verificarte')) return;
+  const body = h('div', { class: 'sheet-body gv' }, h('div', { class: 'spinner' }));
+  const close = openSheet('🐄 Ganadero verificado', body);
+  const { data: req, error } = await sb.from('rancher_requests').select('*').eq('user_id', state.me.id).maybeSingle();
+  if (error && /rancher_requests|relation|schema/i.test(error.message || '')) return body.replaceChildren(h('div', { class: 'empty' }, 'Esta función se está activando. Vuelve en un ratito.'));
+  const approved = GANADEROS.has(state.me.id) || (req && req.status === 'aprobado');
+  const intro = h('div', { class: 'gv-intro' },
+    h('div', { class: 'gv-badge' }, '🐄 Ganadero verificado'),
+    h('p', {}, 'Es la insignia para productores reales. Aparece en tus anuncios de La Feria y en tu perfil, para que los compradores sepan que Ranchfolk revisó tus papeles.'));
+  if (approved) return body.replaceChildren(intro, h('div', { class: 'gv-status ok' }, '✅ ¡Ya eres Ganadero verificado! Tu insignia aparece en tu perfil y en tus anuncios.'));
+  const field = (label, inp, hint) => h('div', { class: 'field' }, h('label', {}, label), inp, hint ? h('small', { class: 'hint' }, hint) : null);
+  const upp = h('input', { class: 'input', maxlength: '40', placeholder: 'ej. 11-020-0123-456', value: (req && req.upp) || '' });
+  const sin = h('input', { class: 'input', maxlength: '60', placeholder: 'Opcional', value: (req && req.siniiga) || '' });
+  const aso = h('input', { class: 'input', maxlength: '120', placeholder: 'ej. Asociación Ganadera Local de León', value: (req && req.asociacion) || '' });
+  const mun = h('input', { class: 'input', maxlength: '80', placeholder: 'ej. León, Guanajuato', value: (req && req.municipio) || [state.me.ubicacion, state.me.estado].filter(Boolean).join(', ') });
+  const kept = [...((req && req.docs) || [])];
+  const files = [];
+  const docsBox = h('div', { class: 'fx-ph-grid' });
+  const picker = h('input', { type: 'file', accept: 'image/*', multiple: true, hidden: true });
+  const paintDocs = () => {
+    const tiles = [...kept.map((p, i) => ({ label: '📄 Papel ' + (i + 1), rm: () => { kept.splice(i, 1); paintDocs(); } })), ...files.map((f, i) => ({ src: f._url, rm: () => { files.splice(i, 1); paintDocs(); } }))];
+    docsBox.replaceChildren(...tiles.map(t => h('div', { class: 'fx-ph' }, t.src ? h('img', { src: t.src, alt: '' }) : h('div', { class: 'gv-doc' }, t.label), h('button', { type: 'button', 'aria-label': 'Quitar', onclick: t.rm }, '✕'))),
+      tiles.length < 4 ? h('button', { type: 'button', class: 'fx-ph add', onclick: () => picker.click() }, h('span', {}, '📄'), h('small', {}, 'Foto del papel')) : null);
+  };
+  picker.addEventListener('change', () => { [...picker.files].forEach(f => { if (kept.length + files.length < 4 && (f.type || '').startsWith('image/')) { f._url = URL.createObjectURL(f); files.push(f); } }); picker.value = ''; paintDocs(); });
+  paintDocs();
+  const err = h('p', { class: 'err', role: 'alert' });
+  const save = h('button', { class: 'btn fx-gold', type: 'button' }, req ? 'Mandar otra vez' : 'Mandar solicitud');
+  save.addEventListener('click', async () => {
+    err.textContent = '';
+    if (!upp.value.trim() && !aso.value.trim()) return (err.textContent = 'Pon tu clave UPP/PSG o el nombre de tu Asociación Ganadera.');
+    if (!kept.length && !files.length) return (err.textContent = 'Sube al menos una foto de tus papeles.');
+    save.disabled = true; save.textContent = 'Subiendo…';
+    try {
+      const paths = [...kept];
+      for (const f of files) {
+        const blob = await compressImage(f, 1600);
+        const path = `${state.me.id}/${Date.now()}-${Math.random().toString(36).slice(2, 7)}.jpg`;
+        const up = await sb.storage.from('verif').upload(path, blob, { contentType: 'image/jpeg' });
+        if (up.error) throw up.error;
+        paths.push(path);
+      }
+      const row = { user_id: state.me.id, upp: upp.value.trim() || null, siniiga: sin.value.trim() || null, asociacion: aso.value.trim() || null, municipio: mun.value.trim() || null, docs: paths.slice(0, 4) };
+      const res = await sb.from('rancher_requests').upsert(row, { onConflict: 'user_id' });
+      if (res.error) throw res.error;
+      close(); toast('¡Listo! Revisaremos tus papeles y te avisaremos 🐄'); SFX.play('ajua');
+    } catch (ex) { save.disabled = false; save.textContent = req ? 'Mandar otra vez' : 'Mandar solicitud'; err.textContent = /bucket|not found/i.test((ex && ex.message) || '') ? 'Falta activar la carpeta de papeles en Supabase.' : friendlyError(ex); }
+  });
+  const status = req ? (req.status === 'rechazado'
+    ? h('div', { class: 'gv-status no' }, '❌ No pudimos verificarte' + (req.note ? ': ' + req.note : '.') + ' Corrige y vuelve a mandarla.')
+    : h('div', { class: 'gv-status wait' }, '⏳ Tu solicitud está en revisión. Te avisaremos cuando la revisemos.')) : null;
+  body.replaceChildren(intro, status || '',
+    h('div', { class: 'lbl', style: 'margin:6px 0 10px' }, 'Tus datos de productor'),
+    field('Clave UPP o PSG', upp, 'Es la clave de tu Unidad de Producción Pecuaria (viene en tus papeles de SINIIGA o de la SADER).'),
+    field('Número de productor SINIIGA', sin),
+    field('Asociación Ganadera Local', aso),
+    field('Municipio y estado', mun),
+    h('div', { class: 'lbl', style: 'margin:6px 0 6px' }, 'Fotos de tus papeles (hasta 4)'),
+    h('small', { class: 'hint', style: 'display:block;margin:0 0 10px' }, 'Por ejemplo: constancia de UPP/PSG, credencial de socio de la asociación o tu registro de SINIIGA. Puedes tapar datos que no quieras mostrar, como tu CURP. 🔒 Solo los ve el equipo de Ranchfolk, nunca se publican.'),
+    picker, docsBox, err, save,
+    h('p', { class: 'hint', style: 'margin-top:10px' }, 'La insignia significa que vimos papeles de productor. Aun así, siempre revisa el animal en persona antes de pagar.'));
+}
 async function renderProfile() {
   const id = state.profileId || state.me.id;
   const isMe = id === state.me.id;
@@ -4797,6 +5067,7 @@ async function renderProfile() {
     cover,
     avBtn,
     h('h1', {}, prof.full_name || prof.username, vb(prof.id)),
+    gb(prof.id, true),
     h('div', { class: 'pf-sub' }, '@' + prof.username + (prof.ubicacion || prof.estado ? ' · 📍 ' + [prof.ubicacion, prof.estado && !(prof.ubicacion || '').toLowerCase().includes(prof.estado.toLowerCase()) ? prof.estado : ''].filter(Boolean).join(', ') : '')),
     ratingSlot,
     hasF ? h('div', { class: 'pf-stats' },
@@ -5239,6 +5510,7 @@ function openMenu() {
     soundRow(),
     pushRow(),
     saverRow(),
+    row('🐄', 'Ganadero verificado', goTo(openRancherVerify), 'Muestra tus papeles y vende con más confianza'),
     row('🚫', 'Personas bloqueadas', () => openBlockedList()),
     row('📜', 'Reglas y privacidad', () => openRules()),
     row('🗑️', 'Borrar mi cuenta', () => openDeleteAccount(), 'Elimina tu cuenta y todo lo que subiste')]);
@@ -5342,7 +5614,7 @@ const EKIND_EMO = Object.fromEntries(EKINDS);
 let HAS_NOV = true;  // columnas nuevas: estado, ficha de ganado y vistas
 const LIST_SEL_OLD = 'id,user_id,title,category,price,location,description,photos,status,featured_until,created_at,profiles!user_id(id,username,full_name,avatar_url,ubicacion)';
 const EVT_SEL_OLD = 'id,user_id,title,kind,starts_at,place,city,description,photo_url,featured_until,created_at,profiles!user_id(id,username,full_name,avatar_url),event_going(user_id)';
-let LIST_SEL = LIST_SEL_OLD.replace('created_at,', 'created_at,estado,details,views,');
+let LIST_SEL = LIST_SEL_OLD.replace('created_at,', 'created_at,estado,details,views,live_video,live_at,');
 let EVT_SEL = EVT_SEL_OLD.replace('created_at,', 'created_at,estado,');
 const novMissing = (e) => /estado|details|views/i.test((e && e.message) || '');
 function noNov() { HAS_NOV = false; LIST_SEL = LIST_SEL_OLD; EVT_SEL = EVT_SEL_OLD; }
@@ -5357,6 +5629,8 @@ const SPEC_FIELDS = [
   ['cabezas', '🔢 Cabezas', 'text', 'ej. 12', 'Ganado'],
   ['registro', '📜 Con registro', ['Sí', 'No']],
   ['arete', '🏷️ Arete SINIIGA', ['Sí', 'No'], null, 'Ganado'],
+  ['aretes', '🔢 No. de arete(s)', 'text', 'ej. 1101234567', 'Ganado'],
+  ['upp', '🏠 UPP de origen', 'text', 'Clave UPP del rancho', 'Ganado'],
   ['fierro', '🔥 Fierro', 'text', 'ej. "M" con media luna', ['Caballos', 'Ganado']]];
 const SPEC_CATS = ['Caballos', 'Ganado', 'Perros y mascotas'];
 const specFor = (f, cat) => !f[4] || (Array.isArray(f[4]) ? f[4].includes(cat) : f[4] === cat);
@@ -5390,6 +5664,7 @@ async function fetchListings({ cat, q, userId, estado, limit = 80 } = {}) {
   if (userId) qq = qq.eq('user_id', userId);
   if (q) qq = qq.ilike('title', `%${q.replace(/[%,()]/g, '')}%`);
   const { data, error } = await qq;
+  if (error && /live_video|live_at/i.test(error.message || '') && LIST_SEL.includes('live_video')) { LIST_SEL = LIST_SEL.replace('live_video,live_at,', ''); return fetchListings({ cat, q, userId, estado, limit }); }
   if (error) { if (novMissing(error) && HAS_NOV) { noNov(); return fetchListings({ cat, q, userId, limit }); } if (feriaMissing(error)) HAS_FERIA = false; return []; }
   const b = state.blocked || new Set(), weekAgo = Date.now() - 7 * 864e5;
   return (data || []).filter(l => !b.has(l.user_id) && (l.status !== 'vendido' || new Date(l.created_at) > weekAgo))
@@ -5440,7 +5715,8 @@ function listingCard(l) {
   const hasVid = (l.photos || []).some(isVidUrl);
   return h('button', { class: 'fx-card' + (l.status === 'vendido' ? ' sold' : ''), onclick: () => openListing(l) },
     h('div', { class: 'fx-pic' }, pic || h('span', {}, LCAT_EMO[l.category] || '📦'),
-      hasVid ? h('span', { class: 'fx-vid' }, '▶ Video') : null,
+      l.live_at ? h('span', { class: 'fx-vid fx-live' }, '🎥 En vivo') : hasVid ? h('span', { class: 'fx-vid' }, '▶ Video') : null,
+      GANADEROS.has(l.user_id) ? h('span', { class: 'fx-gan' }, '🐄 Verificado') : null,
       isFeat(l) ? h('span', { class: 'fx-feat' }, '⭐ Destacado') : null,
       l.status === 'vendido' ? h('span', { class: 'fx-sold' }, 'VENDIDO') : null),
     h('div', { class: 'fx-info' }, h('b', { class: 'fx-price' }, money(l.price)), h('span', { class: 'fx-title' }, l.title),
@@ -5471,7 +5747,7 @@ function openListing(l) {
   const link = location.origin + location.pathname + '#l=' + l.id;
   const share = async () => { try { if (navigator.share) await navigator.share({ title: l.title, text: `${l.title} · ${money(l.price)} en La Feria de Ranchfolk`, url: link }); else { await navigator.clipboard.writeText(link); toast('Enlace copiado'); } } catch (_) {} };
   const actions = mine ? [
-    h('button', { class: 'btn', onclick: async () => { const st = l.status === 'vendido' ? 'activo' : 'vendido'; const { error } = await sb.from('listings').update({ status: st }).eq('id', l.id); if (error) return toast('No se pudo guardar'); close(); toast(st === 'vendido' ? '¡Felicidades por la venta! 🎉' : 'Anuncio activo otra vez'); if (st === 'vendido') SFX.play('ajua'); if (state.view === 'feria') render(); } }, l.status === 'vendido' ? 'Volver a poner a la venta' : '✅ Marcar como vendido'),
+    h('button', { class: 'btn', onclick: async () => { const st = l.status === 'vendido' ? 'activo' : 'vendido'; const { error } = await sb.from('listings').update({ status: st }).eq('id', l.id); if (error) return toast('No se pudo guardar'); close(); toast(st === 'vendido' ? '¡Felicidades por la venta! 🎉' : 'Anuncio activo otra vez'); if (st === 'vendido') { SFX.play('ajua'); setTimeout(() => askBuyer(l), 700); } if (state.view === 'feria') render(); } }, l.status === 'vendido' ? 'Volver a poner a la venta' : '✅ Marcar como vendido'),
     h('div', { style: 'display:flex;gap:8px;margin-top:8px' },
       h('button', { class: 'btn ghost', style: 'flex:1', onclick: () => { close(); listingForm(l); } }, '✏️ Editar'),
       h('button', { class: 'btn ghost', style: 'flex:1', onclick: share }, '📤 Compartir'),
@@ -5487,6 +5763,8 @@ function openListing(l) {
   });
   const body = h('div', { class: 'sheet-body fx-detail' },
     h('div', { class: 'fx-car-wrap' }, car, dots, isFeat(l) ? h('span', { class: 'fx-feat' }, '⭐ Destacado') : null, l.status === 'vendido' ? h('span', { class: 'fx-sold' }, 'VENDIDO') : null),
+    l.live_at ? h('button', { class: 'fx-live-note', type: 'button', onclick: () => { const i = photos.indexOf(l.live_video); if (i >= 0) car.scrollTo({ left: i * car.clientWidth, behavior: 'smooth' }); } },
+      h('b', {}, '🎥 Video grabado en vivo en Ranchfolk'), h('span', {}, 'El ' + liveDate(l.live_at) + ' (' + timeAgo(l.live_at) + '), con la fecha y el usuario marcados. Así sabes que el animal existe y lo tiene el vendedor.')) : null,
     h('div', { class: 'fx-d-price' }, money(l.price)),
     h('h2', { class: 'fx-d-title' }, l.title),
     h('div', { class: 'fx-d-meta' }, `${LCAT_EMO[l.category] || ''} ${l.category}`, l.location || l.estado ? ' · 📍 ' + placeOf(l.location, l.estado) : '', ' · ' + timeAgo(l.created_at)),
@@ -5494,8 +5772,9 @@ function openListing(l) {
     specsEl(l),
     l.description ? h('p', { class: 'fx-d-desc' }, ...richText(l.description)) : null,
     h('button', { class: 'fx-seller', onclick: () => { close(); go('profile', { profileId: l.user_id }); } }, avatar(prof, 44),
-      h('div', {}, h('small', {}, mine ? 'Tu anuncio' : 'Vendedor'), h('b', {}, prof.full_name || prof.username || '', vb(l.user_id)), prof.ubicacion ? h('small', {}, '📍 ' + prof.ubicacion) : null), h('span', { class: 'fx-chev' }, '›')),
+      h('div', {}, h('small', {}, mine ? 'Tu anuncio' : 'Vendedor'), h('b', {}, prof.full_name || prof.username || '', vb(l.user_id), gb(l.user_id)), prof.ubicacion ? h('small', {}, '📍 ' + prof.ubicacion) : null), h('span', { class: 'fx-chev' }, '›')),
     sellerRow,
+    !mine ? sellerHistory(l.user_id) : null,
     ...actions.filter(Boolean),
     !mine ? h('p', { class: 'fx-tip' }, '🤝 Consejo: vean el animal o el producto en persona antes de pagar y no manden anticipos a desconocidos.') : null,
     !mine ? h('button', { class: 'fx-report', onclick: () => reportThing('listing', l) }, '🚩 Reportar este anuncio') : null);
@@ -5521,12 +5800,15 @@ function listingForm(l) {
   const photosBox = h('div', { class: 'fx-ph-grid' });
   const picker = h('input', { type: 'file', accept: 'image/*,video/*', multiple: true, hidden: true });
   const isVidFile = (f) => (f.type || '').startsWith('video/');
+  let liveKept = l && l.live_video && kept.includes(l.live_video) ? l.live_video : null;
   const vidCount = () => kept.filter(isVidUrl).length + files.filter(isVidFile).length;
   const paintPhotos = () => {
-    const tiles = [...kept.map((u, i) => ({ src: u, vid: isVidUrl(u), rm: () => { kept.splice(i, 1); paintPhotos(); } })), ...files.map((f, i) => ({ src: f._url, vid: isVidFile(f), local: true, rm: () => { files.splice(i, 1); paintPhotos(); } }))];
+    const tiles = [...kept.map((u, i) => ({ src: u, vid: isVidUrl(u), live: u === liveKept, rm: () => { if (u === liveKept) liveKept = null; kept.splice(i, 1); paintPhotos(); } })), ...files.map((f, i) => ({ src: f._url, vid: isVidFile(f), live: f._live, local: true, rm: () => { files.splice(i, 1); paintPhotos(); } }))];
+    try { paintLive(); } catch (_) {}
     photosBox.replaceChildren(...tiles.map(t => h('div', { class: 'fx-ph' + (t.vid ? ' vid' : '') },
         t.vid ? (t.local ? h('video', { src: t.src + '#t=0.3', muted: true, playsInline: true, preload: 'metadata' }) : vthumb(t.src)) : h('img', { src: t.src, alt: '' }),
         t.vid ? h('span', { class: 'fx-ph-play' }, '▶') : null,
+        t.live ? h('span', { class: 'fx-ph-live' }, '🎥 En vivo') : null,
         h('button', { type: 'button', 'aria-label': t.vid ? 'Quitar video' : 'Quitar foto', onclick: t.rm }, '✕'))),
       tiles.length < MAX_LPHOTOS ? h('button', { type: 'button', class: 'fx-ph add', onclick: () => picker.click() }, h('span', {}, '📷🎥'), h('small', {}, tiles.length ? `Agregar (${tiles.length}/${MAX_LPHOTOS})` : 'Fotos o video')) : null);
   };
@@ -5547,7 +5829,7 @@ function listingForm(l) {
   paintPhotos();
   const title = h('input', { class: 'input', maxlength: '80', placeholder: 'ej. Yegua cuarto de milla, 5 años', value: (l && l.title) || '' });
   const catChips = h('div', { class: 'chips', style: 'padding:0 0 12px;flex-wrap:wrap' });
-  const paintCats = () => { catChips.replaceChildren(...LCATS.map(([c, e]) => h('button', { type: 'button', class: 'chip' + (c === cat ? ' on' : ''), onclick: () => { cat = c; paintCats(); } }, e + ' ' + c))); try { paintSpecs(); } catch (_) {} try { petBox.hidden = cat !== 'Perros y mascotas'; } catch (_) {} };
+  const paintCats = () => { catChips.replaceChildren(...LCATS.map(([c, e]) => h('button', { type: 'button', class: 'chip' + (c === cat ? ' on' : ''), onclick: () => { cat = c; paintCats(); } }, e + ' ' + c))); try { paintSpecs(); } catch (_) {} try { petBox.hidden = cat !== 'Perros y mascotas'; } catch (_) {} try { paintLive(); } catch (_) {} };
   paintCats();
   const price = h('input', { class: 'input', inputmode: 'numeric', placeholder: 'ej. 45000', value: l && l.price != null ? String(Math.round(l.price)) : '' });
   const nego = h('input', { type: 'checkbox' }); nego.checked = !!(l && l.price == null);
@@ -5573,6 +5855,21 @@ function listingForm(l) {
         return h('div', { class: 'field' }, h('label', {}, label), inp);
       })));
   };
+  // Video en vivo: se graba con la cámara de Ranchfolk (con fecha y usuario) para que el comprador confíe
+  const liveBox = h('div', { class: 'fx-livebox' });
+  const hasLive = () => !!liveKept || files.some(f => f._live);
+  function paintLive() {
+    liveBox.hidden = !HAS_TRUST || !SPEC_CATS.includes(cat);
+    liveBox.replaceChildren(hasLive()
+      ? h('div', { class: 'fx-live-ok' }, '✅ Ya tiene video en vivo. Los compradores verán que es reciente.')
+      : h('div', {}, h('b', {}, '🎥 Graba un video en vivo (recomendado)'),
+        h('small', {}, 'Se graba aquí con la cámara de Ranchfolk y lleva la fecha y tu usuario. Así el comprador sabe que el animal existe y que lo tienes tú. Los anuncios con video en vivo dan más confianza.'),
+        h('button', { type: 'button', class: 'btn small fx-gold', style: 'margin-top:8px', onclick: async () => {
+          if (vidCount() >= MAX_LVIDEOS) return toast(`Máximo ${MAX_LVIDEOS} videos por anuncio. Quita uno primero.`);
+          const f = await recordLiveVideo(60); if (!f) return;
+          f._live = true; f._url = URL.createObjectURL(f); files.push(f); paintPhotos();
+        } }, '🎥 Grabar video en vivo')));
+  }
   const desc = h('textarea', { class: 'input', maxlength: '1000', placeholder: 'Edad, raza, medidas, estado, si se entrega, forma de pago…' }); desc.value = (l && l.description) || '';
   const err = h('p', { class: 'err', role: 'alert' });
   const save = h('button', { class: 'btn', type: 'submit', style: 'width:100%' }, isNew ? 'Publicar anuncio' : 'Guardar cambios');
@@ -5588,13 +5885,15 @@ function listingForm(l) {
     const endTrot = SFX.startUpload();
     try {
       const urls = [...kept];
+      let liveUrl = liveKept;
       const total = kept.length + files.length;
       for (const f of files) {
         if (isVidFile(f)) {
           const set = await prepVideoSet(f, (n) => { save.textContent = `Preparando video… ${n}%`; }, LVIDEO_SEC);
           if (tooBig(set.hd)) throw new Error('El video es muy largo. Prueba con uno más corto.');
           save.textContent = 'Subiendo video…';
-          urls.push((await uploadVideoSet(set, f)).url);
+          const vurl = (await uploadVideoSet(set, f)).url;
+          urls.push(vurl); if (f._live) liveUrl = vurl;
           save.textContent = `Subiendo ${urls.length}/${total}…`;
           continue;
         }
@@ -5611,6 +5910,7 @@ function listingForm(l) {
         const keep = SPEC_CATS.includes(cat) ? SPEC_FIELDS.filter(f => specFor(f, cat)).map(f => f[0]) : [];
         row.details = Object.fromEntries(keep.filter(k => det[k] && String(det[k]).trim()).map(k => [k, String(det[k]).trim().slice(0, 40)]));
       }
+      if (HAS_TRUST && LIST_SEL.includes('live_video')) row.live_video = liveUrl && row.photos.includes(liveUrl) ? liveUrl : null;
       const res = isNew ? await sb.from('listings').insert({ ...row, user_id: state.me.id }).select(LIST_SEL).single()
                         : await sb.from('listings').update(row).eq('id', l.id).select(LIST_SEL).single();
       if (res.error) throw res.error;
@@ -5625,11 +5925,12 @@ function listingForm(l) {
     h('div', { class: 'field' }, h('label', {}, 'Categoría')), catChips, petBox,
     h('div', { class: 'field' }, h('label', {}, 'Precio (pesos)'), price, h('label', { class: 'fx-check' }, nego, ' Precio a tratar')),
     specBox,
+    liveBox,
     h('div', { class: 'field' }, h('label', {}, '📍 ¿Dónde está? (ciudad o pueblo)'), loc),
     HAS_NOV ? h('div', { class: 'field' }, h('label', {}, '🗺️ Estado'), est) : null,
     h('div', { class: 'field' }, h('label', {}, 'Descripción'), desc),
     err, save);
-  paintSpecs(); petBox.hidden = cat !== 'Perros y mascotas';
+  paintSpecs(); petBox.hidden = cat !== 'Perros y mascotas'; paintLive();
   close = openSheet(isNew ? 'Vender en La Feria' : 'Editar anuncio', body);
 }
 
@@ -5962,7 +6263,8 @@ async function renderAdmin() {
   let tab = state.admTab || 'reports';
   const paintTabs = () => tabs.replaceChildren(
     h('button', { class: tab === 'reports' ? 'on' : '', onclick: () => { tab = state.admTab = 'reports'; paintTabs(); loadTab(); } }, '🚩 Reportes'),
-    h('button', { class: tab === 'users' ? 'on' : '', onclick: () => { tab = state.admTab = 'users'; paintTabs(); loadTab(); } }, '👥 Usuarios'));
+    h('button', { class: tab === 'users' ? 'on' : '', onclick: () => { tab = state.admTab = 'users'; paintTabs(); loadTab(); } }, '👥 Usuarios'),
+    h('button', { class: tab === 'gan' ? 'on' : '', onclick: () => { tab = state.admTab = 'gan'; paintTabs(); loadTab(); } }, '🐄 Ganaderos'));
   paintTabs();
   const stat = (n, l, warn) => h('div', { class: 'adm-stat' + (warn && n ? ' warn' : '') }, h('b', {}, Number(n || 0).toLocaleString('es-MX')), h('small', {}, l));
   const loadStats = async () => {
@@ -6019,6 +6321,38 @@ async function renderAdmin() {
               delBtn ? h('button', { class: 'btn small danger-btn', onclick: async () => { if (!confirm(delBtn[0])) return; const { error: e2 } = await sb.rpc(delBtn[1], delBtn[2]); if (e2) return toast(friendlyError(e2)); toast(delBtn[3]); card.remove(); loadStats(); } }, '🗑️ Borrar') : null,
               r.owner_id ? (isBanned(r.owner_banned_until) ? h('button', { class: 'btn small ghost', onclick: () => unban(r.owner_id, r.owner_username, loadTab) }, 'Quitar suspensión') : h('button', { class: 'btn small ghost', onclick: () => banSheet(r.owner_id, r.owner_username, loadTab) }, '⛔ Suspender')) : null,
               h('button', { class: 'btn small ghost', onclick: async () => { const { error: e2 } = await sb.rpc('admin_resolve_report', { rid: r.id }); if (e2) return toast(friendlyError(e2)); toast('Reporte descartado'); card.remove(); loadStats(); } }, '✓ Está bien'))));
+        return card;
+      }));
+    } else if (tab === 'gan') {
+      const all = !!state.admGanAll;
+      const { data, error } = await sb.rpc('admin_rancher_requests', { st: all ? null : 'pendiente' });
+      if (error) return box.replaceChildren(h('p', { class: 'err' }, /admin_rancher|function/i.test(error.message || '') ? 'Falta activar Ganadero verificado en Supabase.' : friendlyError(error)));
+      const toggle = h('button', { class: 'btn small ghost', style: 'margin:0 0 12px', onclick: () => { state.admGanAll = !all; loadTab(); } }, all ? 'Ver solo pendientes' : 'Ver todas (aprobadas y rechazadas)');
+      const rows = data || [];
+      if (!rows.length) return box.replaceChildren(toggle, h('div', { class: 'dm-empty' }, h('div', {}, '🐄'), h('b', {}, all ? 'Nadie ha pedido la verificación' : 'No hay solicitudes pendientes'), 'Cuando alguien mande sus papeles de productor, aparecerán aquí.'));
+      const allPaths = rows.flatMap(r => r.docs || []);
+      const signed = new Map();
+      if (allPaths.length) { const { data: su } = await sb.storage.from('verif').createSignedUrls(allPaths, 3600); (su || []).forEach(x => x && x.signedUrl && signed.set(x.path, x.signedUrl)); }
+      const decide = async (r, ok, card) => {
+        let why = null;
+        if (!ok) { why = prompt('¿Por qué se rechaza? (lo verá la persona)', 'Los papeles no se ven claros'); if (why === null) return; }
+        else if (!confirm('¿Aprobar a @' + r.username + ' como Ganadero verificado?')) return;
+        const { error: e2 } = await sb.rpc('admin_rancher_decide', { uid: r.user_id, ok, why });
+        if (e2) return toast(friendlyError(e2));
+        if (ok) GANADEROS.add(r.user_id); else GANADEROS.delete(r.user_id);
+        toast(ok ? '@' + r.username + ' ya es Ganadero verificado 🐄' : 'Solicitud rechazada'); loadTab();
+      };
+      const ST = { pendiente: '⏳ Pendiente', aprobado: '✅ Aprobado', rechazado: '❌ Rechazado' };
+      box.replaceChildren(toggle, ...rows.map(r => {
+        const card = h('div', { class: 'adm-gv' });
+        card.append(
+          h('button', { class: 'adm-uwho', onclick: () => go('profile', { profileId: r.user_id }) }, avatar(r, 42),
+            h('div', {}, h('b', {}, '@' + r.username), h('small', {}, [r.full_name, r.estado, ST[r.status] || r.status, timeAgo(r.updated_at)].filter(Boolean).join(' · ')))),
+          h('dl', {}, ...[['Clave UPP/PSG', r.upp], ['SINIIGA', r.siniiga], ['Asociación', r.asociacion], ['Municipio', r.municipio], ['Nota', r.note]].filter(x => x[1]).flatMap(([k, v]) => [h('dt', {}, k), h('dd', {}, v)])),
+          h('div', { class: 'adm-gv-docs' }, ...(r.docs || []).map(pth => signed.get(pth) ? h('img', { src: signed.get(pth), alt: 'Papel', onclick: () => openMediaViewer(signed.get(pth), 'image') }) : h('span', {}, '📄'))),
+          h('div', { class: 'adm-acts' },
+            r.status !== 'aprobado' ? h('button', { class: 'btn small', onclick: () => decide(r, true, card) }, '✅ Aprobar') : null,
+            h('button', { class: 'btn small ghost', onclick: () => decide(r, false, card) }, r.status === 'aprobado' ? 'Quitar insignia' : '❌ Rechazar')));
         return card;
       }));
     } else {
@@ -6844,7 +7178,7 @@ async function renderChat() {
   const toBottom = (smooth) => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: smooth ? 'smooth' : 'instant' });
   function paint() {
     const wasNear = nearBottom();
-    const kids = []; let prev = null;
+    const kids = []; let prev = null, scamShown = false, scamAfter = null;
     const lastRead = [...msgs].reverse().find(m => m.sender_id === state.me.id && !m.pending && m.read_at);
     msgs.forEach((m, i) => {
       const gap = !prev || new Date(m.created_at) - new Date(prev.created_at) > 15 * 60e3;
@@ -6854,12 +7188,14 @@ async function renderChat() {
       const joinPrev = !gap && near3(prev, m), joinNext = next && !nextGap && near3(m, next);
       if (m.reply_to && HAS_MSG2 && !m.unsent_at) kids.push(quoteEl(m));
       const el = bubble(m);
+      if (!scamShown && !m.unsent_at && m.body && SCAM_RE.test(m.body)) scamAfter = el;
       el.classList.remove('g-solo', 'g-first', 'g-mid', 'g-last');
       el.classList.add(joinPrev ? (joinNext ? 'g-mid' : 'g-last') : (joinNext ? 'g-first' : 'g-solo'));
       el.querySelectorAll(':scope > .msg-av').forEach(x => x.remove());
       if (m.sender_id !== state.me.id && !joinNext) el.append(h('span', { class: 'msg-av' }, avatar(other, 26)));
       if (!m.pending && !m.unsent_at) rxPill(m, el);
       kids.push(el);
+      if (scamAfter === el) { scamShown = true; kids.push(scamWarnEl(m.sender_id !== state.me.id, () => reportThing('user', other))); }
       if (lastRead && m === lastRead) kids.push(h('div', { class: 'msg-seen-av', title: 'Visto' }, avatar(other, 16)));
       prev = m;
     });
@@ -7115,7 +7451,7 @@ sb.auth.onAuthStateChange((_event, session) => {
   stopInbox();
   COMPAS = null; SAVED = null;
   state.me = session ? null : GUEST; state.blocked = new Set(); state.view = 'feed'; render();
-  if (session) setTimeout(async () => { await loadMe(); listenInbox(); enablePush(true); if (needsWelcome()) { state.view = 'welcome'; state.welcomeStep = 0; } render(); openDeepLink(); }, 0);
+  if (session) setTimeout(async () => { await loadMe(); listenInbox(); enablePush(true); if (needsWelcome()) { state.view = 'welcome'; state.welcomeStep = 0; } render(); openDeepLink(); setTimeout(checkDeals, 4000); }, 0);
   else setTimeout(openDeepLink, 300);
 });
 // Enlaces a una publicación (…/#p=123): la abre al entrar
