@@ -8,6 +8,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Ranchfolk">
+<meta name="description" content="Ranchfolk, la red orgánica del rancho: el día a día ranchero, venta de ganado, eventos, bailes, fiestas, forrajeras, veterinarios y mucho más. Aquí suena el rancho.">
 <title>Ranchfolk</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
@@ -187,6 +188,9 @@ main{flex:1;padding-bottom:calc(104px + env(safe-area-inset-bottom))}
 .fb-think{display:flex;align-items:center;gap:10px;padding:10px 14px 8px}
 .fb-av{border:none;background:none;padding:0;line-height:0}
 .fb-pill{flex:1;height:42px;border-radius:21px;border:1px solid #D9CBB0;background:#FFFDF8;color:#4D6473;font-size:15px;text-align:left;padding:0 16px}
+.auth-organic{margin:-6px auto 18px;max-width:320px;text-align:center;font-size:14px;font-weight:600;opacity:.85}
+.wl-organic{margin:4px auto 18px;max-width:360px;text-align:left;background:#FFF6E4;border:1px solid #E8CFA0;border-radius:14px;padding:12px 14px;color:#172531}
+.wl-organic b{display:block;font-size:16px;margin-bottom:4px}.wl-organic p{margin:4px 0 0;font-size:14px;line-height:1.4}
 .gal-ico{flex-shrink:0;pointer-events:none}
 .fb-photo{border:none;background:none;font-size:26px;padding:4px}
 
@@ -2248,6 +2252,7 @@ function renderAuth() {
   $app.append(h('div', { class: 'auth' },
     h('div', { class: 'logo' }, 'Ranchfolk'),
     h('p', { class: 'lead' }, 'La vida de rancho, en un solo lugar'),
+    h('p', { class: 'auth-organic' }, '🤠 Aquí suena el rancho: sin filtros ni canciones de moda.'),
     form,
     h('button', { type: 'button', class: 'linkbtn', style: 'margin-top:18px;text-decoration:underline;font-size:14px', onclick: () => go('feed') }, 'Seguir viendo sin cuenta'),
     h('div', { class: 'switch' }, isLogin ? '¿No tienes cuenta?' : '¿Ya tienes cuenta?',
@@ -3081,6 +3086,10 @@ async function renderWelcome() {
       } catch (ex) { err.textContent = friendlyError(ex); save.disabled = false; }
     } },
       h('h1', { class: 'wl-title' }, `¡Bienvenido, ${(state.me.full_name || state.me.username || '').split(' ')[0]}!`),
+      h('div', { class: 'wl-organic' },
+        h('b', {}, '🤠 Aquí suena el rancho'),
+        h('p', {}, 'Ranchfolk es orgánica, algo muy diferente a Facebook: sin filtros y sin canciones de moda. Si quieres música de fondo, que sea la del baile, el jaripeo o el estéreo de la troca.'),
+        h('p', {}, 'Aquí va el día a día del rancho, la venta de ganado, eventos, bailes, fiestas, forrajeras, veterinarios y mucho más.')),
       h('p', { class: 'wl-sub' }, 'Ponle cara a tu perfil para que la raza te reconozca.'),
       prev, fileIn,
       h('label', { for: 'wl_av', class: 'btn ghost small', style: 'display:inline-flex;align-items:center;cursor:pointer;margin:0 auto 22px' }, 'Elegir foto'),
