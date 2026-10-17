@@ -1869,7 +1869,9 @@ let hiddenPosts = new Set();
 try { hiddenPosts = new Set(JSON.parse(localStorage.getItem(HIDDEN_KEY) || '[]')); } catch (_) {}
 function hidePost(id) { hiddenPosts.add(id); try { localStorage.setItem(HIDDEN_KEY, JSON.stringify([...hiddenPosts].slice(-500))); } catch (_) {} }
 // Las canciones viejas de Apple Music ya no suenan solas: quedan como enlace para escucharla en Apple Music
-function noApple(p) { if (p && p.song_preview) { p.song_preview = null; p.song_art = null; } return p; }
+// Ranchfolk es orgánica: sin canciones agregadas, solo el sonido real del video (también se ocultan las de publicaciones viejas)
+const ORGANICA = true;
+function noApple(p) { if (p && p.song_preview) { p.song_preview = null; p.song_art = null; } if (p && ORGANICA && p.song_url) { p.song_url = null; p.song_title = null; p.song_start = null; } return p; }
 function visible(list) { const b = state.blocked || new Set(); return (list || []).filter(p => !b.has(p.user_id) && !hiddenPosts.has(p.id)).map(noApple); }
 let HAS_KIND = true;
 let HAS_SONG = true;
@@ -3537,12 +3539,12 @@ function startCreator(file, onDone, opts = {}) {
     h('div', { class: 'sdc-stage' }, canvas),
     h('div', { class: 'sdc-top' },
       h('button', { class: 'sdc-x', type: 'button', 'aria-label': 'Cancelar', onclick: () => closeAsk() }, RIDE ? '‹' : '✕'),
-      h('div', { class: 'sdc-tools' }, tool('🎵', RIDE ? 'Sonidos' : 'Música', () => RIDE ? (document.querySelectorAll('.ride-yt').forEach(x => x.remove()), stopSong(), rideSongSheet(root, song, (s2) => { const had = !!song; song = s2; if (song && !had) origMuted = true; if (!song) origMuted = false; paintOrig(); previewSound(); })) : openMusic()), tool('Aa', 'Texto', () => editText(null)), tool('😊', 'Emojis', () => openEmojis()), origTool)),
+      h('div', { class: 'sdc-tools' }, ORGANICA ? null : tool('🎵', RIDE ? 'Sonidos' : 'Música', () => RIDE ? (document.querySelectorAll('.ride-yt').forEach(x => x.remove()), stopSong(), rideSongSheet(root, song, (s2) => { const had = !!song; song = s2; if (song && !had) origMuted = true; if (!song) origMuted = false; paintOrig(); previewSound(); })) : openMusic()), tool('Aa', 'Texto', () => editText(null)), tool('😊', 'Emojis', () => openEmojis()), origTool)),
     trash,
     h('div', { class: 'sdc-bottom' }, shareBtn));
   document.body.append(root);
   root.addEventListener('scroll', () => { root.scrollTop = 0; root.scrollLeft = 0; });
-  const hint = h('div', { class: 'sdc-hint' }, RIDE ? 'Ponle sonido, texto o emojis. Cuando quede, toca Siguiente.' : 'Agrega texto, emojis o música. Arrástralos con el dedo; con dos dedos los haces grandes o los giras.');
+  const hint = h('div', { class: 'sdc-hint' }, RIDE ? (ORGANICA ? 'Ponle texto o emojis. Cuando quede, toca Siguiente.' : 'Ponle sonido, texto o emojis. Cuando quede, toca Siguiente.') : (ORGANICA ? 'Agrega texto o emojis.' : 'Agrega texto, emojis o música.') + ' Arrástralos con el dedo; con dos dedos los haces grandes o los giras.');
   root.append(hint); setTimeout(() => hint.remove(), 4500);
   if (RIDE) { paintOrig(); previewSound(); }
 
@@ -3776,7 +3778,7 @@ function openRideCreator(onDone) {
   const ring = h('div', { class: 'rc-ring' }, h('span'));
   const recBtn = h('button', { class: 'rc-rec', type: 'button', 'aria-label': 'Grabar' }, ring);
   const timeLab = h('div', { class: 'rc-time', hidden: true }, '0:00');
-  const songBtn = h('button', { class: 'rc-song', type: 'button' }, '🎵 Agregar sonido');
+  const songBtn = h('button', { class: 'rc-song', type: 'button', style: ORGANICA ? 'display:none' : null }, '🎵 Agregar sonido');
   const lens = h('div', { class: 'rc-lens' });
   const side = (ico, label, fn) => { const b = h('button', { class: 'sdc-tool', type: 'button', 'aria-label': label, onclick: fn }, h('span', {}, ico), h('small', {}, label)); return b; };
   const flipBtn = side('🔄', 'Voltear', () => { if (rec) return; facing = facing === 'user' ? 'environment' : 'user'; startCam(); });
@@ -4206,7 +4208,7 @@ function rideCard(p, preload) {
   // Canción del ride: suena sola junto con el video, como en TikTok (y se reinicia cuando el video vuelve a empezar)
   const songSrc = null;   // (los avances de Apple Music ya no suenan solos)
   const songStart = Math.max(0, Math.min(25, Number(p.song_start) || 0));
-  const ytSong = HAS_SONG && !p.song_preview ? ytIdOfSong(p.song_url) : null;   // canción de YouTube: suena con su video en chiquito
+  const ytSong = HAS_SONG && !ORGANICA && !p.song_preview ? ytIdOfSong(p.song_url) : null;   // canción de YouTube: suena con su video en chiquito
   let ytEl = null;
   const ytOn = () => { if (!ytSong) return; if (!ytEl || !ytEl.isConnected) { ytEl = ytRideMini(ytSong, p.song_start || 0, state.ridesMuted); el.append(ytEl); } };
   const ytOff = () => { if (ytEl) { ytEl.remove(); ytEl = null; } };
@@ -4538,7 +4540,7 @@ function renderUpload() {
     songList.append(h('small', { class: 'hint' }, 'Para poner canción: abre YouTube, busca la canción, toca Compartir › Copiar enlace y pégalo aquí.'));
   };
   songInput.addEventListener('input', () => { clearTimeout(songTimer); songTimer = setTimeout(searchSongs, 450); });
-  const songField = HAS_SONG ? h('div', { class: 'field' }, h('label', { for: 'song' }, '🎵 Canción (opcional)'), songInput, songHelp, songList, songPick) : null;
+  const songField = HAS_SONG && !ORGANICA ? h('div', { class: 'field' }, h('label', { for: 'song' }, '🎵 Canción (opcional)'), songInput, songHelp, songList, songPick) : null;
   const caption = mentionAssist(h('textarea', { class: 'input', name: 'caption', id: 'cap', maxlength: '1000', placeholder: '¿Qué está pasando en el rancho? Menciona a tus compas con @' }));
   if (state.presetCaption) { caption.value = state.presetCaption; state.presetCaption = null; }
   // Si pegas el enlace en la descripción, también se detecta
