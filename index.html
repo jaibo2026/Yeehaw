@@ -220,6 +220,8 @@ main{flex:1;padding-bottom:calc(104px + env(safe-area-inset-bottom))}
 .adm-gv{background:#fff;border:1px solid #E8DCC4;border-radius:14px;padding:12px;margin-bottom:12px}
 .adm-gv-docs{display:flex;gap:8px;overflow-x:auto;margin:8px 0}.adm-gv-docs img{width:120px;height:120px;object-fit:cover;border-radius:10px;border:1px solid #ddd;flex-shrink:0}
 .adm-gv dl{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;margin:8px 0;font-size:14px}.adm-gv dt{color:var(--muted)}.adm-gv dd{margin:0;font-weight:700}
+.kt-log{margin:10px 0 0;padding:10px;border-radius:10px;background:#172531;color:#d6f5d6;font:12px/1.35 ui-monospace,Menlo,monospace;white-space:pre-wrap;word-break:break-all;max-height:38vh;overflow:auto}
+.kt-val{margin-top:8px;font-weight:800;font-size:14px}
 .gal-ico{flex-shrink:0;pointer-events:none}
 .fb-photo{border:none;background:none;font-size:26px;padding:4px}
 
@@ -5014,6 +5016,37 @@ async function openRancherVerify() {
     picker, docsBox, err, save,
     h('p', { class: 'hint', style: 'margin-top:10px' }, 'La insignia significa que vimos papeles de productor. Aun así, siempre revisa el animal en persona antes de pagar.'));
 }
+// Prueba de teclado: muestra qué eventos manda el teclado del teléfono (para encontrar fallas al escribir)
+function openKeyTest() {
+  const log = h('pre', { class: 'kt-log' });
+  const lines = [];
+  const add = (t) => { lines.push(t); if (lines.length > 40) lines.shift(); log.textContent = lines.join('\n'); };
+  const inp = h('input', { class: 'input', placeholder: 'Escribe aquí: hola 123', autocomplete: 'off' });
+  const ta = h('textarea', { class: 'input', rows: 2, placeholder: 'Y aquí también' });
+  const val = h('div', { class: 'kt-val' }, 'Valor: (vacío)');
+  [inp, ta].forEach((el, i) => {
+    const n = i ? 'T' : 'I';
+    el.addEventListener('keydown', (e) => add(`${n} keydown key=${e.key} code=${e.keyCode} prevented=${e.defaultPrevented}`));
+    el.addEventListener('beforeinput', (e) => add(`${n} beforeinput ${e.inputType} "${e.data || ''}" prevented=${e.defaultPrevented}`));
+    el.addEventListener('input', () => { add(`${n} input → "${el.value}"`); val.textContent = 'Valor: "' + el.value + '"'; });
+    el.addEventListener('compositionstart', () => add(`${n} compositionstart`));
+    el.addEventListener('compositionend', (e) => add(`${n} compositionend "${e.data || ''}"`));
+    el.addEventListener('focus', () => add(`${n} focus`));
+    el.addEventListener('blur', () => add(`${n} blur → activo: ${document.activeElement && (document.activeElement.tagName + '.' + document.activeElement.className).slice(0, 40)}`));
+  });
+  // ¿Alguien más bloquea las teclas? (escucha en todo el documento, después de los demás)
+  const late = (e) => { if (e.defaultPrevented) add('⚠️ ' + e.type + ' bloqueado por la app'); };
+  ['keydown', 'beforeinput', 'keypress'].forEach(t => document.addEventListener(t, late));
+  const ua = navigator.userAgent;
+  add('Navegador: ' + (/SamsungBrowser\/[\d.]+/.exec(ua) || /Chrome\/[\d.]+/.exec(ua) || ['?'])[0] + (matchMedia('(display-mode: standalone)').matches ? ' · app instalada' : ' · navegador'));
+  add('Pantalla: ' + innerWidth + 'x' + innerHeight + ' · teclado: ' + (getComputedStyle(document.documentElement).getPropertyValue('--kb') || '0'));
+  const close = openSheet('⌨️ Probar el teclado', h('div', { class: 'sheet-body' },
+    h('p', { class: 'hint', style: 'margin:0 0 10px' }, 'Escribe algo en las dos barras. Luego toma una captura de pantalla de esta ventana y mándasela al equipo de Ranchfolk.'),
+    inp, h('div', { style: 'height:8px' }), ta, val, log));
+  const obs = new MutationObserver(() => { if (!document.body.contains(log)) { ['keydown', 'beforeinput', 'keypress'].forEach(t => document.removeEventListener(t, late)); obs.disconnect(); } });
+  obs.observe(document.body, { childList: true });
+  return close;
+}
 async function renderProfile() {
   const id = state.profileId || state.me.id;
   const isMe = id === state.me.id;
@@ -5496,6 +5529,7 @@ function openMenu() {
       e2, h('div', {}, h('b', {}, 'Ahorro de datos'), lab)); };
   const help = section('❓', 'Ayuda y soporte técnico', [
     row('📖', 'Cómo usar Ranchfolk', () => openHowTo()),
+    row('⌨️', 'Probar el teclado', goTo(openKeyTest), 'Si no puedes escribir, esto nos ayuda a encontrar la falla'),
     row('🛠️', 'Reportar un problema', () => openSheet('Reportar un problema', h('div', { class: 'sheet-body', style: 'line-height:1.5' },
       h('p', {}, '¿Algo no funciona bien? Cuéntanos qué pasó y en qué pantalla.'),
       h('p', {}, CONTACT ? 'Escríbenos a ' + CONTACT : 'Escríbenos por mensaje a la página de Ranchfolk en Facebook.'),
