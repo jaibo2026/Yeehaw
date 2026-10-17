@@ -222,6 +222,8 @@ main{flex:1;padding-bottom:calc(104px + env(safe-area-inset-bottom))}
 .adm-gv dl{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;margin:8px 0;font-size:14px}.adm-gv dt{color:var(--muted)}.adm-gv dd{margin:0;font-weight:700}
 .kt-log{margin:10px 0 0;padding:10px;border-radius:10px;background:#172531;color:#d6f5d6;font:12px/1.35 ui-monospace,Menlo,monospace;white-space:pre-wrap;word-break:break-all;max-height:38vh;overflow:auto}
 .kt-val{margin-top:8px;font-weight:800;font-size:14px}
+.gv-cta{cursor:pointer;background:rgba(255,255,255,.1)!important;border:1px dashed #F3BD68!important;color:#F3BD68!important;font:inherit;font-size:13px;font-weight:800}
+.gv-cta.wait{border-style:solid!important;color:#FBE3B4!important}.gv-cta.no{border-color:#F2A3A3!important;color:#F7C6C6!important}
 .gal-ico{flex-shrink:0;pointer-events:none}
 .fb-photo{border:none;background:none;font-size:26px;padding:4px}
 
@@ -4952,6 +4954,17 @@ function scamWarnEl(fromOther, onReport) {
     fromOther ? h('button', { type: 'button', class: 'linkbtn', onclick: onReport }, '🚩 Reportar a esta persona') : null);
 }
 
+// En tu propio perfil, si aún no estás verificado: botón para mandar la solicitud
+function gvCta() {
+  const lab = h('span', {}, '🐄 Ganadero no verificado · ', h('u', {}, 'Verificarme'));
+  const b = h('button', { class: 'gbadge big gv-cta', type: 'button', onclick: () => openRancherVerify() }, lab);
+  sb.from('rancher_requests').select('status').eq('user_id', state.me.id).maybeSingle().then(({ data }) => {
+    if (!data) return;
+    if (data.status === 'pendiente') { b.classList.add('wait'); lab.replaceChildren('⏳ Verificación en revisión'); }
+    else if (data.status === 'rechazado') { b.classList.add('no'); lab.replaceChildren('🐄 No verificado · ', h('u', {}, 'Ver por qué')); }
+  }, () => {});
+  return b;
+}
 // Solicitud de Ganadero verificado
 async function openRancherVerify() {
   if (needLogin('Crea tu cuenta para verificarte')) return;
@@ -5100,7 +5113,7 @@ async function renderProfile() {
     cover,
     avBtn,
     h('h1', {}, prof.full_name || prof.username, vb(prof.id)),
-    gb(prof.id, true),
+    gb(prof.id, true) || (isMe && HAS_TRUST && !isGuest() ? gvCta() : null),
     h('div', { class: 'pf-sub' }, '@' + prof.username + (prof.ubicacion || prof.estado ? ' · 📍 ' + [prof.ubicacion, prof.estado && !(prof.ubicacion || '').toLowerCase().includes(prof.estado.toLowerCase()) ? prof.estado : ''].filter(Boolean).join(', ') : '')),
     ratingSlot,
     hasF ? h('div', { class: 'pf-stats' },
