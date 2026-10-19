@@ -1859,7 +1859,7 @@ function suggestionsCard(title) {
 // ---------- Invitar por WhatsApp ----------
 const INVITE_TXT = '¡Únete a Ranchfolk, la red social del rancho! 🤠🐎 Comparte tus caballos y tu ganado, entérate de jaripeos, cabalgatas y bailes, y compra y vende en La Feria. Es gratis:';
 function inviteFriends() {
-  const url = location.origin + location.pathname;
+  const url = location.origin + location.pathname.replace(/[^/]*$/, '') + 'instalar.html';   // la página con los pasos para instalar y su vista previa
   const wa = 'https://wa.me/?text=' + encodeURIComponent(INVITE_TXT + ' ' + url);
   const close = openSheet('Invitar a mis compas', h('div', { class: 'sheet-body', style: 'line-height:1.5' },
     h('p', { style: 'margin-top:0' }, 'Entre más gente de rancho haya, más ventas, eventos y amigos vas a encontrar. 🤝'),
