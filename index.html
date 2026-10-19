@@ -1048,6 +1048,57 @@ html,body{background:#F5EFE3!important;background-image:none!important;color:#17
 .sd-reply .sendbtn{color:#172531!important}
 .btn.ghost{background:#FFFDF8!important;color:#172531!important;border:1.5px solid #2C4657!important;box-shadow:none!important}
 .auth::before{background:radial-gradient(60% 40% at 50% 0%,rgba(243,189,104,.35),transparent 70%)!important}
+/* ===== Ranchfolk · sistema de botones 2.0 (limpio y consistente, estilo apps grandes) ===== */
+:root{--rf-navy:#172531;--rf-navy2:#24384A;--rf-gold:#EFB45C;--rf-gold-d:#D99A3E;--rf-sand:#EDE3D1;--rf-sand-d:#E2D5BE;--rf-line:#DCCDB2;--rf-red:#C62828;--rf-red-t:#FCE9E9;--rf-cream:#FFFDF8}
+/* Base: misma altura, mismo radio, sin costuras punteadas, sin sombras de "botón 3D" */
+html .btn{height:48px!important;border-radius:12px!important;font-size:15px!important;font-weight:700!important;letter-spacing:.1px;outline:none!important;box-shadow:none!important;transition:transform .12s ease,background-color .15s ease,filter .15s ease;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+html .btn::before,html .btn::after{display:none!important}
+html .btn:active{transform:scale(.97)}
+html .btn:focus-visible,html .chip:focus-visible,html .iconbtn:focus-visible{outline:3px solid rgba(239,180,92,.6)!important;outline-offset:2px!important}
+html .btn.small{height:40px!important;border-radius:10px!important;font-size:14px!important;padding:0 16px!important}
+/* Primario (la acción principal de la pantalla): dorado sólido */
+html .btn,html .btn.fx-gold,html .btn.pf-gold{background:var(--rf-gold)!important;color:var(--rf-navy)!important;border:none!important}
+html .btn:active{background:var(--rf-gold-d)!important}
+/* Secundario: arena suave, sin borde (como los botones grises de Facebook) */
+html .btn.ghost{background:var(--rf-sand)!important;color:var(--rf-navy)!important;border:none!important}
+html .btn.ghost:active{background:var(--rf-sand-d)!important}
+/* Peligro */
+html .btn.danger-btn{background:var(--rf-red)!important;color:#fff!important}
+html .btn.ghost[style*="C2183A"]{background:var(--rf-red-t)!important;color:var(--rf-red)!important}
+/* Botón flotante */
+html .fx-fab{height:52px;border-radius:16px;background:var(--rf-gold)!important;box-shadow:0 6px 18px rgba(23,37,49,.28)!important;outline:none!important}
+/* Chips / filtros: planos, el elegido en azul marino con texto blanco */
+html .chip{height:36px!important;padding:0 14px!important;border-radius:18px!important;border:1px solid var(--rf-line)!important;background:var(--rf-cream)!important;color:var(--rf-navy)!important;font-weight:600!important;font-size:14px!important;box-shadow:none!important;outline:none!important}
+html .chip.on{background:var(--rf-navy)!important;border-color:var(--rf-navy)!important;color:#fff!important}
+/* Pestañas segmentadas */
+html .fx-seg{border-radius:12px!important;padding:3px!important;background:var(--rf-sand)!important}
+html .fx-seg button{height:38px!important;border-radius:10px!important;font-size:14px!important;font-weight:700!important;color:#5A6B78!important;white-space:nowrap}
+html .fx-seg button.on{background:#fff!important;color:var(--rf-navy)!important;box-shadow:0 1px 3px rgba(23,37,49,.18)!important}
+html .fx-seg.feed-seg{background:var(--rf-sand)!important}
+html .fx-seg.feed-seg button{color:#5A6B78!important}
+html .fx-seg.feed-seg button.on{background:#fff!important;color:var(--rf-navy)!important}
+/* Botones de ícono en la barra de arriba: círculos lisos, sin borde dorado */
+html .topbar .iconbtn:not(.plain){width:40px!important;height:40px!important;background:rgba(255,255,255,.1)!important;border:none!important}
+html .topbar .iconbtn:active{background:rgba(255,255,255,.2)!important}
+/* Insignias sobre las fotos: no se encimen */
+html .fx-gan{top:auto!important;bottom:6px!important;right:6px!important;left:auto!important}
+html .fx-card .fx-vid{left:6px!important;bottom:6px!important}
+/* Menú */
+html .mn-tile{border:none!important;background:#fff!important;box-shadow:0 1px 3px rgba(23,37,49,.12)!important;border-radius:12px!important}
+/* "Voy" de eventos y pastillas pequeñas */
+html .ev-go,html .ev-voy{border-radius:10px!important}
+html .btn.danger-btn,html .sheet .btn.danger-btn{box-shadow:none!important;border:none!important;background-image:none!important}
+html .kinds{border-radius:12px;padding:3px;background:var(--rf-sand);border:none}
+html .kinds button{height:38px;border-radius:10px;color:#5A6B78}
+html .kinds button.on{background:#fff!important;color:var(--rf-navy)!important;box-shadow:0 1px 3px rgba(23,37,49,.18)!important}
+html .topbar>.logo:only-child{padding:10px 0 14px}
+html .bi{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;margin-right:2px}
+html .bi svg{width:18px;height:18px}
+html .btn.small .bi svg{width:16px;height:16px}
+html .fx-report{display:inline-flex;align-items:center;gap:6px}
+html .fx-report .bi svg{width:15px;height:15px}
+/* Pantalla Subir: el título no se recorta */
+html .up-top,html .upload-head{padding-top:6px}
 </style>
 </head>
 <body>
@@ -1419,6 +1470,31 @@ const ICONS = {
   edit: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
   trash: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>'
 };
+ICONS.upload = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="m7 8 5-5 5 5"/><path d="M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg>';
+ICONS.check = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+ICONS.chat = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8A8.5 8.5 0 0 1 12.5 3 8.4 8.4 0 0 1 21 11.5z"/></svg>';
+ICONS.star = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3 6.4 20.2l1.1-6.2L3 9.6l6.2-.9z"/></svg>';
+ICONS.video = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="m16 10 6-3v10l-6-3"/></svg>';
+ICONS.x = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>';
+ICONS.link = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>';
+ICONS.pin = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>';
+ICONS.cam = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>';
+// Botones: los emojis del principio se cambian por íconos de línea (se ven igual en todos los teléfonos)
+const BTN_EMO = [['✏️', 'edit'], ['📤', 'upload'], ['🗑️', 'trash'], ['💬', 'chat'], ['⛔', 'block'], ['🚩', 'flag'], ['📷', 'cam'], ['✅', 'check'], ['✓', 'check'], ['❌', 'x'], ['⭐', 'star'], ['🔄', 'refresh'], ['🎥', 'video'], ['🔗', 'link'], ['📍', 'pin'], ['✕', 'x']];
+function btnIcon(el) {
+  const t = el.firstChild;
+  if (!t || t.nodeType !== 3) return;
+  const txt = t.textContent.replace(/^\s+/, '');
+  for (const [e, k] of BTN_EMO) {
+    if (txt.startsWith(e) && ICONS[k]) {
+      const rest = txt.slice(e.length).replace(/^[\s\uFE0F]+/, '');
+      const ic = document.createElement('span'); ic.className = 'bi'; ic.setAttribute('aria-hidden', 'true'); ic.innerHTML = ICONS[k];
+      t.textContent = rest; el.insertBefore(ic, t);
+      return;
+    }
+  }
+}
+
 
 // ---------- utilidades ----------
 // Ícono dorado de galería
@@ -1438,6 +1514,7 @@ function h(tag, attrs, ...kids) {
     if (kid == null || kid === false) continue;
     el.append(kid instanceof Node ? kid : document.createTextNode(String(kid)));
   }
+  if (tag === 'button' && /(^|\s)(btn|fx-fab|fx-report|fx-seller)(\s|$)/.test(el.className)) btnIcon(el);
   return el;
 }
 const $app = document.getElementById('app');
@@ -3230,7 +3307,7 @@ function compaBtn(id, opts = {}) {
   const b = h('button', { type: 'button', class: 'btn' + (opts.small ? ' small' : '') });
   const paint = () => {
     const c = compaOf(id);
-    b.className = 'btn' + (opts.small ? ' small' : '') + (!c ? ' pf-gold' : c.status === 'pendiente' && c.dir === 'in' ? ' pf-gold' : ' ghost');
+    b.className = 'btn' + (opts.small ? ' small' : '') + (!c ? (opts.small ? ' pf-gold' : ' ghost') : c.status === 'pendiente' && c.dir === 'in' ? ' pf-gold' : ' ghost');
     b.replaceChildren(h('span', { icon: 'compas', class: 'cb-ico' }), h('span', {}, !c ? (opts.small ? 'Agregar' : 'Agregar compa') : c.status === 'aceptada' ? 'Compas' : c.dir === 'out' ? 'Enviada' : 'Responder'));
   };
   b.addEventListener('click', async (e) => {
