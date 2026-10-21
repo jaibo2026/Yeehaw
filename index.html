@@ -1092,6 +1092,22 @@ html .kinds{border-radius:12px;padding:3px;background:var(--rf-sand);border:none
 html .kinds button{height:38px;border-radius:10px;color:#5A6B78}
 html .kinds button.on{background:#fff!important;color:var(--rf-navy)!important;box-shadow:0 1px 3px rgba(23,37,49,.18)!important}
 html .topbar>.logo:only-child{padding:10px 0 14px}
+html .btn.wa-btn{background:#25D366!important;color:#fff!important}
+html .btn.wa-btn:active{background:#1EB257!important}
+.fx-wa-tip{margin:6px 2px 0;font-size:13px;color:var(--muted);text-align:center}
+.gd-card{margin:4px 14px 12px;padding:14px;border-radius:16px;background:linear-gradient(180deg,#24384A,#172531);color:#F3EBDD;display:flex;flex-direction:column;gap:12px;box-shadow:0 4px 14px rgba(23,37,49,.18)}
+.gd-txt b{display:block;font-size:17px;color:#F3BD68}
+.gd-txt span{display:block;font-size:13.5px;color:#C9D3DA;margin-top:2px}
+.gd-btns{display:flex;gap:8px}
+.gd-btns .btn{flex:1;height:46px!important;font-size:15px!important}
+html .gd-card .btn.ghost{background:rgba(255,255,255,.12)!important;color:#F3EBDD!important}
+.gd-btns .bi svg{width:18px;height:18px}
+.tabbar .nav-feria{flex:1.2 1 0;flex-direction:column;gap:2px;height:64px;margin-top:-14px;opacity:1;color:#F3BD68}
+.nav-feria .nf-circle{width:52px;height:52px;border-radius:50%;background:#EFB45C;color:#172531;display:grid;place-items:center;box-shadow:0 4px 12px rgba(0,0,0,.35);border:3px solid #172531}
+.nav-feria .nf-circle svg{width:26px;height:26px}
+.nav-feria small{font-size:10.5px;font-weight:800;letter-spacing:.02em;color:#F3BD68}
+.tabbar .nav-feria.on::before{display:none}
+.nav-feria.on .nf-circle{background:#F3BD68;box-shadow:0 0 0 3px rgba(243,189,104,.35),0 4px 12px rgba(0,0,0,.35)}
 html .bi{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;margin-right:2px}
 html .bi svg{width:18px;height:18px}
 html .btn.small .bi svg{width:16px;height:16px}
@@ -2258,17 +2274,22 @@ function navBar() {
   return h('nav', { class: 'tabbar' }, h('div', { class: 'tabbar-in' },
     b('feed', h('span', { icon: 'home', style: 'display:flex' }), 'Inicio', state.view === 'feed'),
     b('rides', h('span', { icon: 'horseshoe', style: 'display:flex' }), 'Rides', state.view === 'rides'),
+    feriaTab(),
     b('compas', h('span', { icon: 'compas', style: 'display:flex' }), 'Compas', state.view === 'compas', compaBadge),
-    b('feria', h('span', { icon: 'feria', style: 'display:flex' }), 'La Feria', state.view === 'feria'),
-    navBell(),
     b('profile', me, 'Perfil', ownProfile)));
+  // La Feria va al centro y resalta: es a lo que se viene a Ranchfolk (comprar y vender ganado)
+  function feriaTab() {
+    const on = state.view === 'feria';
+    return h('button', { class: 'nav-feria' + (on ? ' on' : ''), 'aria-label': 'La Feria: comprar y vender', title: 'La Feria', onclick: () => { state.feriaTab = 'mercado'; go('feria'); } },
+      h('span', { class: 'nf-circle' }, h('span', { icon: 'feria', style: 'display:flex' })), h('small', {}, 'La Feria'));
+  }
 }
 // Botones de arriba (como Facebook): publicar, buscar, menú y mensajes
 function plusButton() {
   return h('button', { class: 'iconbtn dm-btn top-plus', 'aria-label': 'Publicar', icon: 'plus', onclick: () => { if (needLogin('Crea tu cuenta para subir tus fotos y videos')) return; if (state.view === 'rides') return openRideCreator(); state.uploadKind = 'post'; go('upload'); } });
 }
 function topActions() {
-  return h('div', { class: 'top-actions' }, plusButton(), searchButton(), menuButton(), dmButton());
+  return h('div', { class: 'top-actions' }, searchButton(), bellButton(), menuButton(), dmButton());
 }
 
 // ---------- pantallas ----------
@@ -2278,7 +2299,7 @@ function render() {
   $app.replaceChildren();
   if (!state.session && state.view === 'auth') return renderAuth();
   if (!state.me) { $app.append(h('div', { class: 'spinner' })); return; }
-  if (isGuest() && !['feed', 'rides', 'explore', 'profile', 'animal'].includes(state.view)) state.view = 'feed';
+  if (isGuest() && !['feed', 'rides', 'explore', 'profile', 'animal', 'feria'].includes(state.view)) state.view = 'feed';
   if (state.view === 'welcome') return renderWelcome();
   const views = { compas: renderCompas, saved: renderSaved, admin: renderAdmin, feed: renderFeed, rides: renderRides, explore: renderExplore, upload: renderUpload, profile: renderProfile, animal: renderAnimal, inbox: renderInbox, chat: renderChat, notifs: renderNotifs, feria: renderFeria };
   (views[state.view] || renderFeed)();
@@ -2395,7 +2416,7 @@ async function renderFeed() {
     h('button', { class: 'fb-av', 'aria-label': 'Tu perfil', onclick: () => go('profile', { profileId: state.me.id }) }, avatar(state.me, 42)),
     h('button', { class: 'fb-pill', onclick: () => { state.uploadKind = 'post'; go('upload'); } }, '¿Qué hay de nuevo?'),
     h('button', { class: 'fb-photo', 'aria-label': 'Subir foto o video', onclick: () => { state.uploadKind = 'post'; state.uploadPick = true; go('upload'); } }, galIco(30)));
-  main.append(...[banned ? h('div', { class: 'ban-note' }, '⛔ Tu cuenta está suspendida' + (new Date(state.me.banned_until).getFullYear() > 2100 ? '' : ' hasta el ' + new Date(state.me.banned_until).toLocaleDateString('es-MX')) + ' por no seguir las reglas. Puedes ver la app, pero no publicar, comentar ni mandar mensajes.') : null, think, stories, feriaShowcase(), welcomeCard(), seg, chips, list].filter(Boolean));
+  main.append(...[banned ? h('div', { class: 'ban-note' }, '⛔ Tu cuenta está suspendida' + (new Date(state.me.banned_until).getFullYear() > 2100 ? '' : ' hasta el ' + new Date(state.me.banned_until).toLocaleDateString('es-MX')) + ' por no seguir las reglas. Puedes ver la app, pero no publicar, comentar ni mandar mensajes.') : null, think, ganadoCard(), stories, feriaShowcase(), welcomeCard(), seg, chips, list].filter(Boolean));
 
   // Sundowns: lo que subieron en las últimas 24 horas
   // Como Facebook: tarjetas altas. Primero "Crear vivencia" y "Crear ride", luego las vivencias de cada quien
@@ -5137,6 +5158,62 @@ function openKeyTest() {
   obs.observe(document.body, { childList: true });
   return close;
 }
+// ---------- Compartir un anuncio en WhatsApp con su tarjeta (foto, precio e insignias) ----------
+const WA_SVG = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7a2.8 2.8 0 0 0 1.9-1.3 2.3 2.3 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3z"/></svg>';
+function loadImg(src) {
+  return new Promise((ok, no) => { const im = new Image(); im.crossOrigin = 'anonymous'; im.onload = () => ok(im); im.onerror = no; im.src = src; });
+}
+async function listingCardBlob(l) {
+  const W = 1080, H = 1350, c = document.createElement('canvas'); c.width = W; c.height = H;
+  const x = c.getContext('2d');
+  try { await Promise.all([document.fonts.load('80px Rye'), document.fonts.load('800 60px "Work Sans"')]); } catch (_) {}
+  x.fillStyle = '#172531'; x.fillRect(0, 0, W, H);
+  const ps = (l.photos || []).filter(Boolean);
+  const src = ps.find(u => !isVidUrl(u)) || (ps[0] ? posterOf(ps[0]) : null);
+  const PH = 860;
+  if (src) {
+    try {
+      const im = await loadImg(src);
+      const sc = Math.max(W / im.width, PH / im.height), w = im.width * sc, hh = im.height * sc;
+      x.drawImage(im, (W - w) / 2, (PH - hh) / 2, w, hh);
+    } catch (_) { x.fillStyle = '#24384A'; x.fillRect(0, 0, W, PH); }
+  } else { x.fillStyle = '#24384A'; x.fillRect(0, 0, W, PH); x.font = '220px serif'; x.textAlign = 'center'; x.fillText(LCAT_EMO[l.category] || '📦', W / 2, PH / 2 + 80); x.textAlign = 'left'; }
+  const g = x.createLinearGradient(0, PH - 260, 0, PH); g.addColorStop(0, 'rgba(23,37,49,0)'); g.addColorStop(1, 'rgba(23,37,49,1)');
+  x.fillStyle = g; x.fillRect(0, PH - 260, W, 260);
+  // Insignias sobre la foto
+  const pill = (txt, bx, by, bg, fg) => { x.font = '800 34px "Work Sans", Arial, sans-serif'; const tw = x.measureText(txt).width; x.fillStyle = bg; x.beginPath(); x.roundRect(bx, by, tw + 44, 62, 31); x.fill(); x.fillStyle = fg; x.fillText(txt, bx + 22, by + 43); return tw + 44 + 12; };
+  let bx = 40;
+  if (GANADEROS.has(l.user_id)) bx += pill('🐄 Ganadero verificado', bx, 40, 'rgba(23,96,43,.95)', '#fff');
+  if (l.live_at) pill('🎥 Video en vivo', bx, 40, 'rgba(198,40,40,.95)', '#fff');
+  // Precio, título y lugar
+  x.fillStyle = '#F3BD68'; x.font = '800 104px "Work Sans", Arial, sans-serif'; x.fillText(money(l.price), 56, PH + 120);
+  x.fillStyle = '#F3EBDD'; x.font = '700 52px "Work Sans", Arial, sans-serif';
+  const words = String(l.title || '').split(/\s+/); let line = '', y = PH + 196, lines = 0;
+  for (const wd of words) { const t = line ? line + ' ' + wd : wd; if (x.measureText(t).width > W - 112 && line) { x.fillText(line, 56, y); y += 64; line = wd; if (++lines === 2) { line += '…'; break; } } else line = t; }
+  if (lines < 2 && line) x.fillText(line, 56, y);
+  const place = placeOf(l.location, l.estado);
+  if (place) { x.fillStyle = '#A9B6C0'; x.font = '500 38px "Work Sans", Arial, sans-serif'; x.fillText('📍 ' + place, 56, Math.min(y + 70, H - 150)); }
+  // Pie: marca
+  x.fillStyle = '#0F1A23'; x.fillRect(0, H - 110, W, 110);
+  x.strokeStyle = 'rgba(239,180,92,.7)'; x.lineWidth = 3; x.setLineDash([16, 12]); x.beginPath(); x.moveTo(30, H - 112); x.lineTo(W - 30, H - 112); x.stroke(); x.setLineDash([]);
+  x.fillStyle = '#F3BD68'; x.font = '58px Rye, Georgia, serif'; x.fillText('Ranchfolk', 50, H - 36);
+  x.fillStyle = '#D7DEE3'; x.font = '600 34px "Work Sans", Arial, sans-serif'; x.textAlign = 'right'; x.fillText('La Feria · Míralo en la app', W - 50, H - 44); x.textAlign = 'left';
+  return await new Promise(ok => c.toBlob(ok, 'image/jpeg', 0.88));
+}
+async function shareListingWA(l, btn) {
+  const link = location.origin + location.pathname + '#l=' + l.id;
+  const text = `${LCAT_EMO[l.category] || '🛒'} ${l.title} · ${money(l.price)}${l.location ? ' · 📍 ' + l.location : ''}\nMíralo en La Feria de Ranchfolk:\n${link}`;
+  const old = btn && btn.lastChild && btn.lastChild.textContent;
+  if (btn) { btn.disabled = true; btn.lastChild.textContent = 'Preparando…'; }
+  try {
+    const blob = await listingCardBlob(l);
+    const file = blob && new File([blob], 'ranchfolk-' + l.id + '.jpg', { type: 'image/jpeg' });
+    if (file && navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], text }); return; }
+  } catch (e) { if (e && e.name === 'AbortError') return; }
+  finally { if (btn) { btn.disabled = false; btn.lastChild.textContent = old; } }
+  // Si el teléfono no deja compartir la imagen: solo el texto con el enlace (WhatsApp muestra la vista previa)
+  window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank', 'noopener');
+}
 async function renderProfile() {
   const id = state.profileId || state.me.id;
   const isMe = id === state.me.id;
@@ -5869,15 +5946,19 @@ function openListing(l) {
   car.addEventListener('scroll', () => { const i = Math.round(car.scrollLeft / car.clientWidth); [...dots.children].forEach((d, k) => d.classList.toggle('on', k === i)); }, { passive: true });
   car.addEventListener('click', (e) => { if (e.target.tagName === 'IMG') openMediaViewer(e.target.src, 'image'); });
   const link = location.origin + location.pathname + '#l=' + l.id;
+  const waShare = h('button', { class: 'btn wa-btn', type: 'button', onclick: () => shareListingWA(l, waShare) }, h('span', { class: 'bi', 'aria-hidden': 'true', html: true }), 'Compartir en WhatsApp');
+  waShare.firstChild.innerHTML = WA_SVG;
   const share = async () => { try { if (navigator.share) await navigator.share({ title: l.title, text: `${l.title} · ${money(l.price)} en La Feria de Ranchfolk`, url: link }); else { await navigator.clipboard.writeText(link); toast('Enlace copiado'); } } catch (_) {} };
   const actions = mine ? [
-    h('button', { class: 'btn', onclick: async () => { const st = l.status === 'vendido' ? 'activo' : 'vendido'; const { error } = await sb.from('listings').update({ status: st }).eq('id', l.id); if (error) return toast('No se pudo guardar'); close(); toast(st === 'vendido' ? '¡Felicidades por la venta! 🎉' : 'Anuncio activo otra vez'); if (st === 'vendido') { SFX.play('ajua'); setTimeout(() => askBuyer(l), 700); } if (state.view === 'feria') render(); } }, l.status === 'vendido' ? 'Volver a poner a la venta' : '✅ Marcar como vendido'),
+    l.status !== 'vendido' ? waShare : null,
+    l.status !== 'vendido' ? h('p', { class: 'fx-wa-tip' }, 'Compártelo en tus grupos y estados: llega con foto, precio y tu insignia.') : null,
+    h('button', { class: 'btn ghost', style: 'margin-top:8px', onclick: async () => { const st = l.status === 'vendido' ? 'activo' : 'vendido'; const { error } = await sb.from('listings').update({ status: st }).eq('id', l.id); if (error) return toast('No se pudo guardar'); close(); toast(st === 'vendido' ? '¡Felicidades por la venta! 🎉' : 'Anuncio activo otra vez'); if (st === 'vendido') { SFX.play('ajua'); setTimeout(() => askBuyer(l), 700); } if (state.view === 'feria') render(); } }, l.status === 'vendido' ? 'Volver a poner a la venta' : '✅ Marcar como vendido'),
     h('div', { style: 'display:flex;gap:8px;margin-top:8px' },
       h('button', { class: 'btn ghost', style: 'flex:1', onclick: () => { close(); listingForm(l); } }, '✏️ Editar'),
       h('button', { class: 'btn ghost', style: 'flex:1', onclick: share }, '📤 Compartir'),
       h('button', { class: 'btn ghost', style: 'flex:1;color:#C2183A', onclick: async () => { if (!confirm('¿Borrar este anuncio?')) return; const { error } = await sb.from('listings').delete().eq('id', l.id); if (error) return toast('No se pudo borrar'); const paths = photos.map(u => u.split('/media/')[1]).filter(Boolean).map(decodeURIComponent).flatMap(withVariants); if (paths.length) sb.storage.from('media').remove(paths); close(); toast('Anuncio borrado'); if (state.view === 'feria') render(); } }, '🗑️'))] : [
     l.status !== 'vendido' && h('button', { class: 'btn fx-gold', onclick: () => interested(l) }, '💬 Me interesa'),
-    h('button', { class: 'btn ghost', style: 'margin-top:8px', onclick: share }, '📤 Compartir anuncio')];
+    h('div', { style: 'display:flex;gap:8px;margin-top:8px' }, (waShare.style.flex = '1', waShare), h('button', { class: 'btn ghost', style: 'flex:0 0 52px;padding:0', 'aria-label': 'Compartir de otra forma', onclick: share }, h('span', { class: 'bi', icon: 'upload' })))];
   const sellerRow = h('div', { class: 'fx-rating' });
   if (HAS_REV) sellerRating(l.user_id).then(r => {
     if (!r) return;
@@ -6189,6 +6270,16 @@ async function openEventById(id) {
   openEvent(data);
 }
 // Vitrina de La Feria en el inicio
+// Inicio: lo primero que se ve es comprar y vender ganado
+function ganadoCard() {
+  const sell = () => { if (needLogin('Crea tu cuenta para vender tu ganado')) return; state.feriaCat = 'Ganado'; listingForm(null); };
+  const buy = () => { state.feriaTab = 'mercado'; state.feriaCat = 'Ganado'; state.feriaQ = ''; go('feria'); };
+  return h('section', { class: 'gd-card', 'aria-label': 'Comprar y vender ganado' },
+    h('div', { class: 'gd-txt' }, h('b', {}, '¿Compras o vendes ganado?'), h('span', {}, 'Ganaderos verificados y video en vivo con fecha. Gratis.')),
+    h('div', { class: 'gd-btns' },
+      h('button', { class: 'btn gd-sell', type: 'button', onclick: sell }, h('span', { class: 'bi', 'aria-hidden': 'true', icon: 'plus' }), 'Vender ganado'),
+      h('button', { class: 'btn ghost gd-buy', type: 'button', onclick: buy }, h('span', { class: 'bi', 'aria-hidden': 'true', icon: 'search' }), 'Buscar ganado')));
+}
 function feriaShowcase() {
   const box = h('section', { class: 'fx-show', hidden: true });
   (async () => {
