@@ -1145,6 +1145,26 @@ html.msg-dark .msg-q-b{background:#22384A;color:#C9D3DA}
 html.msg-dark .mchat .msg.unsent{border-color:#2F4759!important;color:#A9B6C0!important}
 html.msg-dark .msg-rx{background:#24384A}
 html.msg-dark .mchat .dm-empty span,html.msg-dark .mchat .dm-empty small{color:#A9B6C0}
+/* ===== Filtros ===== */
+.fx-ov{position:absolute;inset:0;pointer-events:none;z-index:1}
+.fx-ov i{position:absolute;inset:0}
+.rc-cam .rc-fx{z-index:1}
+.fx-strip{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 8px;scrollbar-width:none;scroll-snap-type:x proximity}
+.fx-strip::-webkit-scrollbar{display:none}
+.fx-it{flex:0 0 auto;width:66px;border:none;background:none;padding:0;display:flex;flex-direction:column;align-items:center;gap:5px;scroll-snap-align:center;cursor:pointer}
+.fx-th{position:relative;width:62px;height:62px;border-radius:14px;overflow:hidden;border:2.5px solid transparent;background:#24384A}
+.fx-th img{width:100%;height:100%;object-fit:cover;display:block}
+.fx-it small{font-size:11.5px;font-weight:700;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.fx-it.on .fx-th{border-color:#EFB45C;box-shadow:0 0 0 2px rgba(239,180,92,.35)}
+.fx-it.on small{color:#F3BD68}
+.rc-bottom .fx-strip{margin:0 -20px 6px;padding-left:20px;padding-right:20px}
+.fx-ed{position:absolute;left:0;right:0;bottom:calc(76px + env(safe-area-inset-bottom));z-index:4;padding:6px 14px 8px;background:linear-gradient(transparent,rgba(0,0,0,.45))}
+.fx-up{margin:10px 0 4px}
+.fx-up .fx-it small{color:#172531;text-shadow:none}
+.fx-up .fx-it.on small{color:#A0582A}
+.rc-fxico{width:46px;height:46px;border-radius:12px;border:2px solid rgba(255,255,255,.85);display:grid;place-items:center;font-size:22px}
+.rc-fxbtn.on .rc-fxico{border-color:#EFB45C;background:rgba(239,180,92,.25)}
+.rc-cam.recording .rc-fxbtn,.rc-cam.recording .fx-strip{visibility:hidden}
 html .bi{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;margin-right:2px}
 html .bi svg{width:18px;height:18px}
 html .btn.small .bi svg{width:16px;height:16px}
@@ -1614,7 +1634,107 @@ function friendlyError(e) {
 }
 // ---------- Comprimir videos (720p, ~1.5 Mbps) antes de subirlos, como Facebook o TikTok ----------
 // Se reproduce el video en silencio por dentro y se vuelve a grabar más ligero. Tarda lo que dura el video.
+// ---------- Filtros de cámara (como Instagram). Nunca en La Feria: ahí el animal se ve tal como es ----------
+// b brillo · c contraste · s saturación · p sepia · g gris · h tono (grados) · t [color, fuerza, mezcla] · v viñeta
+const FX = [
+  { id: 'normal', n: 'Normal' },
+  { id: 'atardecer', n: 'Atardecer', b: 1.05, c: 1.08, s: 1.3, p: 0.18, t: ['#ff8a2b', 0.24, 'soft-light'], v: 0.28 },
+  { id: 'dorado', n: 'Dorado', b: 1.08, c: 1.06, s: 1.22, p: 0.1, t: ['#f3bd68', 0.26, 'overlay'], v: 0.12 },
+  { id: 'campo', n: 'Campo', b: 1.1, c: 0.96, s: 1.38, h: -6, t: ['#eaffd8', 0.14, 'soft-light'] },
+  { id: 'cielo', n: 'Cielo', c: 1.22, s: 1.35, t: ['#7fd0ff', 0.2, 'overlay'] },
+  { id: 'jaripeo', n: 'Jaripeo', b: 0.96, c: 1.35, s: 1.42, v: 0.45 },
+  { id: 'polvo', n: 'Polvo', b: 1.12, c: 0.84, s: 0.72, p: 0.22, t: ['#fff0d2', 0.22, 'screen'] },
+  { id: 'antiguo', n: 'Antiguo', b: 1.05, c: 1.1, s: 0.9, p: 0.55, t: ['#c47a3d', 0.2, 'soft-light'], v: 0.42 },
+  { id: 'lluvia', n: 'Lluvia', b: 1.03, c: 1.05, s: 0.82, h: 8, t: ['#4a7bb8', 0.2, 'soft-light'] },
+  { id: 'charro', n: 'Charro', b: 1.05, c: 1.28, g: 1, v: 0.32 },
+  { id: 'luna', n: 'Luna', b: 1.12, c: 1.1, g: 1, t: ['#9fb7d9', 0.18, 'soft-light'] }];
+const fxOn = (f) => !!(f && f.id && f.id !== 'normal');
+function fxCss(f) {
+  if (!fxOn(f)) return 'none';
+  const p = [];
+  if (f.b) p.push(`brightness(${f.b})`); if (f.c) p.push(`contrast(${f.c})`); if (f.s != null) p.push(`saturate(${f.s})`);
+  if (f.p) p.push(`sepia(${f.p})`); if (f.g) p.push(`grayscale(${f.g})`); if (f.h) p.push(`hue-rotate(${f.h}deg)`);
+  return p.join(' ') || 'none';
+}
+// Capa de color y viñeta encima de la vista previa (la misma que se "quema" en la foto o el video)
+function fxLayer() { return h('div', { class: 'fx-ov', 'aria-hidden': 'true' }, h('i', { class: 'fx-tint' }), h('i', { class: 'fx-vig' })); }
+function fxPaint(media, layer, f) {
+  if (media) media.style.filter = fxCss(f) === 'none' ? '' : fxCss(f);
+  if (!layer) return;
+  const [tint, vig] = layer.children;
+  if (fxOn(f) && f.t) { tint.style.background = f.t[0]; tint.style.opacity = f.t[1]; tint.style.mixBlendMode = f.t[2]; tint.hidden = false; } else tint.hidden = true;
+  if (fxOn(f) && f.v) { vig.style.background = `radial-gradient(ellipse at center, rgba(0,0,0,0) 48%, rgba(0,0,0,${f.v}) 100%)`; vig.hidden = false; } else vig.hidden = true;
+}
+const CTX_FILTER = (() => { try { const g = document.createElement('canvas').getContext('2d'); return 'filter' in g; } catch (_) { return false; } })();
+// Matriz de color equivalente a los filtros CSS (para teléfonos sin ctx.filter, como iPhone)
+function fxMatrix(f) {
+  let M = [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0]];
+  const mul = (A) => { M = A.map(r => [0, 1, 2, 3].map(j => r[0] * M[0][j] + r[1] * M[1][j] + r[2] * M[2][j] + (j === 3 ? r[3] : 0))); };
+  const lin = (a) => [[a[0], a[1], a[2], 0], [a[3], a[4], a[5], 0], [a[6], a[7], a[8], 0]];
+  if (f.b) mul([[f.b, 0, 0, 0], [0, f.b, 0, 0], [0, 0, f.b, 0]]);
+  if (f.c) { const o = 0.5 - 0.5 * f.c; mul([[f.c, 0, 0, o], [0, f.c, 0, o], [0, 0, f.c, o]]); }
+  if (f.s != null) { const s = f.s; mul(lin([0.213 + 0.787 * s, 0.715 - 0.715 * s, 0.072 - 0.072 * s, 0.213 - 0.213 * s, 0.715 + 0.285 * s, 0.072 - 0.072 * s, 0.213 - 0.213 * s, 0.715 - 0.715 * s, 0.072 + 0.928 * s])); }
+  if (f.p) { const a = 1 - f.p; mul(lin([0.393 + 0.607 * a, 0.769 - 0.769 * a, 0.189 - 0.189 * a, 0.349 - 0.349 * a, 0.686 + 0.314 * a, 0.168 - 0.168 * a, 0.272 - 0.272 * a, 0.534 - 0.534 * a, 0.131 + 0.869 * a])); }
+  if (f.g) { const a = 1 - f.g; mul(lin([0.2126 + 0.7874 * a, 0.7152 - 0.7152 * a, 0.0722 - 0.0722 * a, 0.2126 - 0.2126 * a, 0.7152 + 0.2848 * a, 0.0722 - 0.0722 * a, 0.2126 - 0.2126 * a, 0.7152 - 0.7152 * a, 0.0722 + 0.9278 * a])); }
+  if (f.h) { const r = f.h * Math.PI / 180, c = Math.cos(r), s = Math.sin(r);
+    mul(lin([0.213 + c * 0.787 - s * 0.213, 0.715 - c * 0.715 - s * 0.715, 0.072 - c * 0.072 + s * 0.928, 0.213 - c * 0.213 + s * 0.143, 0.715 + c * 0.285 + s * 0.14, 0.072 - c * 0.072 - s * 0.283, 0.213 - c * 0.213 - s * 0.787, 0.715 - c * 0.715 + s * 0.715, 0.072 + c * 0.928 + s * 0.072])); }
+  return M;
+}
+function fxPixels(g, w, hh, f) {
+  const M = fxMatrix(f), d = g.getImageData(0, 0, w, hh), a = d.data;
+  for (let i = 0; i < a.length; i += 4) {
+    const r = a[i] / 255, gg = a[i + 1] / 255, b = a[i + 2] / 255;
+    a[i] = 255 * (M[0][0] * r + M[0][1] * gg + M[0][2] * b + M[0][3]);
+    a[i + 1] = 255 * (M[1][0] * r + M[1][1] * gg + M[1][2] * b + M[1][3]);
+    a[i + 2] = 255 * (M[2][0] * r + M[2][1] * gg + M[2][2] * b + M[2][3]);
+  }
+  g.putImageData(d, 0, 0);
+}
+function fxOverlays(g, w, hh, f) {
+  g.save();
+  if (f.t) { g.globalCompositeOperation = f.t[2]; g.globalAlpha = f.t[1]; g.fillStyle = f.t[0]; g.fillRect(0, 0, w, hh); }
+  if (f.v) {
+    g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1;
+    const gr = g.createRadialGradient(w / 2, hh / 2, Math.min(w, hh) * 0.36, w / 2, hh / 2, Math.hypot(w, hh) / 2);
+    gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, `rgba(0,0,0,${f.v})`);
+    g.fillStyle = gr; g.fillRect(0, 0, w, hh);
+  }
+  g.restore();
+}
+// Dibuja una foto o un cuadro de video con el filtro ya puesto. pixels=false en video si el teléfono no tiene ctx.filter
+function fxDraw(g, src, w, hh, f, pixels) {
+  if (!fxOn(f)) { g.drawImage(src, 0, 0, w, hh); return; }
+  if (CTX_FILTER) { g.filter = fxCss(f); g.drawImage(src, 0, 0, w, hh); g.filter = 'none'; }
+  else { g.drawImage(src, 0, 0, w, hh); if (pixels) fxPixels(g, w, hh, f); }
+  if (CTX_FILTER || pixels) fxOverlays(g, w, hh, f);
+}
+// Tira de filtros para escoger, con una miniatura de tu propia foto o video
+function fxStrip(getThumb, current, onPick) {
+  const strip = h('div', { class: 'fx-strip', role: 'listbox', 'aria-label': 'Filtros' });
+  let cur = current || FX[0];
+  const paint = (thumb) => {
+    strip.replaceChildren(...FX.map(f => {
+      const im = h('img', { src: thumb, alt: '' }); im.style.filter = fxCss(f) === 'none' ? '' : fxCss(f);
+      const lay = fxLayer(); fxPaint(null, lay, f);
+      return h('button', { type: 'button', role: 'option', class: 'fx-it' + (f.id === cur.id ? ' on' : ''), 'aria-selected': String(f.id === cur.id), onclick: () => { cur = f; strip.querySelectorAll('.fx-it').forEach(b => { const on = b === btnOf(f); b.classList.toggle('on', on); b.setAttribute('aria-selected', String(on)); }); onPick(f); try { navigator.vibrate && navigator.vibrate(8); } catch (_) {} } },
+        h('span', { class: 'fx-th' }, im, lay), h('small', {}, f.n));
+    }));
+  };
+  const btnOf = (f) => strip.children[FX.indexOf(f)];
+  Promise.resolve(getThumb()).then(t => paint(t || '')).catch(() => paint(''));
+  return strip;
+}
+// Miniatura de un video (o de la cámara en vivo) para la tira de filtros
+function frameThumb(v, mirror) {
+  try {
+    const w = 120, hh = Math.round(120 * (v.videoHeight || 160) / (v.videoWidth || 120));
+    const c = document.createElement('canvas'); c.width = w; c.height = hh; const g = c.getContext('2d');
+    if (mirror) { g.translate(w, 0); g.scale(-1, 1); }
+    g.drawImage(v, 0, 0, w, hh); return c.toDataURL('image/jpeg', 0.7);
+  } catch (_) { return ''; }
+}
 async function shrinkVideo(file, onProgress, o = {}) {
+  const fx = fxOn(file && file._fx) && CTX_FILTER ? file._fx : null;   // filtro elegido: se "quema" en el video
   if (!file || !(file.type || '').startsWith('video/')) return file;
   if (!window.MediaRecorder || !HTMLCanvasElement.prototype.captureStream) return file;
   const mime = ['video/mp4;codecs=avc1.42E01E,mp4a.40.2', 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'].find(t => { try { return MediaRecorder.isTypeSupported(t); } catch (_) { return false; } });
@@ -1636,7 +1756,7 @@ async function shrinkVideo(file, onProgress, o = {}) {
     const trimming = dur < full - 0.5;
     const sc = Math.min(1, side / Math.min(W, H));
     const kbps = file.size * 8 / full / 1000;
-    if (!o.force && !trimming && sc === 1 && (kbps < (o.sd ? 2500 : 2200) || file.size < (o.sd ? 4 : 6) * 1048576)) { cleanup(); return file; }   // ya viene ligero
+    if (!o.force && !fx && !trimming && sc === 1 && (kbps < (o.sd ? 2500 : 2200) || file.size < (o.sd ? 4 : 6) * 1048576)) { cleanup(); return file; }   // ya viene ligero
     const cw = Math.round(W * sc / 2) * 2, ch = Math.round(H * sc / 2) * 2;
     const c = document.createElement('canvas'); c.width = cw; c.height = ch;
     const g = c.getContext('2d');
@@ -1676,8 +1796,8 @@ async function shrinkVideo(file, onProgress, o = {}) {
     let finish;
     const done = new Promise(r => { finish = r; });
     const draw = () => {
-      try { g.drawImage(v, 0, 0, cw, ch); } catch (_) {}
-      if (g2) try { g2.drawImage(v, 0, 0, c2.width, c2.height); } catch (_) {}
+      try { fx ? fxDraw(g, v, cw, ch, fx, false) : g.drawImage(v, 0, 0, cw, ch); } catch (_) {}
+      if (g2) try { fx ? fxDraw(g2, v, c2.width, c2.height, fx, false) : g2.drawImage(v, 0, 0, c2.width, c2.height); } catch (_) {}
       // Foto de portada: un cuadro del principio, para que el video aparezca al instante mientras carga
       if (o.sd && !posterP && v.currentTime >= Math.min(0.4, dur / 3)) posterP = new Promise(r => { try { c.toBlob(b => r(b), 'image/jpeg', 0.8); } catch (_) { r(null); } });
       if (onProgress) onProgress(Math.min(99, Math.round(v.currentTime / dur * 100)));
@@ -1696,7 +1816,7 @@ async function shrinkVideo(file, onProgress, o = {}) {
     cleanup();
     if (!ok) return file;
     const out = new Blob(chunks, { type: mime.split(';')[0] });
-    if (!out.size || (!trimming && !o.force && out.size >= file.size * 0.9)) return file;
+    if (!out.size || (!trimming && !o.force && !fx && out.size >= file.size * 0.9)) return file;
     if (onProgress) onProgress(100);
     if (o.sd) {
       const sd = rec2 && chunks2.length ? new Blob(chunks2, { type: mime.split(';')[0] }) : null;
@@ -1781,12 +1901,13 @@ function tooBig(blob) { return blob.size > MAX_UP_MB * 1048576; }
 async function compressImage(file, max = 1440) {
   if (!file.type.startsWith('image/') || file.type === 'image/gif') return file;
   const saver = SAVER.on; if (saver) max = Math.min(max, 1080);
+  const fx = fxOn(file._fx) ? file._fx : null;
   try {
     const bmp = await createImageBitmap(file);
     const s = Math.min(1, max / Math.max(bmp.width, bmp.height));
     const c = document.createElement('canvas');
     c.width = Math.round(bmp.width * s); c.height = Math.round(bmp.height * s);
-    c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+    fxDraw(c.getContext('2d'), bmp, c.width, c.height, fx, true);
     const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', saver ? 0.7 : 0.82));
     return blob || file;
   } catch (_) { return file; }
@@ -2423,7 +2544,7 @@ function renderAuth() {
   $app.append(h('div', { class: 'auth' },
     h('div', { class: 'logo' }, 'Ranchfolk'),
     h('p', { class: 'lead' }, 'La vida de rancho, en un solo lugar'),
-    h('p', { class: 'auth-organic' }, '🤠 Aquí suena el rancho: sin filtros ni canciones agregadas.'),
+    h('p', { class: 'auth-organic' }, '🤠 Aquí suena el rancho: sin poses, lo real del rancho.'),
     form,
     h('button', { type: 'button', class: 'linkbtn', style: 'margin-top:18px;text-decoration:underline;font-size:14px', onclick: () => go('feed') }, 'Seguir viendo sin cuenta'),
     h('div', { class: 'switch' }, isLogin ? '¿No tienes cuenta?' : '¿Ya tienes cuenta?',
@@ -3259,7 +3380,7 @@ async function renderWelcome() {
       h('h1', { class: 'wl-title' }, `¡Bienvenido, ${(state.me.full_name || state.me.username || '').split(' ')[0]}!`),
       h('div', { class: 'wl-organic' },
         h('b', {}, '🤠 Aquí suena el rancho'),
-        h('p', {}, 'Ranchfolk es orgánica, algo muy diferente a Facebook: sin filtros y sin canciones agregadas. Aquí se oye lo real: el ganado, los caballos, la gente y el trabajo de todos los días.'),
+        h('p', {}, 'Ranchfolk es orgánica, algo muy diferente a Facebook: sin poses y sin canciones agregadas. Aquí se oye lo real: el ganado, los caballos, la gente y el trabajo de todos los días.'),
         h('p', {}, 'Aquí va el día a día del rancho, la venta de ganado, eventos, bailes, fiestas, forrajeras, veterinarios y mucho más.')),
       h('p', { class: 'wl-sub' }, 'Ponle cara a tu perfil para que la raza te reconozca.'),
       prev, fileIn,
@@ -3681,6 +3802,7 @@ function startCreator(file, onDone, opts = {}) {
   if (!isVideo && !(file.type || '').startsWith('image/')) return toast('Escoge una foto o un video');
   if (file.size > MAX_VIDEO_MB * 1024 * 1024) return toast(`El video es muy pesado (máx. ${MAX_VIDEO_MB} MB)`);
   const url = URL.createObjectURL(file);
+  if (opts.fx) file._fx = opts.fx;
   const items = [];            // { t:'text'|'emoji'|'music', x, y, s, r, ... }
   let song = RIDE ? (opts.song || null) : null;             // { url, title, preview, art, start }
   let origMuted = RIDE ? (opts.origMuted != null ? !!opts.origMuted : !!song) : true;   // rides: ¿se oye el sonido del video?
@@ -3689,12 +3811,15 @@ function startCreator(file, onDone, opts = {}) {
   // Rides: el video se empieza a preparar y subir desde ya, mientras lo editas (como TikTok)
   let prep = null;
   const prepState = { pct: 0, done: false, err: null };
-  if (RIDE) {
-    prep = prepVideoSet(file, (n) => { prepState.pct = n; if (prepState.paint) prepState.paint(); }, RIDE_MAX_SEC)
+  const startPrep = () => {
+    prepState.pct = 0; prepState.done = false; prepState.err = null;
+    const mine = prepVideoSet(file, (n) => { if (prep !== mine) return; prepState.pct = n; if (prepState.paint) prepState.paint(); }, RIDE_MAX_SEC)
       .then(set => { if (tooBig(set.hd)) throw new Error('El video es muy largo. Prueba con uno más corto (máx. 3 minutos).'); return uploadVideoSet(set, file); })
-      .then(r => { prepState.done = true; try { localStorage.setItem('rf_pending_up', r.path); } catch (_) {} if (prepState.paint) prepState.paint(); return r; });
-    prep.catch(e => { prepState.err = e; if (prepState.paint) prepState.paint(); });
-  }
+      .then(r => { if (prep !== mine) { sb.storage.from('media').remove(withVariants(r.path)).catch(() => {}); return r; } prepState.done = true; try { localStorage.setItem('rf_pending_up', r.path); } catch (_) {} if (prepState.paint) prepState.paint(); return r; });
+    prep = mine;
+    mine.catch(e => { if (prep !== mine) return; prepState.err = e; if (prepState.paint) prepState.paint(); });
+  };
+  if (RIDE) startPrep();
   // Rides: la canción suena con el video al editar, y vuelve a empezar cuando el video da la vuelta
   let lastT = 0;
   const previewSound = () => {
@@ -3708,7 +3833,20 @@ function startCreator(file, onDone, opts = {}) {
   };
   if (RIDE && isVideo) media.addEventListener('timeupdate', () => { if (song && SONG.audio && media.currentTime < lastT - 1) try { SONG.audio.currentTime = song.start || 0; } catch (_) {} lastT = media.currentTime; });
   const layer = h('div', { class: 'sdo-layer edit' });
-  const canvas = h('div', { class: 'sd-canvas' }, media, layer);
+  const fxLay = fxLayer();
+  const canvas = h('div', { class: 'sd-canvas' }, media, fxLay, layer);
+  fxPaint(media, fxLay, file._fx);
+  // Filtros: tira abajo, como en Instagram. En rides el video se vuelve a preparar con el filtro nuevo
+  let edStrip = null, fxT = null;
+  const openFx = () => {
+    if (edStrip) { edStrip.remove(); edStrip = null; return; }
+    edStrip = fxStrip(() => isVideo ? frameThumb(media) : url, file._fx || FX[0], (f) => {
+      file._fx = f; fxPaint(media, fxLay, f);
+      if (isVideo && !CTX_FILTER && fxOn(f)) toast('En este teléfono el filtro solo se ve aquí; en video no se puede aplicar');
+      if (RIDE) { clearTimeout(fxT); fxT = setTimeout(startPrep, 900); }
+    });
+    edStrip.classList.add('fx-ed'); root.append(edStrip);
+  };
   const trash = h('div', { class: 'sdc-trash', 'aria-hidden': 'true' }, '🗑️');
   const shareLabel = RIDE ? 'Siguiente ›' : opts.total ? `Compartir ${opts.step} de ${opts.total}` : 'Compartir vivencia';
   const shareBtn = h('button', { class: 'sdc-share', type: 'button' }, shareLabel);
@@ -3720,7 +3858,7 @@ function startCreator(file, onDone, opts = {}) {
     h('div', { class: 'sdc-stage' }, canvas),
     h('div', { class: 'sdc-top' },
       h('button', { class: 'sdc-x', type: 'button', 'aria-label': 'Cancelar', onclick: () => closeAsk() }, RIDE ? '‹' : '✕'),
-      h('div', { class: 'sdc-tools' }, ORGANICA ? null : tool('🎵', RIDE ? 'Sonidos' : 'Música', () => RIDE ? (document.querySelectorAll('.ride-yt').forEach(x => x.remove()), stopSong(), rideSongSheet(root, song, (s2) => { const had = !!song; song = s2; if (song && !had) origMuted = true; if (!song) origMuted = false; paintOrig(); previewSound(); })) : openMusic()), tool('Aa', 'Texto', () => editText(null)), tool('😊', 'Emojis', () => openEmojis()), origTool)),
+      h('div', { class: 'sdc-tools' }, ORGANICA ? null : tool('🎵', RIDE ? 'Sonidos' : 'Música', () => RIDE ? (document.querySelectorAll('.ride-yt').forEach(x => x.remove()), stopSong(), rideSongSheet(root, song, (s2) => { const had = !!song; song = s2; if (song && !had) origMuted = true; if (!song) origMuted = false; paintOrig(); previewSound(); })) : openMusic()), tool('✨', 'Filtros', () => openFx()), tool('Aa', 'Texto', () => editText(null)), tool('😊', 'Emojis', () => openEmojis()), origTool)),
     trash,
     h('div', { class: 'sdc-bottom' }, shareBtn));
   document.body.append(root);
@@ -3967,8 +4105,17 @@ function openRideCreator(onDone) {
   const durs = h('div', { class: 'rc-durs' });
   const paintDurs = () => durs.replaceChildren(...[[15, '15 s'], [60, '60 s'], [180, '3 min']].map(([v, l]) => h('button', { type: 'button', class: v === maxSec ? 'on' : '', onclick: () => { if (!rec) { maxSec = v; paintDurs(); } } }, l)));
   paintDurs();
+  // Filtros en vivo, como Instagram: se ven al grabar y se aplican al video
+  let camFx = FX[0], camStrip = null;
+  const camLayer = fxLayer(); camLayer.classList.add('rc-fx');
+  const fxBtn = h('button', { class: 'rc-gal rc-fxbtn', type: 'button', onclick: () => {
+    if (rec) return;
+    if (camStrip) { camStrip.remove(); camStrip = null; fxBtn.classList.remove('on'); return; }
+    camStrip = fxStrip(() => frameThumb(live, facing === 'user'), camFx, (f) => { camFx = f; fxPaint(live, camLayer, f); fxBtn.querySelector('small').textContent = f.id === 'normal' ? 'Filtros' : f.n; });
+    durs.before(camStrip); fxBtn.classList.add('on');
+  } }, h('span', { class: 'rc-fxico', 'aria-hidden': 'true' }, '✨'), h('small', {}, 'Filtros'));
   const root = h('div', { class: 'sdc rc-cam', role: 'dialog', 'aria-label': 'Crear ride' },
-    lens, live, msg,
+    lens, live, camLayer, msg,
     h('div', { class: 'sdc-top' },
       h('button', { class: 'sdc-x', type: 'button', 'aria-label': 'Cerrar', onclick: () => root._close() }, '✕'),
       songBtn,
@@ -3978,7 +4125,7 @@ function openRideCreator(onDone) {
       h('div', { class: 'rc-row3' },
         h('button', { class: 'rc-gal', type: 'button', onclick: () => gallery.click() }, galIco(34), h('small', {}, 'Subir')),
         recBtn,
-        h('span', { style: 'width:56px' }))),
+        fxBtn)),
     gallery);
   document.body.append(root);
   const stopCam = () => { if (stream) stream.getTracks().forEach(t => t.stop()); stream = null; };
@@ -4023,7 +4170,7 @@ function openRideCreator(onDone) {
   gallery.addEventListener('change', () => {
     const f = gallery.files[0]; if (!f) return;
     if (!(f.type || '').startsWith('video/')) return toast('Los rides son videos. Escoge un video.');
-    close(); startCreator(f, onDone, { mode: 'ride', song, origMuted: song ? true : false });
+    close(); startCreator(f, onDone, { mode: 'ride', song, origMuted: song ? true : false, fx: camFx });
   });
   songBtn.addEventListener('click', () => { if (rec) return; rideSongSheet(root, song, (s2) => { song = s2; paintSong(); }); });
   const fmt = (sec) => Math.floor(sec / 60) + ':' + String(Math.floor(sec % 60)).padStart(2, '0');
@@ -4046,7 +4193,7 @@ function openRideCreator(onDone) {
       stopSong(); document.querySelectorAll('.ride-yt').forEach(x => x.remove());
       if (!blob.size) return toast('No se grabó nada. Intenta otra vez.');
       const f = new File([blob], 'ride.' + (type.includes('mp4') ? 'mp4' : 'webm'), { type });
-      close(); startCreator(f, onDone, { mode: 'ride', song, origMuted: !!song });
+      close(); startCreator(f, onDone, { mode: 'ride', song, origMuted: !!song, fx: camFx });
     };
     rec.start(500); t0 = performance.now();
     if (song && song.preview) playSong(song.preview, null, song.start || 0);
@@ -4628,8 +4775,20 @@ function renderUpload() {
     file = f;
     const url = URL.createObjectURL(f);
     clearLink(true);
-    picker.replaceChildren(f.type.startsWith('video/') ? h('video', { src: url, muted: true, playsInline: true, autoplay: true, loop: true }) : h('img', { src: url, alt: 'Vista previa' }), upStatus);
+    const pv = f.type.startsWith('video/') ? h('video', { src: url, muted: true, playsInline: true, autoplay: true, loop: true }) : h('img', { src: url, alt: 'Vista previa' });
+    const lay = fxLayer();
+    picker.replaceChildren(pv, lay, upStatus);
     startBg(f);
+    // Filtros debajo de la vista previa
+    let fxTimer = null;
+    const strip = fxStrip(() => f.type.startsWith('video/') ? new Promise(ok => { const go2 = () => ok(frameThumb(pv)); if (pv.readyState >= 2) go2(); else pv.addEventListener('loadeddata', go2, { once: true }); setTimeout(() => ok(''), 3000); }) : url, f._fx || FX[0], (fsel) => {
+      f._fx = fsel; fxPaint(pv, lay, fsel);
+      if (f.type.startsWith('video/') && !CTX_FILTER && fxOn(fsel)) toast('En este teléfono el filtro solo se ve aquí; en video no se puede aplicar');
+      clearTimeout(fxTimer); fxTimer = setTimeout(() => { if (file === f) startBg(f); }, 800);
+    });
+    strip.classList.add('fx-up');
+    document.querySelectorAll('.fx-up').forEach(x => x.remove());
+    picker.after(strip);
   });
 
   const shopBox = h('div', { class: 'shop', style: 'margin:0 0 14px;display:none' },
